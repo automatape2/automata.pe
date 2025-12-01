@@ -1,0 +1,50 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Portfolio de Desarrollador FullStack especializado en Arquitectura, Seguridad y Automatización IA" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body class="bg-slate-950 text-slate-200 font-sans antialiased selection:bg-cyan-500 selection:text-white">
+		<div class="fixed inset-0 -z-10 h-full w-full bg-slate-950 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
+            <div class="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-cyan-500 opacity-20 blur-[100px]"></div>
+        </div>
+
+        <header class="fixed top-0 z-50 w-full backdrop-blur-sm border-b border-white/10">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="#" class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent hover:scale-105 transition-transform">
+                    DevFullStack
+                </a>
+                <ul class="hidden md:flex space-x-8">
+                    <li><a href="#about" class="hover:text-cyan-400 transition-colors">Sobre mí</a></li>
+                    <li><a href="#skills" class="hover:text-cyan-400 transition-colors">Habilidades</a></li>
+                    <li><a href="#projects" class="hover:text-cyan-400 transition-colors">Proyectos</a></li>
+                    <li><a href="#contact" class="hover:text-cyan-400 transition-colors">Contacto</a></li>
+                </ul>
+            </nav>
+        </header>
+
+		<main class="container mx-auto px-6 pt-24 pb-12">
+			<slot />
+		</main>
+
+        <footer class="border-t border-white/10 py-8 mt-12">
+            <div class="container mx-auto px-6 text-center text-slate-400">
+                <p>&copy; {new Date().getFullYear()} Desarrollador FullStack. Todos los derechos reservados.</p>
+            </div>
+        </footer>
+	</body>
+</html>
