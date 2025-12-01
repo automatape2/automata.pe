@@ -68,7 +68,9 @@ export const translations = {
         contact: {
             title: "¿Listo para empezar?",
             description: "Actualmente estoy disponible para nuevos proyectos y colaboraciones. Si tienes una idea que quieres llevar al siguiente nivel, hablemos.",
-            cta: "Enviar Mensaje"
+            email: "tu-email@ejemplo.com",
+            emailLabel: "Email",
+            socialLabel: "Sígueme"
         },
         footer: {
             copyright: "Desarrollador FullStack. Todos los derechos reservados."
@@ -143,7 +145,9 @@ export const translations = {
         contact: {
             title: "Ready to start?",
             description: "I'm currently available for new projects and collaborations. If you have an idea you want to take to the next level, let's talk.",
-            cta: "Send Message"
+            email: "your-email@example.com",
+            emailLabel: "Email",
+            socialLabel: "Follow Me"
         },
         footer: {
             copyright: "FullStack Developer. All rights reserved."
