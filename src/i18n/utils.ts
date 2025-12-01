@@ -3,7 +3,8 @@ import { translations, type Locale } from './translations';
 export function getLangFromUrl(url: URL): Locale {
     const [, lang] = url.pathname.split('/');
     if (lang === 'en') return 'en';
-    return 'es';
+    if (lang === 'es') return 'es';
+    return 'en';
 }
 
 export function getTranslations(locale: Locale) {
