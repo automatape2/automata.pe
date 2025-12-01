@@ -14,43 +14,124 @@ interface Props {
 
 const { t } = Astro.props;
 ---
-
 <section id="experience" class="py-20">
     <h2 class="text-3xl font-bold mb-12 text-center">
         {t.sectionTitle}
     </h2>
 
-    <div class="space-y-6">
-        {
-            t.items.map((exp) => (
-                <div class="bg-slate-900 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all hover:-translate-y-1 group p-6">
-                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-2 mb-3">
-                        <div>
-                            <h3 class="text-xl font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">
+    <div class="max-w-4xl mx-auto relative">
+        <!-- Timeline line -->
+        <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-slate-800"></div>
+
+        <!-- Timeline items -->
+        <div class="space-y-12">
+            {t.items.map((exp, index) => (
+                <div class="relative">
+                    <!-- Timeline dot -->
+                    <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-cyan-400 rounded-full border-4 border-slate-950 z-10"></div>
+                    
+                    <!-- Content card -->
+                    <div class={`w-[calc(50%-2rem)] ${index % 2 === 0 ? 'mr-auto pr-8' : 'ml-auto pl-8'}`}>
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all hover:-translate-y-1 group p-6 relative">
+                            <!-- Arrow pointing to timeline -->
+                            <div class={`absolute top-8 ${index % 2 === 0 ? 'right-0 translate-x-full' : 'left-0 -translate-x-full'} w-0 h-0 border-t-8 border-b-8 border-transparent ${index % 2 === 0 ? 'border-l-8 border-l-slate-800' : 'border-r-8 border-r-slate-800'}`}></div>
+                            
+                            <!-- Period badge -->
+                            <div class="inline-block mb-3">
+                                <span class="text-xs font-mono text-cyan-400 bg-cyan-950/30 px-3 py-1 rounded-full">
+                                    {exp.period}
+                                </span>
+                            </div>
+                            
+                            <!-- Position & Company -->
+                            <h3 class="text-xl font-bold text-slate-100 group-hover:text-cyan-400 transition-colors mb-1">
                                 {exp.position}
                             </h3>
-                            <p class="text-cyan-400 font-medium">
+                            <p class="text-cyan-400 font-medium mb-3">
                                 {exp.company}
                             </p>
+                            
+                            <!-- Description -->
+                            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                                {exp.description}
+                            </p>
+                            
+                            <!-- Tech stack -->
+                            <div class="flex flex-wrap gap-2">
+                                {exp.tech.map((tech) => (
+                                    <span class="text-xs font-mono text-slate-400 bg-slate-800/50 px-2 py-1 rounded">
+                                        {tech}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
-                        <span class="text-slate-500 text-sm font-mono">
-                            {exp.period}
-                        </span>
-                    </div>
-
-                    <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                        {exp.description}
-                    </p>
-
-                    <div class="flex flex-wrap gap-2">
-                        {exp.tech.map((tech) => (
-                            <span class="text-xs font-mono text-cyan-400 bg-cyan-950/30 px-2 py-1 rounded">
-                                {tech}
-                            </span>
-                        ))}
                     </div>
                 </div>
-            ))
-        }
+            ))}
+        </div>
+    </div>
+
+    <!-- Mobile timeline (stacked) -->
+    <div class="md:hidden max-w-2xl mx-auto relative mt-12">
+        <!-- Mobile timeline line -->
+        <div class="absolute left-4 top-0 h-full w-0.5 bg-slate-800"></div>
+
+        <!-- Mobile timeline items -->
+        <div class="space-y-8">
+            {t.items.map((exp) => (
+                <div class="relative pl-12">
+                    <!-- Mobile timeline dot -->
+                    <div class="absolute left-0 top-6 w-4 h-4 bg-cyan-400 rounded-full border-4 border-slate-950 z-10"></div>
+                    
+                    <!-- Mobile content card -->
+                    <div class="bg-slate-900 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all p-5">
+                        <!-- Period badge -->
+                        <div class="inline-block mb-3">
+                            <span class="text-xs font-mono text-cyan-400 bg-cyan-950/30 px-3 py-1 rounded-full">
+                                {exp.period}
+                            </span>
+                        </div>
+                        
+                        <!-- Position & Company -->
+                        <h3 class="text-lg font-bold text-slate-100 mb-1">
+                            {exp.position}
+                        </h3>
+                        <p class="text-cyan-400 font-medium mb-3">
+                            {exp.company}
+                        </p>
+                        
+                        <!-- Description -->
+                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                            {exp.description}
+                        </p>
+                        
+                        <!-- Tech stack -->
+                        <div class="flex flex-wrap gap-2">
+                            {exp.tech.map((tech) => (
+                                <span class="text-xs font-mono text-slate-400 bg-slate-800/50 px-2 py-1 rounded">
+                                    {tech}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
     </div>
 </section>
+
+<style>
+    /* Hide mobile timeline on desktop */
+    @media (min-width: 768px) {
+        .md\:hidden {
+            display: none;
+        }
+    }
+    
+    /* Hide desktop timeline on mobile */
+    @media (max-width: 767px) {
+        .max-w-4xl.mx-auto.relative:not(.mt-12) {
+            display: none;
+        }
+    }
+</style>
