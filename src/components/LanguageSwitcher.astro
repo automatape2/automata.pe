@@ -53,8 +53,8 @@ const toggleUrl = isEnglish
             const currentPath = window.location.pathname;
             const isEnglish = currentPath.startsWith("/en");
             const newPath = isEnglish
-                ? currentPath.replace("/en", "") || "/"
-                : `/en${currentPath}`;
+                ? currentPath.replace("en", "es") || "es"
+                : currentPath.replace("es", "en") || "en";
             window.location.href = newPath;
         });
     }

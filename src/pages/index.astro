@@ -5,9 +5,9 @@ import Projects from "../components/Projects.astro";
 import Experience from "../components/Experience.astro";
 import Skills from "../components/Skills.astro";
 import Contact from "../components/Contact.astro";
-import { getTranslations } from "../i18n/utils";
+import { getLangFromUrl, getTranslations } from "../i18n/utils";
 
-const t = getTranslations("es");
+const t = getTranslations(getLangFromUrl(Astro.url));
 ---
 
 <Layout title="Portfolio | Desarrollador FullStack">
