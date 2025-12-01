@@ -5,12 +5,15 @@ import Projects from "../components/Projects.astro";
 import Experience from "../components/Experience.astro";
 import Skills from "../components/Skills.astro";
 import Contact from "../components/Contact.astro";
+import { getTranslations } from "../i18n/utils";
+
+const t = getTranslations("es");
 ---
 
 <Layout title="Portfolio | Desarrollador FullStack">
-	<Hero />
-	<Projects />
-	<Experience />
-	<Skills />
-	<Contact />
+	<Hero t={t.hero} />
+	<Projects t={t.projects} />
+	<Experience t={t.experience} />
+	<Skills t={t.skills} />
+	<Contact t={t.contact} />
 </Layout>

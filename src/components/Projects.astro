@@ -1,38 +1,28 @@
 ---
-const projects = [
-    {
-        title: "Plataforma SaaS de Gestión",
-        description:
-            "Sistema integral de gestión empresarial con arquitectura microservicios.",
-        tech: ["Laravel", "Vue.js", "Docker"],
-        link: "#",
-    },
-    {
-        title: "Bot de Automatización IA",
-        description:
-            "Bot inteligente para procesamiento de documentos legales usando NLP.",
-        tech: ["Python", "OpenAI API", "AWS Lambda"],
-        link: "#",
-    },
-    {
-        title: "API Segura Fintech",
-        description:
-            "API RESTful para transacciones financieras con altos estándares de seguridad.",
-        tech: ["Node.js", "PostgreSQL", "Redis"],
-        link: "#",
-    },
-];
+interface Props {
+    t: {
+        sectionTitle: string;
+        items: Array<{
+            title: string;
+            description: string;
+            tech: string[];
+        }>;
+    };
+}
+
+const { t } = Astro.props;
 ---
 
 <section id="projects" class="py-20">
     <h2 class="text-3xl font-bold mb-12 flex items-center gap-4">
-        <span class="text-cyan-400">01.</span> Proyectos Destacados
+        <span class="text-cyan-400">01.</span>
+        {t.sectionTitle}
         <span class="h-px bg-slate-700 flex-grow max-w-xs"></span>
     </h2>
 
     <div class="grid md:grid-cols-3 gap-8">
         {
-            projects.map((project) => (
+            t.items.map((project) => (
                 <div class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/30 transition-all hover:-translate-y-2 group">
                     <div class="h-48 bg-slate-800 flex items-center justify-center group-hover:bg-slate-800/80 transition-colors">
                         <span class="text-slate-500 text-4xl">📂</span>
@@ -45,9 +35,9 @@ const projects = [
                             {project.description}
                         </p>
                         <div class="flex flex-wrap gap-2 pt-2">
-                            {project.tech.map((t) => (
+                            {project.tech.map((tech) => (
                                 <span class="text-xs font-mono text-cyan-400 bg-cyan-950/30 px-2 py-1 rounded">
-                                    {t}
+                                    {tech}
                                 </span>
                             ))}
                         </div>

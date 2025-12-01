@@ -1,0 +1,61 @@
+---
+const currentPath = Astro.url.pathname;
+const isEnglish = currentPath.startsWith("/en");
+
+// Toggle between languages
+const toggleUrl = isEnglish
+    ? currentPath.replace("/en", "") || "/"
+    : `/en${currentPath}`;
+---
+
+<div class="relative group">
+    <button
+        id="lang-switcher"
+        class="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 hover:border-cyan-400 transition-all bg-slate-900/50 backdrop-blur-sm"
+        aria-label="Change language"
+    >
+        <span
+            class="text-sm font-mono text-slate-300 group-hover:text-cyan-400 transition-colors"
+        >
+            {isEnglish ? "EN" : "ES"}
+        </span>
+        <svg
+            class="w-4 h-4 text-slate-400 group-hover:text-cyan-400 transition-colors"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+            ></path>
+        </svg>
+    </button>
+
+    <!-- Tooltip -->
+    <div
+        class="absolute top-full mt-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+    >
+        <div
+            class="bg-slate-800 text-slate-200 px-3 py-1 rounded text-xs whitespace-nowrap"
+        >
+            {isEnglish ? "Cambiar a Español" : "Switch to English"}
+        </div>
+    </div>
+</div>
+
+<script>
+    const button = document.getElementById("lang-switcher");
+    if (button) {
+        button.addEventListener("click", () => {
+            const currentPath = window.location.pathname;
+            const isEnglish = currentPath.startsWith("/en");
+            const newPath = isEnglish
+                ? currentPath.replace("/en", "") || "/"
+                : `/en${currentPath}`;
+            window.location.href = newPath;
+        });
+    }
+</script>

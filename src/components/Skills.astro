@@ -1,4 +1,12 @@
 ---
+interface Props {
+    t: {
+        sectionTitle: string;
+    };
+}
+
+const { t } = Astro.props;
+
 const skills = [
     { name: "Laravel", icon: "devicon-laravel-plain" },
     { name: "Python", icon: "devicon-python-plain" },
@@ -12,7 +20,8 @@ const skills = [
 
 <section id="skills" class="py-20">
     <h2 class="text-3xl font-bold mb-12 flex items-center gap-4">
-        <span class="text-cyan-400">03.</span> Habilidades
+        <span class="text-cyan-400">03.</span>
+        {t.sectionTitle}
         <span class="h-px bg-slate-700 flex-grow max-w-xs"></span>
     </h2>
 
