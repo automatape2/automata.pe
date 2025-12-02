@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import ScrollToTop from "../components/ScrollToTop.astro";
+import AIChat from "../components/AIChat.astro";
 import { getLangFromUrl, getTranslations } from "../i18n/utils";
 
 interface Props {
@@ -56,25 +57,29 @@ const t = getTranslations(lang);
                             <a
                                 href="#projects"
                                 class="hover:text-cyan-400 transition-colors"
-                                >{t.nav.projects}</a>
+                                >{t.nav.projects}</a
+                            >
                         </li>
                         <li>
                             <a
                                 href="#experience"
                                 class="hover:text-cyan-400 transition-colors"
-                                >{t.nav.experience}</a>
+                                >{t.nav.experience}</a
+                            >
                         </li>
                         <li>
                             <a
                                 href="#skills"
                                 class="hover:text-cyan-400 transition-colors"
-                                >{t.nav.skills}</a>
+                                >{t.nav.skills}</a
+                            >
                         </li>
                         <li>
                             <a
                                 href="#contact"
                                 class="hover:text-cyan-400 transition-colors"
-                                >{t.nav.contact}</a>
+                                >{t.nav.contact}</a
+                            >
                         </li>
                     </ul>
                     <LanguageSwitcher />
@@ -96,5 +101,8 @@ const t = getTranslations(lang);
 
         <!-- Scroll to top button -->
         <ScrollToTop />
+
+        <!-- AI Chat Assistant -->
+        <AIChat lang={lang} />
     </body>
 </html>
