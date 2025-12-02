@@ -14,7 +14,8 @@ export const translations = {
             titleEnd: " con Automatización IA.",
             description: "Desarrollador FullStack especializado en crear soluciones automatizadas para startups. De la idea al MVP en tiempo récord.",
             cta1: "Ver Proyectos",
-            cta2: "Contactar"
+            cta2: "Contactar",
+            chatWithAI: "Chatea con IA"
         },
         projects: {
             sectionTitle: "Proyectos Destacados",
@@ -91,7 +92,8 @@ export const translations = {
             titleEnd: " with AI Automation.",
             description: "FullStack Developer specialized in creating automated solutions for startups. From idea to MVP in record time.",
             cta1: "View Projects",
-            cta2: "Contact Me"
+            cta2: "Contact Me",
+            chatWithAI: "Chat with AI"
         },
         projects: {
             sectionTitle: "Featured Projects",
