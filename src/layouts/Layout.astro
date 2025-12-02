@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
+import ScrollToTop from "../components/ScrollToTop.astro";
 import { getLangFromUrl, getTranslations } from "../i18n/utils";
 
 interface Props {
@@ -92,5 +93,8 @@ const t = getTranslations(lang);
                 <p>&copy; {new Date().getFullYear()} {t.footer.copyright}</p>
             </div>
         </footer>
+
+        <!-- Scroll to top button -->
+        <ScrollToTop />
     </body>
 </html>
