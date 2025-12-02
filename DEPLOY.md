@@ -11,13 +11,19 @@ Esta guía explica cómo configurar y usar el pipeline de GitHub Actions para de
 
 ## 🔑 Configuración Inicial de Secrets en GitHub
 
-### Paso 1: Acceder a Settings
+### Paso 1: Crear el Environment "prod"
 1. Ve a tu repositorio en GitHub
 2. Click en **Settings** (Configuración)
-3. En el menú lateral, navega a **Secrets and variables** → **Actions**
-4. Click en **New repository secret**
+3. En el menú lateral, click en **Environments**
+4. Click en **New environment**
+5. Nombre: `prod`
+6. Click en **Configure environment**
 
-### Paso 2: Crear los Secrets
+### Paso 2: Agregar Secrets al Environment
+1. En la página de configuración del environment `prod`
+2. Busca la sección **Environment secrets**
+3. Click en **Add environment secret**
+4. Agrega los secrets aquí (no en Repository secrets)
 
 Crea los siguientes 4 secrets:
 

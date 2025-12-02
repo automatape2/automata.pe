@@ -9,7 +9,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: prod  # Usar el environment 'prod' donde están los secrets
+    environment:
+      name: prod
+      url: http://66.29.148.137
     
     steps:
       - name: Checkout code
