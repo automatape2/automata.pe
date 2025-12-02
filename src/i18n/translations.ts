@@ -8,11 +8,11 @@ export const translations = {
             contact: "Contacto"
         },
         hero: {
-            greeting: "HOLA, SOY DESARROLLADOR",
-            title: "Construyendo ",
-            titleHighlight: "Arquitecturas Sólidas",
-            titleEnd: " y Soluciones Seguras.",
-            description: "Especialista en Laravel, AWS y Automatización con IA. Transformo ideas en productos escalables.",
+            greeting: "CONSTRUCTOR DE APPS PARA STARTUPS",
+            title: "Transformo Ideas en ",
+            titleHighlight: "Aplicaciones Escalables",
+            titleEnd: " con Automatización IA.",
+            description: "Desarrollador FullStack especializado en crear soluciones automatizadas para startups. De la idea al MVP en tiempo récord.",
             cta1: "Ver Proyectos",
             cta2: "Contactar"
         },
@@ -85,11 +85,11 @@ export const translations = {
             contact: "Contact"
         },
         hero: {
-            greeting: "HI, I'M A DEVELOPER",
-            title: "Building ",
-            titleHighlight: "Solid Architectures",
-            titleEnd: " and Secure Solutions.",
-            description: "Specialist in Laravel, AWS and AI Automation. I transform ideas into scalable products.",
+            greeting: "APP BUILDER FOR STARTUPS",
+            title: "Transforming Ideas into ",
+            titleHighlight: "Scalable Applications",
+            titleEnd: " with AI Automation.",
+            description: "FullStack Developer specialized in creating automated solutions for startups. From idea to MVP in record time.",
             cta1: "View Projects",
             cta2: "Contact Me"
         },
