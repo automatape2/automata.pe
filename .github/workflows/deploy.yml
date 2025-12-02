@@ -100,7 +100,7 @@ jobs:
               expect "Enter passphrase"
               send "$SSH_PASSPHRASE\r"
               expect eof
-EOF
+          EOF
           else
             echo "🔑 Usando llave sin passphrase"
             ssh-add ~/.ssh/id_rsa
