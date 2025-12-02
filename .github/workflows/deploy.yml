@@ -1,0 +1,70 @@
+name: Deploy to Server via SSH
+
+on:
+  push:
+    branches:
+      - main  # Cambia a tu rama principal si es diferente
+  workflow_dispatch:  # Permite ejecutar manualmente desde GitHub
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
+          chmod 644 ~/.ssh/id_rsa.pub
+          
+          # Añadir el host a known_hosts para evitar confirmación manual
+          ssh-keyscan -H 66.29.148.137 >> ~/.ssh/known_hosts
+      
+      - name: Deploy via SSH
+        env:
+          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          # Si la llave tiene passphrase, usamos sshpass o ssh-agent
+          eval $(ssh-agent -s)
+          
+          # Si hay passphrase, la usamos
+          if [ ! -z "$SSH_PASSPHRASE" ]; then
+            echo "echo $SSH_PASSPHRASE" > ~/.ssh_askpass
+            chmod +x ~/.ssh_askpass
+            export DISPLAY=:0
+            export SSH_ASKPASS=~/.ssh_askpass
+            setsid ssh-add ~/.ssh/id_rsa < /dev/null
+          else
+            ssh-add ~/.ssh/id_rsa
+          fi
+          
+          # Crear directorio remoto si no existe
+          ssh -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "mkdir -p $DEPLOY_PATH"
+          
+          # Sincronizar archivos del dist al servidor
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            dist/ \
+            ejyjaujiet@66.29.148.137:$DEPLOY_PATH/
+      
+      - name: Verify deployment
+        run: |
+          ssh -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "ls -la ${{ secrets.DEPLOY_PATH }}"
