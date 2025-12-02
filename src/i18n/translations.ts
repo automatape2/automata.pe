@@ -15,7 +15,12 @@ export const translations = {
             description: "Desarrollador FullStack especializado en crear soluciones automatizadas para startups. De la idea al MVP en tiempo récord.",
             cta1: "Ver Proyectos",
             cta2: "Contactar",
-            chatWithAI: "Chatea con IA"
+            chatWithAI: "Chatea con IA",
+            socialLinks: {
+                github: "https://github.com/tuusuario",
+                linkedin: "https://linkedin.com/in/tuusuario",
+                twitter: "https://twitter.com/tuusuario"
+            }
         },
         projects: {
             sectionTitle: "Proyectos Destacados",
@@ -93,7 +98,12 @@ export const translations = {
             description: "FullStack Developer specialized in creating automated solutions for startups. From idea to MVP in record time.",
             cta1: "View Projects",
             cta2: "Contact Me",
-            chatWithAI: "Chat with AI"
+            chatWithAI: "Chat with AI",
+            socialLinks: {
+                github: "https://github.com/tuusuario",
+                linkedin: "https://linkedin.com/in/tuusuario",
+                twitter: "https://twitter.com/tuusuario"
+            }
         },
         projects: {
             sectionTitle: "Featured Projects",
