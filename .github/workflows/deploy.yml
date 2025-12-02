@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: prod  # Usar el environment 'prod' donde están los secrets
     
     steps:
       - name: Checkout code
@@ -28,42 +29,95 @@ jobs:
       
       - name: Setup SSH
         run: |
+          # Validar que los secrets estén configurados
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "❌ ERROR: SSH_PRIVATE_KEY secret no está configurado"
+            echo "Ve a Settings -> Secrets and variables -> Actions"
+            exit 1
+          fi
+          
+          if [ -z "${{ secrets.SSH_PUBLIC_KEY }}" ]; then
+            echo "❌ ERROR: SSH_PUBLIC_KEY secret no está configurado"
+            echo "Ve a Settings -> Secrets and variables -> Actions"
+            exit 1
+          fi
+          
+          # Crear directorio SSH
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          
+          # Configurar llave privada
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          
+          # Configurar llave pública
           echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
           chmod 644 ~/.ssh/id_rsa.pub
           
+          # Verificar que las llaves se crearon correctamente
+          if [ ! -s ~/.ssh/id_rsa ]; then
+            echo "❌ ERROR: La llave privada está vacía"
+            exit 1
+          fi
+          
+          echo "✅ Llaves SSH configuradas correctamente"
+          
           # Añadir el host a known_hosts para evitar confirmación manual
-          ssh-keyscan -H 66.29.148.137 >> ~/.ssh/known_hosts
+          echo "🔍 Agregando host a known_hosts..."
+          ssh-keyscan -H 66.29.148.137 >> ~/.ssh/known_hosts 2>&1
+          
+          echo "✅ Setup SSH completado"
       
       - name: Deploy via SSH
         env:
           SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          # Si la llave tiene passphrase, usamos sshpass o ssh-agent
+          # Validar que los secrets requeridos estén configurados
+          if [ -z "$DEPLOY_PATH" ]; then
+            echo "❌ ERROR: DEPLOY_PATH secret no está configurado"
+            echo "Ve a Settings -> Secrets and variables -> Actions"
+            exit 1
+          fi
+          
+          echo "📦 Iniciando despliegue a $DEPLOY_PATH"
+          
+          # Configurar SSH agent
           eval $(ssh-agent -s)
           
-          # Si hay passphrase, la usamos
+          # Agregar la llave al agente
           if [ ! -z "$SSH_PASSPHRASE" ]; then
-            echo "echo $SSH_PASSPHRASE" > ~/.ssh_askpass
-            chmod +x ~/.ssh_askpass
-            export DISPLAY=:0
-            export SSH_ASKPASS=~/.ssh_askpass
-            setsid ssh-add ~/.ssh/id_rsa < /dev/null
+            echo "🔑 Usando llave con passphrase"
+            # Instalar expect para manejar la passphrase
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq expect > /dev/null
+            
+            # Usar expect para agregar la llave con passphrase
+            expect << EOF
+              spawn ssh-add ~/.ssh/id_rsa
+              expect "Enter passphrase"
+              send "$SSH_PASSPHRASE\r"
+              expect eof
+EOF
           else
+            echo "🔑 Usando llave sin passphrase"
             ssh-add ~/.ssh/id_rsa
           fi
           
+          echo "✅ Llave SSH agregada al agente"
+          
           # Crear directorio remoto si no existe
+          echo "📁 Verificando/creando directorio remoto..."
           ssh -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "mkdir -p $DEPLOY_PATH"
           
           # Sincronizar archivos del dist al servidor
+          echo "🚀 Sincronizando archivos..."
           rsync -avz --delete \
             -e "ssh -o StrictHostKeyChecking=no" \
             dist/ \
             ejyjaujiet@66.29.148.137:$DEPLOY_PATH/
+          
+          echo "✅ Despliegue completado exitosamente"
       
       - name: Verify deployment
         run: |
