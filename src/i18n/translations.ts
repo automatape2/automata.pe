@@ -3,6 +3,7 @@ export const translations = {
         nav: {
             about: "Sobre mí",
             projects: "Proyectos",
+            git: "Repositorios",
             linkedin: "LinkedIn",
             contact: "Contacto"
         },
@@ -80,6 +81,45 @@ export const translations = {
                 }
             ]
         },
+        gitRepositories: {
+            sectionTitle: "Repositorios Open Source",
+            subtitle: "Contribuciones a la comunidad y proyectos personales",
+            viewProfile: "Ver GitHub",
+            items: [
+                {
+                    name: "fast-api-starter",
+                    description: "Boilerplate de producción para APIs con FastAPI y PostgreSQL",
+                    language: "Python",
+                    stars: 85,
+                    forks: 12,
+                    url: "https://github.com/tuusuario/fast-api-starter"
+                },
+                {
+                    name: "react-native-ui-kit",
+                    description: "Colección de componentes UI reutilizables para React Native",
+                    language: "TypeScript",
+                    stars: 230,
+                    forks: 45,
+                    url: "https://github.com/tuusuario/react-native-ui-kit"
+                },
+                {
+                    name: "docker-dev-env",
+                    description: "Entorno de desarrollo local automatizado con Docker Compose",
+                    language: "Shell",
+                    stars: 45,
+                    forks: 8,
+                    url: "https://github.com/tuusuario/docker-dev-env"
+                },
+                {
+                    name: "vue-admin-dashboard",
+                    description: "Panel de administración moderno construido con Vue 3 y Tailwind",
+                    language: "Vue",
+                    stars: 150,
+                    forks: 28,
+                    url: "https://github.com/tuusuario/vue-admin-dashboard"
+                }
+            ]
+        },
         linkedInPosts: {
             sectionTitle: "Últimas Publicaciones en LinkedIn",
             subtitle: "Comparto conocimientos, experiencias y tendencias en desarrollo de software",
@@ -150,6 +190,7 @@ export const translations = {
         nav: {
             about: "About",
             projects: "Projects",
+            git: "Repositories",
             linkedin: "LinkedIn",
             contact: "Contact"
         },
@@ -224,6 +265,45 @@ export const translations = {
                     ],
                     challenges: "Ensuring transaction security while maintaining low latency. We implemented a message queue system and asynchronous processing for non-critical transactions.",
                     results: "Processing over 1 million transactions monthly with 99.99% uptime. Zero security breaches since launch. Average response time of 150ms."
+                }
+            ]
+        },
+        gitRepositories: {
+            sectionTitle: "Open Source Repositories",
+            subtitle: "Community contributions and personal projects",
+            viewProfile: "View GitHub",
+            items: [
+                {
+                    name: "fast-api-starter",
+                    description: "Production-ready boilerplate for APIs with FastAPI and PostgreSQL",
+                    language: "Python",
+                    stars: 85,
+                    forks: 12,
+                    url: "https://github.com/tuusuario/fast-api-starter"
+                },
+                {
+                    name: "react-native-ui-kit",
+                    description: "Collection of reusable UI components for React Native",
+                    language: "TypeScript",
+                    stars: 230,
+                    forks: 45,
+                    url: "https://github.com/tuusuario/react-native-ui-kit"
+                },
+                {
+                    name: "docker-dev-env",
+                    description: "Automated local development environment with Docker Compose",
+                    language: "Shell",
+                    stars: 45,
+                    forks: 8,
+                    url: "https://github.com/tuusuario/docker-dev-env"
+                },
+                {
+                    name: "vue-admin-dashboard",
+                    description: "Modern admin dashboard built with Vue 3 and Tailwind",
+                    language: "Vue",
+                    stars: 150,
+                    forks: 28,
+                    url: "https://github.com/tuusuario/vue-admin-dashboard"
                 }
             ]
         },
