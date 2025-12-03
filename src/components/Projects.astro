@@ -3,6 +3,7 @@ interface Props {
     t: {
         sectionTitle: string;
         items: Array<{
+            slug: string;
             title: string;
             description: string;
             tech: string[];
@@ -22,7 +23,10 @@ const { t } = Astro.props;
     <div class="grid md:grid-cols-3 gap-8">
         {
             t.items.map((project) => (
-                <div class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/30 transition-all hover:-translate-y-2 group">
+                <a
+                    href={`/projects/${project.slug}`}
+                    class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/30 transition-all hover:-translate-y-2 group block cursor-pointer"
+                >
                     <div class="h-48 overflow-hidden">
                         <img
                             src={project.image}
@@ -44,8 +48,24 @@ const { t } = Astro.props;
                                 </span>
                             ))}
                         </div>
+                        <div class="flex items-center gap-2 text-cyan-400 text-sm font-medium pt-2">
+                            <span>View Details</span>
+                            <svg
+                                class="w-4 h-4 transition-transform group-hover:translate-x-1"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                        </div>
                     </div>
-                </div>
+                </a>
             ))
         }
     </div>
