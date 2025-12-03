@@ -154,14 +154,12 @@ jobs:
             sudo apt-get install -y -qq sshpass > /dev/null
             
             # Crear un script temporal para ssh-add
-            cat > /tmp/ssh-add.sh << 'EOFSCRIPT'
-#!/usr/bin/expect -f
-set timeout -1
-spawn ssh-add /home/runner/.ssh/id_rsa
-expect "Enter passphrase"
-send -- "$env(SSH_PASSPHRASE)\r"
-expect eof
-EOFSCRIPT
+            echo '#!/usr/bin/expect -f' > /tmp/ssh-add.sh
+            echo 'set timeout -1' >> /tmp/ssh-add.sh
+            echo 'spawn ssh-add /home/runner/.ssh/id_rsa' >> /tmp/ssh-add.sh
+            echo 'expect "Enter passphrase"' >> /tmp/ssh-add.sh
+            echo 'send -- "$env(SSH_PASSPHRASE)\r"' >> /tmp/ssh-add.sh
+            echo 'expect eof' >> /tmp/ssh-add.sh
             
             chmod +x /tmp/ssh-add.sh
             
