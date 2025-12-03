@@ -33,7 +33,7 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: automata.pe
-          username: ftpuser@automata.pe
+          username: ftpuser
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           local-dir: ./dist/
