@@ -35,5 +35,6 @@ jobs:
           server: automata.pe
           username: ftpuser@automata.pe
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
           local-dir: ./dist/
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          server-dir: /home/ejyjaujiet/automata.pe/
