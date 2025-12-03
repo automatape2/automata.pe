@@ -1,17 +1,17 @@
-name: Deploy to Server via SSH
+name: Deploy to Server
 
 on:
   push:
     branches:
-      - main  # Cambia a tu rama principal si es diferente
-  workflow_dispatch:  # Permite ejecutar manualmente desde GitHub
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     environment:
       name: prod
-      url: http://66.29.148.137
+      url: https://automata.pe
     
     steps:
       - name: Checkout code
@@ -29,183 +29,11 @@ jobs:
       - name: Build project
         run: npm run build
       
-      - name: Setup SSH
-        run: |
-          # Validar que los secrets estén configurados
-          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
-            echo "❌ ERROR: SSH_PRIVATE_KEY secret no está configurado"
-            echo "Ve a Settings -> Secrets and variables -> Actions"
-            exit 1
-          fi
-          
-          if [ -z "${{ secrets.SSH_PUBLIC_KEY }}" ]; then
-            echo "❌ ERROR: SSH_PUBLIC_KEY secret no está configurado"
-            echo "Ve a Settings -> Secrets and variables -> Actions"
-            exit 1
-          fi
-          
-          # Crear directorio SSH
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          
-          # Configurar llave privada
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          
-          # Configurar llave pública
-          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
-          chmod 644 ~/.ssh/id_rsa.pub
-          
-          # Verificar que las llaves se crearon correctamente
-          if [ ! -s ~/.ssh/id_rsa ]; then
-            echo "❌ ERROR: La llave privada está vacía"
-            exit 1
-          fi
-          
-          echo "✅ Llaves SSH configuradas correctamente"
-          
-          # Añadir el host a known_hosts para evitar confirmación manual
-          echo "🔍 Agregando host a known_hosts..."
-          
-          # Verificar conectividad primero
-          echo "🔍 Verificando conectividad al servidor..."
-          if ! ping -c 2 -W 5 66.29.148.137 > /dev/null 2>&1; then
-            echo "⚠️  ADVERTENCIA: No se pudo hacer ping al servidor, pero continuando..."
-          else
-            echo "✅ Servidor alcanzable"
-          fi
-          
-          # Intentar ssh-keyscan con timeout y reintentos (puerto 21098)
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          SUCCESS=false
-          
-          while [ $RETRY_COUNT -lt $MAX_RETRIES ] && [ "$SUCCESS" = "false" ]; do
-            echo "🔄 Intento $((RETRY_COUNT + 1)) de $MAX_RETRIES..."
-            
-            # Usar timeout para evitar que se cuelgue indefinidamente
-            if timeout 30 ssh-keyscan -T 10 -p 21098 -H 66.29.148.137 >> ~/.ssh/known_hosts 2>&1; then
-              SUCCESS=true
-              echo "✅ ssh-keyscan exitoso"
-            else
-              RETRY_COUNT=$((RETRY_COUNT + 1))
-              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-                echo "⚠️  Intento fallido, esperando 5 segundos antes de reintentar..."
-                sleep 5
-              fi
-            fi
-          done
-          
-          if [ "$SUCCESS" = "false" ]; then
-            echo "❌ ERROR: ssh-keyscan falló después de $MAX_RETRIES intentos"
-            echo "🔍 Información de depuración:"
-            echo "  - Host: 66.29.148.137"
-            echo "  - Puerto SSH: 21098"
-            echo ""
-            echo "💡 Posibles causas:"
-            echo "  1. El servidor SSH no está corriendo en el puerto 21098"
-            echo "  2. Firewall bloqueando la conexión desde GitHub Actions"
-            echo "  3. Problemas de red temporales"
-            echo ""
-            echo "🔧 Soluciones:"
-            echo "  1. Verifica que el servidor SSH esté corriendo: systemctl status sshd"
-            echo "  2. Verifica el firewall: sudo ufw status"
-            echo "  3. Asegúrate de que el puerto 21098 esté abierto para conexiones externas"
-            exit 1
-          fi
-          
-          # Verificar que known_hosts tiene contenido
-          if [ ! -s ~/.ssh/known_hosts ]; then
-            echo "❌ ERROR: known_hosts está vacío después de ssh-keyscan"
-            exit 1
-          fi
-          
-          echo "✅ Host agregado a known_hosts correctamente"
-          echo "✅ Setup SSH completado"
-      
-      - name: Deploy via SSH
-        env:
-          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-        run: |
-          # Validar que los secrets requeridos estén configurados
-          if [ -z "$DEPLOY_PATH" ]; then
-            echo "❌ ERROR: DEPLOY_PATH secret no está configurado"
-            echo "Ve a Settings -> Secrets and variables -> Actions"
-            exit 1
-          fi
-          
-          echo "📦 Iniciando despliegue a $DEPLOY_PATH"
-          
-          # Configurar SSH agent y asegurarse de que persista
-          eval $(ssh-agent -s)
-          export SSH_AUTH_SOCK
-          export SSH_AGENT_PID
-          
-          echo "🔍 SSH Agent PID: $SSH_AGENT_PID"
-          echo "🔍 SSH Auth Socket: $SSH_AUTH_SOCK"
-          
-          # Agregar la llave al agente con passphrase
-          if [ ! -z "$SSH_PASSPHRASE" ]; then
-            echo "🔑 Usando llave con passphrase"
-            
-            # Instalar sshpass para manejar la passphrase
-            sudo apt-get update -qq
-            sudo apt-get install -y -qq sshpass > /dev/null
-            
-            # Crear un script temporal para ssh-add
-            echo '#!/usr/bin/expect -f' > /tmp/ssh-add.sh
-            echo 'set timeout -1' >> /tmp/ssh-add.sh
-            echo 'spawn ssh-add /home/runner/.ssh/id_rsa' >> /tmp/ssh-add.sh
-            echo 'expect "Enter passphrase"' >> /tmp/ssh-add.sh
-            echo 'send -- "$env(SSH_PASSPHRASE)\r"' >> /tmp/ssh-add.sh
-            echo 'expect eof' >> /tmp/ssh-add.sh
-            
-            chmod +x /tmp/ssh-add.sh
-            
-            # Instalar expect si no está disponible
-            sudo apt-get install -y -qq expect > /dev/null
-            
-            # Ejecutar el script
-            /tmp/ssh-add.sh
-            
-            # Verificar que la llave se agregó
-            if ! ssh-add -l | grep -q "id_rsa"; then
-              echo "❌ ERROR: No se pudo agregar la llave al agente"
-              ssh-add -l
-              exit 1
-            fi
-            
-            echo "✅ Llave agregada al agente SSH"
-          else
-            echo "🔑 Usando llave sin passphrase"
-            ssh-add ~/.ssh/id_rsa
-          fi
-          
-          # Listar llaves en el agente
-          echo "🔍 Llaves en el agente SSH:"
-          ssh-add -l
-          
-          # Probar conexión SSH primero
-          echo "🔍 Probando conexión SSH..."
-          if ssh -p 21098 -o StrictHostKeyChecking=no -o BatchMode=yes ejyjaujiet@66.29.148.137 "echo '✅ Conexión SSH exitosa'"; then
-            echo "✅ Conexión SSH verificada"
-          else
-            echo "❌ ERROR: No se pudo establecer conexión SSH"
-            echo "🔍 Intentando con más verbosidad..."
-            ssh -p 21098 -vvv -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "echo 'test'" 2>&1 | tail -20
-            exit 1
-          fi
-          
-          # Sincronizar archivos del dist al servidor (usando puerto 21098)
-          echo "🚀 Sincronizando archivos..."
-          rsync -avz --delete \
-            -e "ssh -p 21098 -o StrictHostKeyChecking=no -o BatchMode=yes" \
-            dist/ \
-            ejyjaujiet@66.29.148.137:$DEPLOY_PATH/
-          
-          echo "✅ Despliegue completado exitosamente"
-      
-      - name: Verify deployment
-        run: |
-          ssh -p 21098 -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "ls -la ${{ secrets.DEPLOY_PATH }}"
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: automata.pe
+          username: ftpuser@automata.pe
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
