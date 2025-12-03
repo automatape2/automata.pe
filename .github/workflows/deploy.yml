@@ -66,13 +66,61 @@ jobs:
           
           # Añadir el host a known_hosts para evitar confirmación manual
           echo "🔍 Agregando host a known_hosts..."
-          ssh-keyscan -H 66.29.148.137 >> ~/.ssh/known_hosts
           
-          if [ ! -s ~/.ssh/known_hosts ]; then
-             echo "❌ ERROR: ssh-keyscan no pudo obtener las llaves del host"
-             exit 1
+          # Verificar conectividad primero
+          echo "🔍 Verificando conectividad al servidor..."
+          if ! ping -c 2 -W 5 66.29.148.137 > /dev/null 2>&1; then
+            echo "⚠️  ADVERTENCIA: No se pudo hacer ping al servidor, pero continuando..."
+          else
+            echo "✅ Servidor alcanzable"
           fi
           
+          # Intentar ssh-keyscan con timeout y reintentos
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          SUCCESS=false
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ] && [ "$SUCCESS" = "false" ]; do
+            echo "🔄 Intento $((RETRY_COUNT + 1)) de $MAX_RETRIES..."
+            
+            # Usar timeout para evitar que se cuelgue indefinidamente
+            if timeout 30 ssh-keyscan -T 10 -H 66.29.148.137 >> ~/.ssh/known_hosts 2>&1; then
+              SUCCESS=true
+              echo "✅ ssh-keyscan exitoso"
+            else
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "⚠️  Intento fallido, esperando 5 segundos antes de reintentar..."
+                sleep 5
+              fi
+            fi
+          done
+          
+          if [ "$SUCCESS" = "false" ]; then
+            echo "❌ ERROR: ssh-keyscan falló después de $MAX_RETRIES intentos"
+            echo "🔍 Información de depuración:"
+            echo "  - Host: 66.29.148.137"
+            echo "  - Puerto SSH: 22 (por defecto)"
+            echo ""
+            echo "💡 Posibles causas:"
+            echo "  1. El servidor SSH no está corriendo en el puerto 22"
+            echo "  2. Firewall bloqueando la conexión desde GitHub Actions"
+            echo "  3. Problemas de red temporales"
+            echo ""
+            echo "🔧 Soluciones:"
+            echo "  1. Verifica que el servidor SSH esté corriendo: systemctl status sshd"
+            echo "  2. Verifica el firewall: sudo ufw status"
+            echo "  3. Asegúrate de que el puerto 22 esté abierto para conexiones externas"
+            exit 1
+          fi
+          
+          # Verificar que known_hosts tiene contenido
+          if [ ! -s ~/.ssh/known_hosts ]; then
+            echo "❌ ERROR: known_hosts está vacío después de ssh-keyscan"
+            exit 1
+          fi
+          
+          echo "✅ Host agregado a known_hosts correctamente"
           echo "✅ Setup SSH completado"
       
       - name: Deploy via SSH
