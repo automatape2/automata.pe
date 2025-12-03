@@ -37,4 +37,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           local-dir: ./dist/
-          server-dir: /home/ejyjaujiet/automata.pe/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
