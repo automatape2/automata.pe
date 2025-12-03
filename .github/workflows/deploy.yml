@@ -137,38 +137,74 @@ jobs:
           
           echo "📦 Iniciando despliegue a $DEPLOY_PATH"
           
-          # Configurar SSH agent
+          # Configurar SSH agent y asegurarse de que persista
           eval $(ssh-agent -s)
+          export SSH_AUTH_SOCK
+          export SSH_AGENT_PID
           
-          # Agregar la llave al agente
+          echo "🔍 SSH Agent PID: $SSH_AGENT_PID"
+          echo "🔍 SSH Auth Socket: $SSH_AUTH_SOCK"
+          
+          # Agregar la llave al agente con passphrase
           if [ ! -z "$SSH_PASSPHRASE" ]; then
             echo "🔑 Usando llave con passphrase"
-            # Instalar expect para manejar la passphrase
+            
+            # Instalar sshpass para manejar la passphrase
             sudo apt-get update -qq
+            sudo apt-get install -y -qq sshpass > /dev/null
+            
+            # Crear un script temporal para ssh-add
+            cat > /tmp/ssh-add.sh << 'EOFSCRIPT'
+#!/usr/bin/expect -f
+set timeout -1
+spawn ssh-add /home/runner/.ssh/id_rsa
+expect "Enter passphrase"
+send -- "$env(SSH_PASSPHRASE)\r"
+expect eof
+EOFSCRIPT
+            
+            chmod +x /tmp/ssh-add.sh
+            
+            # Instalar expect si no está disponible
             sudo apt-get install -y -qq expect > /dev/null
             
-            # Usar expect para agregar la llave con passphrase
-            expect -c "
-              spawn ssh-add ~/.ssh/id_rsa
-              expect \"Enter passphrase\"
-              send \"$SSH_PASSPHRASE\r\"
-              expect eof
-            "
+            # Ejecutar el script
+            /tmp/ssh-add.sh
+            
+            # Verificar que la llave se agregó
+            if ! ssh-add -l | grep -q "id_rsa"; then
+              echo "❌ ERROR: No se pudo agregar la llave al agente"
+              ssh-add -l
+              exit 1
+            fi
+            
+            echo "✅ Llave agregada al agente SSH"
           else
             echo "🔑 Usando llave sin passphrase"
             ssh-add ~/.ssh/id_rsa
           fi
           
-          echo "✅ Llave SSH agregada al agente"
+          # Listar llaves en el agente
+          echo "🔍 Llaves en el agente SSH:"
+          ssh-add -l
+          
+          # Probar conexión SSH primero
+          echo "🔍 Probando conexión SSH..."
+          if ssh -p 21098 -o StrictHostKeyChecking=no -o BatchMode=yes ejyjaujiet@66.29.148.137 "echo '✅ Conexión SSH exitosa'"; then
+            echo "✅ Conexión SSH verificada"
+          else
+            echo "❌ ERROR: No se pudo establecer conexión SSH"
+            echo "🔍 Intentando con más verbosidad..."
+            ssh -p 21098 -vvv -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "echo 'test'" 2>&1 | tail -20
+            exit 1
+          fi
           
           # Sincronizar archivos del dist al servidor (usando puerto 21098)
           echo "🚀 Sincronizando archivos..."
           rsync -avz --delete \
-            -e "ssh -p 21098 -o StrictHostKeyChecking=no" \
+            -e "ssh -p 21098 -o StrictHostKeyChecking=no -o BatchMode=yes" \
             dist/ \
             ejyjaujiet@66.29.148.137:$DEPLOY_PATH/
-          
-          echo "✅ Despliegue completado exitosamente"
           
           echo "✅ Despliegue completado exitosamente"
       
