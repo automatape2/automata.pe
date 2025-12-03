@@ -161,10 +161,6 @@ jobs:
           
           echo "✅ Llave SSH agregada al agente"
           
-          # Crear directorio remoto si no existe (usando puerto 21098)
-          echo "📁 Verificando/creando directorio remoto..."
-          ssh -p 21098 -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "mkdir -p $DEPLOY_PATH"
-          
           # Sincronizar archivos del dist al servidor (usando puerto 21098)
           echo "🚀 Sincronizando archivos..."
           rsync -avz --delete \
