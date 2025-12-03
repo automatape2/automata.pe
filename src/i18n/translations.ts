@@ -2,9 +2,8 @@ export const translations = {
     es: {
         nav: {
             about: "Sobre mí",
-            skills: "Habilidades",
             projects: "Proyectos",
-            experience: "Experiencia",
+            linkedin: "LinkedIn",
             contact: "Contacto"
         },
         hero: {
@@ -81,34 +80,54 @@ export const translations = {
                 }
             ]
         },
-        experience: {
-            sectionTitle: "Experiencia Laboral",
+        linkedInPosts: {
+            sectionTitle: "Últimas Publicaciones en LinkedIn",
+            subtitle: "Comparto conocimientos, experiencias y tendencias en desarrollo de software",
+            viewProfile: "Ver Perfil Completo",
             items: [
                 {
-                    company: "Tech Solutions S.A.",
-                    position: "Senior FullStack Developer",
-                    period: "2022 - Presente",
-                    description: "Liderazgo técnico en proyectos empresariales de gran escala, implementación de arquitecturas escalables y mentoría a desarrolladores junior.",
-                    tech: ["Laravel", "Vue.js", "AWS", "Docker"]
+                    date: "Hace 2 días",
+                    content: "🚀 Acabo de completar la migración de nuestra arquitectura monolítica a microservicios. El resultado: 60% de mejora en tiempo de respuesta y escalabilidad infinita. Las lecciones aprendidas fueron invaluables. #Microservicios #Arquitectura #DevOps",
+                    likes: 234,
+                    comments: 18,
+                    link: "https://linkedin.com/in/tuusuario"
                 },
                 {
-                    company: "Digital Innovations",
-                    position: "Backend Developer",
-                    period: "2020 - 2022",
-                    description: "Desarrollo de APIs RESTful y microservicios para aplicaciones fintech, optimización de bases de datos y mejoras de rendimiento.",
-                    tech: ["Node.js", "PostgreSQL", "Redis", "Kubernetes"]
+                    date: "Hace 5 días",
+                    content: "💡 La IA está transformando cómo desarrollamos software. Implementé GPT-4 en nuestro sistema de procesamiento de documentos y redujimos 200 horas de trabajo manual al mes. El futuro es ahora. #InteligenciaArtificial #Automatización #Innovation",
+                    likes: 456,
+                    comments: 32,
+                    link: "https://linkedin.com/in/tuusuario"
                 },
                 {
-                    company: "StartupLab",
-                    position: "FullStack Developer",
-                    period: "2018 - 2020",
-                    description: "Desarrollo de aplicaciones web desde cero, participación en todas las fases del ciclo de desarrollo de software.",
-                    tech: ["Python", "Django", "React", "MongoDB"]
+                    date: "Hace 1 semana",
+                    content: "🔒 Seguridad en APIs: Implementé autenticación JWT con refresh tokens y rate limiting en nuestra API fintech. Cero brechas desde el lanzamiento. La seguridad no es opcional, es fundamental. #CyberSecurity #API #BestPractices",
+                    likes: 189,
+                    comments: 15,
+                    link: "https://linkedin.com/in/tuusuario"
+                },
+                {
+                    date: "Hace 2 semanas",
+                    content: "⚡ Docker + Kubernetes = Magia. Nuestra nueva infraestructura maneja 10,000 usuarios concurrentes sin despeinarse. Si aún no estás usando contenedores, estás perdiendo tiempo y dinero. #Docker #Kubernetes #CloudNative",
+                    likes: 312,
+                    comments: 24,
+                    link: "https://linkedin.com/in/tuusuario"
+                },
+                {
+                    date: "Hace 3 semanas",
+                    content: "📊 Datos en tiempo real con Vue.js y WebSockets. Construí un dashboard que actualiza métricas cada segundo. Los usuarios están encantados con la experiencia. #VueJS #RealTime #Frontend",
+                    likes: 267,
+                    comments: 21,
+                    link: "https://linkedin.com/in/tuusuario"
+                },
+                {
+                    date: "Hace 1 mes",
+                    content: "🎯 De idea a MVP en 2 semanas. Así es como trabajamos en startups. Laravel + Vue.js + AWS = Stack perfecto para iterar rápido sin sacrificar calidad. #Startup #MVP #AgileDevlopment",
+                    likes: 398,
+                    comments: 29,
+                    link: "https://linkedin.com/in/tuusuario"
                 }
             ]
-        },
-        skills: {
-            sectionTitle: "Habilidades"
         },
         contact: {
             title: "¿Listo para empezar?",
@@ -130,9 +149,8 @@ export const translations = {
     en: {
         nav: {
             about: "About",
-            skills: "Skills",
             projects: "Projects",
-            experience: "Experience",
+            linkedin: "LinkedIn",
             contact: "Contact"
         },
         hero: {
@@ -209,34 +227,54 @@ export const translations = {
                 }
             ]
         },
-        experience: {
-            sectionTitle: "Work Experience",
+        linkedInPosts: {
+            sectionTitle: "Latest LinkedIn Posts",
+            subtitle: "Sharing insights, experiences, and trends in software development",
+            viewProfile: "View Full Profile",
             items: [
                 {
-                    company: "Tech Solutions S.A.",
-                    position: "Senior FullStack Developer",
-                    period: "2022 - Present",
-                    description: "Technical leadership in large-scale enterprise projects, implementation of scalable architectures and mentoring junior developers.",
-                    tech: ["Laravel", "Vue.js", "AWS", "Docker"]
+                    date: "2 days ago",
+                    content: "🚀 Just completed the migration from monolithic architecture to microservices. The result: 60% improvement in response time and infinite scalability. The lessons learned were invaluable. #Microservices #Architecture #DevOps",
+                    likes: 234,
+                    comments: 18,
+                    link: "https://linkedin.com/in/tuusuario"
                 },
                 {
-                    company: "Digital Innovations",
-                    position: "Backend Developer",
-                    period: "2020 - 2022",
-                    description: "Development of RESTful APIs and microservices for fintech applications, database optimization and performance improvements.",
-                    tech: ["Node.js", "PostgreSQL", "Redis", "Kubernetes"]
+                    date: "5 days ago",
+                    content: "💡 AI is transforming how we develop software. I implemented GPT-4 in our document processing system and reduced 200 hours of manual work per month. The future is now. #ArtificialIntelligence #Automation #Innovation",
+                    likes: 456,
+                    comments: 32,
+                    link: "https://linkedin.com/in/tuusuario"
                 },
                 {
-                    company: "StartupLab",
-                    position: "FullStack Developer",
-                    period: "2018 - 2020",
-                    description: "Web application development from scratch, participation in all phases of the software development lifecycle.",
-                    tech: ["Python", "Django", "React", "MongoDB"]
+                    date: "1 week ago",
+                    content: "🔒 API Security: Implemented JWT authentication with refresh tokens and rate limiting in our fintech API. Zero breaches since launch. Security is not optional, it's fundamental. #CyberSecurity #API #BestPractices",
+                    likes: 189,
+                    comments: 15,
+                    link: "https://linkedin.com/in/tuusuario"
+                },
+                {
+                    date: "2 weeks ago",
+                    content: "⚡ Docker + Kubernetes = Magic. Our new infrastructure handles 10,000 concurrent users without breaking a sweat. If you're not using containers yet, you're wasting time and money. #Docker #Kubernetes #CloudNative",
+                    likes: 312,
+                    comments: 24,
+                    link: "https://linkedin.com/in/tuusuario"
+                },
+                {
+                    date: "3 weeks ago",
+                    content: "📊 Real-time data with Vue.js and WebSockets. Built a dashboard that updates metrics every second. Users are delighted with the experience. #VueJS #RealTime #Frontend",
+                    likes: 267,
+                    comments: 21,
+                    link: "https://linkedin.com/in/tuusuario"
+                },
+                {
+                    date: "1 month ago",
+                    content: "🎯 From idea to MVP in 2 weeks. That's how we work in startups. Laravel + Vue.js + AWS = Perfect stack to iterate fast without sacrificing quality. #Startup #MVP #AgileDevelopment",
+                    likes: 398,
+                    comments: 29,
+                    link: "https://linkedin.com/in/tuusuario"
                 }
             ]
-        },
-        skills: {
-            sectionTitle: "Skills"
         },
         contact: {
             title: "Ready to start?",
