@@ -29,13 +29,12 @@ jobs:
       - name: Build project
         run: npm run build
       
-      - name: Deploy via FTP
+      - name: Deploy via SFTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: automata.pe
           username: ftpuser@automata.pe
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
+          protocol: ftps
           local-dir: ./dist/
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          dangerous-clean-slate: true
+          server-dir: /home/ejyjaujiet/automata.pe/
