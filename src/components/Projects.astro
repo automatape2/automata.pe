@@ -6,6 +6,7 @@ interface Props {
             title: string;
             description: string;
             tech: string[];
+            image: string;
         }>;
     };
 }
@@ -22,8 +23,12 @@ const { t } = Astro.props;
         {
             t.items.map((project) => (
                 <div class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/30 transition-all hover:-translate-y-2 group">
-                    <div class="h-48 bg-slate-800 flex items-center justify-center group-hover:bg-slate-800/80 transition-colors">
-                        <span class="text-slate-500 text-4xl">📂</span>
+                    <div class="h-48 overflow-hidden">
+                        <img
+                            src={project.image}
+                            alt={project.title}
+                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
                     </div>
                     <div class="p-6 space-y-4">
                         <h3 class="text-xl font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">

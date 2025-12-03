@@ -28,17 +28,20 @@ export const translations = {
                 {
                     title: "Plataforma SaaS de Gestión",
                     description: "Sistema integral de gestión empresarial con arquitectura microservicios.",
-                    tech: ["Laravel", "Vue.js", "Docker"]
+                    tech: ["Laravel", "Vue.js", "Docker"],
+                    image: "/projects/saas-platform.png"
                 },
                 {
                     title: "Bot de Automatización IA",
                     description: "Bot inteligente para procesamiento de documentos legales usando NLP.",
-                    tech: ["Python", "OpenAI API", "AWS Lambda"]
+                    tech: ["Python", "OpenAI API", "AWS Lambda"],
+                    image: "/projects/ai-bot.png"
                 },
                 {
                     title: "API Segura Fintech",
                     description: "API RESTful para transacciones financieras con altos estándares de seguridad.",
-                    tech: ["Node.js", "PostgreSQL", "Redis"]
+                    tech: ["Node.js", "PostgreSQL", "Redis"],
+                    image: "/projects/fintech-api.png"
                 }
             ]
         },
@@ -117,17 +120,20 @@ export const translations = {
                 {
                     title: "SaaS Management Platform",
                     description: "Comprehensive enterprise management system with microservices architecture.",
-                    tech: ["Laravel", "Vue.js", "Docker"]
+                    tech: ["Laravel", "Vue.js", "Docker"],
+                    image: "/projects/saas-platform.png"
                 },
                 {
                     title: "AI Automation Bot",
                     description: "Intelligent bot for legal document processing using NLP.",
-                    tech: ["Python", "OpenAI API", "AWS Lambda"]
+                    tech: ["Python", "OpenAI API", "AWS Lambda"],
+                    image: "/projects/ai-bot.png"
                 },
                 {
                     title: "Secure Fintech API",
                     description: "RESTful API for financial transactions with high security standards.",
-                    tech: ["Node.js", "PostgreSQL", "Redis"]
+                    tech: ["Node.js", "PostgreSQL", "Redis"],
+                    image: "/projects/fintech-api.png"
                 }
             ]
         },
