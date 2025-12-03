@@ -79,7 +79,13 @@ export const translations = {
             socialLabel: "Sígueme"
         },
         footer: {
-            copyright: "Desarrollador FullStack. Todos los derechos reservados."
+            copyright: "Desarrollador FullStack. Todos los derechos reservados.",
+            tagline: "Transformando ideas en aplicaciones escalables con automatización IA.",
+            quickLinks: "Enlaces Rápidos",
+            contactTitle: "Contacto",
+            socialTitle: "Sígueme",
+            privacy: "Privacidad",
+            terms: "Términos"
         }
     },
     en: {
@@ -162,7 +168,13 @@ export const translations = {
             socialLabel: "Follow Me"
         },
         footer: {
-            copyright: "FullStack Developer. All rights reserved."
+            copyright: "FullStack Developer. All rights reserved.",
+            tagline: "Transforming ideas into scalable applications with AI automation.",
+            quickLinks: "Quick Links",
+            contactTitle: "Contact",
+            socialTitle: "Follow Me",
+            privacy: "Privacy",
+            terms: "Terms"
         }
     }
 } as const;
