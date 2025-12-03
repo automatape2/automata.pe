@@ -75,7 +75,7 @@ jobs:
             echo "✅ Servidor alcanzable"
           fi
           
-          # Intentar ssh-keyscan con timeout y reintentos
+          # Intentar ssh-keyscan con timeout y reintentos (puerto 21098)
           MAX_RETRIES=3
           RETRY_COUNT=0
           SUCCESS=false
@@ -84,7 +84,7 @@ jobs:
             echo "🔄 Intento $((RETRY_COUNT + 1)) de $MAX_RETRIES..."
             
             # Usar timeout para evitar que se cuelgue indefinidamente
-            if timeout 30 ssh-keyscan -T 10 -H 66.29.148.137 >> ~/.ssh/known_hosts 2>&1; then
+            if timeout 30 ssh-keyscan -T 10 -p 21098 -H 66.29.148.137 >> ~/.ssh/known_hosts 2>&1; then
               SUCCESS=true
               echo "✅ ssh-keyscan exitoso"
             else
@@ -100,17 +100,17 @@ jobs:
             echo "❌ ERROR: ssh-keyscan falló después de $MAX_RETRIES intentos"
             echo "🔍 Información de depuración:"
             echo "  - Host: 66.29.148.137"
-            echo "  - Puerto SSH: 22 (por defecto)"
+            echo "  - Puerto SSH: 21098"
             echo ""
             echo "💡 Posibles causas:"
-            echo "  1. El servidor SSH no está corriendo en el puerto 22"
+            echo "  1. El servidor SSH no está corriendo en el puerto 21098"
             echo "  2. Firewall bloqueando la conexión desde GitHub Actions"
             echo "  3. Problemas de red temporales"
             echo ""
             echo "🔧 Soluciones:"
             echo "  1. Verifica que el servidor SSH esté corriendo: systemctl status sshd"
             echo "  2. Verifica el firewall: sudo ufw status"
-            echo "  3. Asegúrate de que el puerto 22 esté abierto para conexiones externas"
+            echo "  3. Asegúrate de que el puerto 21098 esté abierto para conexiones externas"
             exit 1
           fi
           
@@ -161,19 +161,21 @@ jobs:
           
           echo "✅ Llave SSH agregada al agente"
           
-          # Crear directorio remoto si no existe
+          # Crear directorio remoto si no existe (usando puerto 21098)
           echo "📁 Verificando/creando directorio remoto..."
-          ssh -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "mkdir -p $DEPLOY_PATH"
+          ssh -p 21098 -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "mkdir -p $DEPLOY_PATH"
           
-          # Sincronizar archivos del dist al servidor
+          # Sincronizar archivos del dist al servidor (usando puerto 21098)
           echo "🚀 Sincronizando archivos..."
           rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "ssh -p 21098 -o StrictHostKeyChecking=no" \
             dist/ \
             ejyjaujiet@66.29.148.137:$DEPLOY_PATH/
+          
+          echo "✅ Despliegue completado exitosamente"
           
           echo "✅ Despliegue completado exitosamente"
       
       - name: Verify deployment
         run: |
-          ssh -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "ls -la ${{ secrets.DEPLOY_PATH }}"
+          ssh -p 21098 -o StrictHostKeyChecking=no ejyjaujiet@66.29.148.137 "ls -la ${{ secrets.DEPLOY_PATH }}"

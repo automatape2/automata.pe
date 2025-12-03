@@ -5,6 +5,7 @@ Esta guía explica cómo configurar y usar el pipeline de GitHub Actions para de
 ## 📋 Información del Servidor
 
 - **Host**: `66.29.148.137`
+- **Puerto SSH**: `21098`
 - **Usuario**: `ejyjaujiet`
 - **Protocolo**: SSH con autenticación por llave pública/privada
 - **Passphrase**: Requerida (configurada en secrets)
@@ -119,7 +120,7 @@ El despliegue se ejecutará automáticamente.
 ### Desde SSH (Local)
 Puedes verificar manualmente conectándote al servidor:
 ```bash
-ssh ejyjaujiet@66.29.148.137
+ssh -p 21098 ejyjaujiet@66.29.148.137
 ls -la /ruta/donde/desplegaste
 ```
 
@@ -183,12 +184,12 @@ ssh-keygen -t rsa -b 4096 -C "tu-email@ejemplo.com"
 
 ### Copiar llave pública al servidor
 ```bash
-ssh-copy-id ejyjaujiet@66.29.148.137
+ssh-copy-id -p 21098 ejyjaujiet@66.29.148.137
 ```
 
 ### Probar conexión SSH
 ```bash
-ssh -v ejyjaujiet@66.29.148.137
+ssh -p 21098 -v ejyjaujiet@66.29.148.137
 ```
 
 ### Build local
@@ -219,6 +220,7 @@ Puedes agregar esto a tu `~/.ssh/config`:
 ```
 Host portfolio-server
     HostName 66.29.148.137
+    Port 21098
     User ejyjaujiet
     IdentityFile ~/.ssh/id_rsa
 ```
