@@ -26,58 +26,53 @@ export const translations = {
             sectionTitle: "Proyectos Destacados",
             items: [
                 {
-                    slug: "saas-platform",
-                    title: "Plataforma SaaS de Gestión",
-                    description: "Sistema integral de gestión empresarial con arquitectura microservicios.",
-                    tech: ["Laravel", "Vue.js", "Docker"],
-                    image: "/projects/saas-platform.png",
-                    fullDescription: "Una plataforma completa de gestión empresarial diseñada con arquitectura de microservicios para máxima escalabilidad y rendimiento. El sistema incluye módulos de CRM, gestión de inventario, facturación y análisis en tiempo real.",
-                    features: [
-                        "Arquitectura de microservicios escalable",
-                        "Dashboard en tiempo real con Vue.js",
-                        "API RESTful robusta con Laravel",
-                        "Contenedorización con Docker",
-                        "Sistema de autenticación multi-tenant",
-                        "Reportes y análisis avanzados"
-                    ],
-                    challenges: "El principal desafío fue diseñar una arquitectura que pudiera escalar horizontalmente mientras mantenía la consistencia de datos entre servicios. Implementamos event sourcing y CQRS para manejar la complejidad.",
-                    results: "La plataforma ahora maneja más de 10,000 usuarios activos con un tiempo de respuesta promedio de 200ms. Reducción del 40% en costos de infraestructura gracias a la optimización de recursos."
-                },
-                {
-                    slug: "ai-automation-bot",
-                    title: "Bot de Automatización IA",
-                    description: "Bot inteligente para procesamiento de documentos legales usando NLP.",
-                    tech: ["Python", "OpenAI API", "AWS Lambda"],
+                    slug: "automata-pe",
+                    title: "Portfolio Personal",
+                    description: "Portfolio de Jose Anicama, construido con Astro, TailwindCSS y TypeScript.",
+                    tech: ["Astro", "TailwindCSS", "TypeScript"],
                     image: "/projects/ai-bot.png",
-                    fullDescription: "Un bot inteligente que automatiza el procesamiento y análisis de documentos legales utilizando procesamiento de lenguaje natural avanzado. Capaz de extraer información clave, clasificar documentos y generar resúmenes automáticos.",
+                    fullDescription: "Mi portfolio personal, una PWA construida con Astro, TailwindCSS y TypeScript. Muestra mis proyectos, habilidades y experiencia de una manera moderna y accesible.",
                     features: [
-                        "Procesamiento de lenguaje natural con OpenAI GPT-4",
-                        "Extracción automática de entidades y cláusulas",
-                        "Clasificación inteligente de documentos",
-                        "Generación de resúmenes ejecutivos",
-                        "Arquitectura serverless con AWS Lambda",
-                        "Procesamiento en lote de miles de documentos"
+                        "PWA (Progressive Web App) para una experiencia nativa.",
+                        "Diseño responsive y moderno con TailwindCSS.",
+                        "Componentes interactivos con Astro.",
+                        "Integración con GitHub para mostrar repositorios.",
+                        "Soporte multi-idioma (inglés y español)."
                     ],
-                    challenges: "Optimizar el costo de las llamadas a la API de OpenAI mientras mantenemos alta precisión. Implementamos un sistema de caché inteligente y pre-procesamiento para reducir tokens.",
-                    results: "Reducción del 85% en tiempo de procesamiento de documentos. Ahorro de más de 200 horas mensuales en trabajo manual. Precisión del 94% en extracción de información."
+                    challenges: "Aprender a usar Astro y sus características, como la hidratación parcial y la generación de sitios estáticos. Integrar la API de GitHub para mostrar los repositorios de forma dinámica.",
+                    results: "Un portfolio moderno, rápido y accesible que muestra mis habilidades y proyectos. Una excelente herramienta para mostrar mi trabajo a posibles empleadores y clientes."
                 },
                 {
-                    slug: "fintech-api",
-                    title: "API Segura Fintech",
-                    description: "API RESTful para transacciones financieras con altos estándares de seguridad.",
-                    tech: ["Node.js", "PostgreSQL", "Redis"],
-                    image: "/projects/fintech-api.png",
-                    fullDescription: "Una API RESTful de alta seguridad diseñada para manejar transacciones financieras con cumplimiento de estándares PCI DSS. Incluye procesamiento de pagos, gestión de cuentas y sistema de auditoría completo.",
+                    slug: "netflics2",
+                    title: "Clon de Netflix",
+                    description: "Una aplicación web construida con PHP, HTML y Vue para transmitir y administrar contenido multimedia.",
+                    tech: ["PHP", "HTML", "Vue"],
+                    image: "/projects/saas-platform.png",
+                    fullDescription: "Una aplicación web construida con PHP, HTML y Vue para transmitir y administrar contenido multimedia. Permite a los usuarios ver películas y series, y a los administradores gestionar el contenido.",
                     features: [
-                        "Autenticación JWT con refresh tokens",
-                        "Encriptación end-to-end de datos sensibles",
-                        "Rate limiting y protección DDoS",
-                        "Sistema de auditoría completo",
-                        "Procesamiento de transacciones con ACID",
-                        "Caché distribuido con Redis para alto rendimiento"
+                        "Streaming de video.",
+                        "Gestión de contenido multimedia.",
+                        "Autenticación de usuarios.",
+                        "Panel de administración para gestionar películas y series."
                     ],
-                    challenges: "Garantizar la seguridad de las transacciones mientras mantenemos baja latencia. Implementamos un sistema de cola de mensajes y procesamiento asíncrono para transacciones no críticas.",
-                    results: "Procesamiento de más de 1 millón de transacciones mensuales con 99.99% de uptime. Cero brechas de seguridad desde el lanzamiento. Tiempo de respuesta promedio de 150ms."
+                    challenges: "Implementar un sistema de streaming de video eficiente y escalable. Diseñar una base de datos para almacenar y gestionar el contenido multimedia.",
+                    results: "Una aplicación web funcional para transmitir y administrar contenido multimedia. Una excelente manera de aprender sobre streaming de video y gestión de contenido."
+                },
+                {
+                    slug: "shortener",
+                    title: "Acortador de URL",
+                    description: "Un acortador de URL simple y eficiente construido con PHP para una gestión de enlaces rápida y sencilla.",
+                    tech: ["PHP", "Docker", "Laravel"],
+                    image: "/projects/fintech-api.png",
+                    fullDescription: "Un acortador de URL simple y eficiente construido con PHP para una gestión de enlaces rápida y sencilla. Permite a los usuarios acortar URLs largas y realizar un seguimiento de los clics.",
+                    features: [
+                        "Acortamiento de URL.",
+                        "Seguimiento de clics.",
+                        "API para acortar URLs mediante programación.",
+                        "Contenedorizado con Docker."
+                    ],
+                    challenges: "Generar URLs cortas únicas y evitar colisiones. Implementar un sistema de seguimiento de clics eficiente.",
+                    results: "Un acortador de URL funcional y eficiente. Una herramienta útil para compartir enlaces en redes sociales y otras plataformas."
                 }
             ]
         },
@@ -147,21 +142,21 @@ export const translations = {
                     link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
-                    date: "2 weeks ago",
+                    date: "Hace 2 semanas",
                     content: "⚡ Docker + Kubernetes = Magia. Nuestra nueva infraestructura maneja 10,000 usuarios concurrentes sin despeinarse. Si aún no estás usando contenedores, estás perdiendo tiempo y dinero. #Docker #Kubernetes #CloudNative",
                     likes: 312,
                     comments: 24,
                     link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
-                    date: "3 weeks ago",
+                    date: "Hace 3 semanas",
                     content: "📊 Datos en tiempo real con Vue.js y WebSockets. Construí un dashboard que actualiza métricas cada segundo. Los usuarios están encantados con la experiencia. #VueJS #RealTime #Frontend",
                     likes: 267,
                     comments: 21,
                     link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
-                    date: "1 month ago",
+                    date: "Hace 1 mes",
                     content: "🎯 De idea a MVP en 2 semanas. Así es como trabajamos en startups. Laravel + Vue.js + AWS = Stack perfecto para iterar rápido sin sacrificar calidad. #Startup #MVP #AgileDevlopment",
                     likes: 398,
                     comments: 29,
@@ -211,58 +206,53 @@ export const translations = {
             sectionTitle: "Featured Projects",
             items: [
                 {
-                    slug: "saas-platform",
-                    title: "SaaS Management Platform",
-                    description: "Comprehensive enterprise management system with microservices architecture.",
-                    tech: ["Laravel", "Vue.js", "Docker"],
-                    image: "/projects/saas-platform.png",
-                    fullDescription: "A complete enterprise management platform designed with microservices architecture for maximum scalability and performance. The system includes CRM modules, inventory management, billing, and real-time analytics.",
-                    features: [
-                        "Scalable microservices architecture",
-                        "Real-time dashboard with Vue.js",
-                        "Robust RESTful API with Laravel",
-                        "Containerization with Docker",
-                        "Multi-tenant authentication system",
-                        "Advanced reporting and analytics"
-                    ],
-                    challenges: "The main challenge was designing an architecture that could scale horizontally while maintaining data consistency across services. We implemented event sourcing and CQRS to handle the complexity.",
-                    results: "The platform now handles over 10,000 active users with an average response time of 200ms. 40% reduction in infrastructure costs thanks to resource optimization."
-                },
-                {
-                    slug: "ai-automation-bot",
-                    title: "AI Automation Bot",
-                    description: "Intelligent bot for legal document processing using NLP.",
-                    tech: ["Python", "OpenAI API", "AWS Lambda"],
+                    slug: "automata-pe",
+                    title: "Personal Portfolio",
+                    description: "Jose Anicama's portfolio, built with Astro, TailwindCSS, and TypeScript.",
+                    tech: ["Astro", "TailwindCSS", "TypeScript"],
                     image: "/projects/ai-bot.png",
-                    fullDescription: "An intelligent bot that automates the processing and analysis of legal documents using advanced natural language processing. Capable of extracting key information, classifying documents, and generating automatic summaries.",
+                    fullDescription: "My personal portfolio, a PWA built with Astro, TailwindCSS, and TypeScript. It showcases my projects, skills, and experience in a modern and accessible way.",
                     features: [
-                        "Natural language processing with OpenAI GPT-4",
-                        "Automatic entity and clause extraction",
-                        "Intelligent document classification",
-                        "Executive summary generation",
-                        "Serverless architecture with AWS Lambda",
-                        "Procesamiento en lote de miles de documentos"
+                        "PWA (Progressive Web App) for a native-like experience.",
+                        "Modern and responsive design with TailwindCSS.",
+                        "Interactive components with Astro.",
+                        "GitHub integration to display repositories.",
+                        "Multi-language support (English and Spanish)."
                     ],
-                    challenges: "Optimizing the cost of OpenAI API calls while maintaining high accuracy. We implemented an intelligent caching system and pre-processing to reduce tokens.",
-                    results: "85% reduction in document processing time. Savings of over 200 hours monthly in manual work. 94% accuracy in information extraction."
+                    challenges: "Learning to use Astro and its features, such as partial hydration and static site generation. Integrating the GitHub API to display repositories dynamically.",
+                    results: "A modern, fast, and accessible portfolio that showcases my skills and projects. An excellent tool to show my work to potential employers and clients."
                 },
                 {
-                    slug: "fintech-api",
-                    title: "Secure Fintech API",
-                    description: "RESTful API for financial transactions with high security standards.",
-                    tech: ["Node.js", "PostgreSQL", "Redis"],
-                    image: "/projects/fintech-api.png",
-                    fullDescription: "A high-security RESTful API designed to handle financial transactions with PCI DSS compliance. Includes payment processing, account management, and complete audit system.",
+                    slug: "netflics2",
+                    title: "Netflix Clone",
+                    description: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content.",
+                    tech: ["PHP", "HTML", "Vue"],
+                    image: "/projects/saas-platform.png",
+                    fullDescription: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content. It allows users to watch movies and series, and administrators to manage the content.",
                     features: [
-                        "JWT authentication with refresh tokens",
-                        "End-to-end encryption of sensitive data",
-                        "Rate limiting and DDoS protection",
-                        "Complete audit system",
-                        "ACID transaction processing",
-                        "Distributed cache with Redis for high performance"
+                        "Video streaming.",
+                        "Multimedia content management.",
+                        "User authentication.",
+                        "Admin panel to manage movies and series."
                     ],
-                    challenges: "Ensuring transaction security while maintaining low latency. We implemented a message queue system and asynchronous processing for non-critical transactions.",
-                    results: "Processing over 1 million transactions monthly with 99.99% uptime. Zero security breaches since launch. Average response time of 150ms."
+                    challenges: "Implementing an efficient and scalable video streaming system. Designing a database to store and manage multimedia content.",
+                    results: "A functional and efficient web application for streaming and managing multimedia content. A great way to learn about video streaming and content management."
+                },
+                {
+                    slug: "shortener",
+                    title: "URL Shortener",
+                    description: "A simple and efficient URL shortener built with PHP for quick and easy link management.",
+                    tech: ["PHP", "Docker", "Laravel"],
+                    image: "/projects/fintech-api.png",
+                    fullDescription: "A simple and efficient URL shortener built with PHP for quick and easy link management. It allows users to shorten long URLs and track clicks.",
+                    features: [
+                        "URL shortening.",
+                        "Click tracking.",
+                        "API to shorten URLs programmatically.",
+                        "Containerized with Docker."
+                    ],
+                    challenges: "Generating unique short URLs and avoiding collisions. Implementing an efficient click tracking system.",
+                    results: "A functional and efficient URL shortener. A useful tool for sharing links on social media and other platforms."
                 }
             ]
         },
@@ -347,7 +337,7 @@ export const translations = {
                 },
                 {
                     date: "1 month ago",
-                    content: "🎯 From idea to MVP in 2 weeks. That's how we work in startups. Laravel + Vue.js + AWS = Perfect stack to iterate fast without sacrificing quality. #Startup #MVP #AgileDevelopment",
+                    content: "🎯 From idea to MVP in 2 weeks. That's how we work in startups. Laravel + Vue.js + AWS = Perfect stack to iterate fast without sacrificing quality. #Startup #MVP #AgileDevlopment",
                     likes: 398,
                     comments: 29,
                     link: "https://www.linkedin.com/in/jjanicamatanta/"
