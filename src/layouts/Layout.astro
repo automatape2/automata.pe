@@ -26,6 +26,28 @@ const t = getTranslations(lang);
         <meta name="viewport" content="width=device-width" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
+
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json" />
+
+        <!-- Theme Color for mobile browsers -->
+        <meta name="theme-color" content="#06b6d4" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
+
+        <!-- Preconnect to improve performance -->
+        <link
+            rel="preconnect"
+            href="https://fonts.googleapis.com"
+            crossorigin
+        />
+
+        <!-- DNS Prefetch for external resources -->
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+
         <title>{title}</title>
     </head>
     <body
@@ -97,5 +119,8 @@ const t = getTranslations(lang);
 
         <!-- Scroll to top button -->
         <ScrollToTop />
+
+        <!-- Service Worker Registration -->
+        <script src="/sw-register.js" is:inline></script>
     </body>
 </html>

@@ -1,0 +1,68 @@
+# Cache headers for modern hosting platforms (Netlify, Cloudflare Pages, etc.)
+# This file provides cache configuration for platforms that support _headers files
+
+# Default caching for all files (1 month)
+/*
+  Cache-Control: public, max-age=2592000
+
+# HTML pages - No cache (always fresh)
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Root HTML (index)
+/
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Hashed static assets - Immutable cache (1 year)
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images - Long cache (1 year)
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+/*.avif
+  Cache-Control: public, max-age=31536000, immutable
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+/*.gif
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts - Long cache (1 year)
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+/*.ttf
+  Cache-Control: public, max-age=31536000, immutable
+/*.otf
+  Cache-Control: public, max-age=31536000, immutable
+
+# Favicon - Medium cache (1 week)
+/favicon.ico
+  Cache-Control: public, max-age=604800
+/favicon.svg
+  Cache-Control: public, max-age=604800
+
+# Manifest - Medium cache (1 week)
+/manifest.json
+  Cache-Control: public, max-age=604800
+
+# Service Worker - No cache (must always be fresh)
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+/service-worker.js
+  Cache-Control: no-cache, no-store, must-revalidate

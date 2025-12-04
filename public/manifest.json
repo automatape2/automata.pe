@@ -1,0 +1,27 @@
+{
+    "name": "Jose Anicama - FullStack Developer Portfolio",
+    "short_name": "Automata.pe",
+    "description": "FullStack Developer specialized in creating automated solutions for startups. From idea to MVP in record time.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#020617",
+    "theme_color": "#06b6d4",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "business",
+        "productivity",
+        "technology"
+    ],
+    "lang": "en",
+    "dir": "ltr",
+    "scope": "/",
+    "screenshots": []
+}
