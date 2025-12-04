@@ -17,9 +17,8 @@ export const translations = {
             cta2: "Contactar",
             chatWithAI: "Chatea con IA",
             socialLinks: {
-                github: "https://github.com/tuusuario",
-                linkedin: "https://linkedin.com/in/tuusuario",
-                twitter: "https://twitter.com/tuusuario"
+                github: "https://github.com/automatape2",
+                linkedin: "https://www.linkedin.com/in/jjanicamatanta/"
             }
         },
         projects: {
@@ -87,36 +86,36 @@ export const translations = {
             viewProfile: "Ver GitHub",
             items: [
                 {
-                    name: "fast-api-starter",
-                    description: "Boilerplate de producción para APIs con FastAPI y PostgreSQL",
-                    language: "Python",
-                    stars: 85,
-                    forks: 12,
-                    url: "https://github.com/tuusuario/fast-api-starter"
+                    name: "automata.pe",
+                    description: "Portfolio de Jose Anicama, construido con Astro, TailwindCSS y TypeScript.",
+                    language: "Astro",
+                    stars: 0,
+                    forks: 0,
+                    url: "https://github.com/automatape2/automata.pe"
                 },
                 {
-                    name: "react-native-ui-kit",
-                    description: "Colección de componentes UI reutilizables para React Native",
-                    language: "TypeScript",
-                    stars: 230,
-                    forks: 45,
-                    url: "https://github.com/tuusuario/react-native-ui-kit"
+                    name: "inven2",
+                    description: "Offline backup of the original inven2 website downloaded with wget",
+                    language: "HTML",
+                    stars: 0,
+                    forks: 0,
+                    url: "https://github.com/automatape2/inven2"
                 },
                 {
-                    name: "docker-dev-env",
-                    description: "Entorno de desarrollo local automatizado con Docker Compose",
-                    language: "Shell",
-                    stars: 45,
-                    forks: 8,
-                    url: "https://github.com/tuusuario/docker-dev-env"
+                    name: "netflics2",
+                    description: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content",
+                    language: "PHP",
+                    stars: 1,
+                    forks: 0,
+                    url: "https://github.com/automatape2/netflics2"
                 },
                 {
-                    name: "vue-admin-dashboard",
-                    description: "Panel de administración moderno construido con Vue 3 y Tailwind",
-                    language: "Vue",
-                    stars: 150,
-                    forks: 28,
-                    url: "https://github.com/tuusuario/vue-admin-dashboard"
+                    name: "shortener",
+                    description: "A simple and efficient URL shortener built with PHP for quick and easy link management.",
+                    language: "PHP",
+                    stars: 1,
+                    forks: 0,
+                    url: "https://github.com/automatape2/shortener"
                 }
             ]
         },
@@ -130,49 +129,49 @@ export const translations = {
                     content: "🚀 Acabo de completar la migración de nuestra arquitectura monolítica a microservicios. El resultado: 60% de mejora en tiempo de respuesta y escalabilidad infinita. Las lecciones aprendidas fueron invaluables. #Microservicios #Arquitectura #DevOps",
                     likes: 234,
                     comments: 18,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
                     date: "Hace 5 días",
                     content: "💡 La IA está transformando cómo desarrollamos software. Implementé GPT-4 en nuestro sistema de procesamiento de documentos y redujimos 200 horas de trabajo manual al mes. El futuro es ahora. #InteligenciaArtificial #Automatización #Innovation",
                     likes: 456,
                     comments: 32,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
                     date: "Hace 1 semana",
                     content: "🔒 Seguridad en APIs: Implementé autenticación JWT con refresh tokens y rate limiting en nuestra API fintech. Cero brechas desde el lanzamiento. La seguridad no es opcional, es fundamental. #CyberSecurity #API #BestPractices",
                     likes: 189,
                     comments: 15,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
                     date: "Hace 2 semanas",
                     content: "⚡ Docker + Kubernetes = Magia. Nuestra nueva infraestructura maneja 10,000 usuarios concurrentes sin despeinarse. Si aún no estás usando contenedores, estás perdiendo tiempo y dinero. #Docker #Kubernetes #CloudNative",
                     likes: 312,
                     comments: 24,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
                     date: "Hace 3 semanas",
                     content: "📊 Datos en tiempo real con Vue.js y WebSockets. Construí un dashboard que actualiza métricas cada segundo. Los usuarios están encantados con la experiencia. #VueJS #RealTime #Frontend",
                     likes: 267,
                     comments: 21,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
                     date: "Hace 1 mes",
                     content: "🎯 De idea a MVP en 2 semanas. Así es como trabajamos en startups. Laravel + Vue.js + AWS = Stack perfecto para iterar rápido sin sacrificar calidad. #Startup #MVP #AgileDevlopment",
                     likes: 398,
                     comments: 29,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 }
             ]
         },
         contact: {
             title: "¿Listo para empezar?",
             description: "Actualmente estoy disponible para nuevos proyectos y colaboraciones. Si tienes una idea que quieres llevar al siguiente nivel, hablemos.",
-            email: "tu-email@ejemplo.com",
+            email: "j.j.anicamatanta@gmail.com",
             emailLabel: "Email",
             socialLabel: "Sígueme"
         },
@@ -204,9 +203,8 @@ export const translations = {
             cta2: "Contact Me",
             chatWithAI: "Chat with AI",
             socialLinks: {
-                github: "https://github.com/tuusuario",
-                linkedin: "https://linkedin.com/in/tuusuario",
-                twitter: "https://twitter.com/tuusuario"
+                github: "https://github.com/automatape2",
+                linkedin: "https://www.linkedin.com/in/jjanicamatanta/"
             }
         },
         projects: {
@@ -274,36 +272,36 @@ export const translations = {
             viewProfile: "View GitHub",
             items: [
                 {
-                    name: "fast-api-starter",
-                    description: "Production-ready boilerplate for APIs with FastAPI and PostgreSQL",
-                    language: "Python",
-                    stars: 85,
-                    forks: 12,
-                    url: "https://github.com/tuusuario/fast-api-starter"
+                    name: "automata.pe",
+                    description: "Jose Anicama's portfolio, built with Astro, TailwindCSS, and TypeScript.",
+                    language: "Astro",
+                    stars: 0,
+                    forks: 0,
+                    url: "https://github.com/automatape2/automata.pe"
                 },
                 {
-                    name: "react-native-ui-kit",
-                    description: "Collection of reusable UI components for React Native",
-                    language: "TypeScript",
-                    stars: 230,
-                    forks: 45,
-                    url: "https://github.com/tuusuario/react-native-ui-kit"
+                    name: "inven2",
+                    description: "Offline backup of the original inven2 website downloaded with wget",
+                    language: "HTML",
+                    stars: 0,
+                    forks: 0,
+                    url: "https://github.com/automatape2/inven2"
                 },
                 {
-                    name: "docker-dev-env",
-                    description: "Automated local development environment with Docker Compose",
-                    language: "Shell",
-                    stars: 45,
-                    forks: 8,
-                    url: "https://github.com/tuusuario/docker-dev-env"
+                    name: "netflics2",
+                    description: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content",
+                    language: "PHP",
+                    stars: 1,
+                    forks: 0,
+                    url: "https://github.com/automatape2/netflics2"
                 },
                 {
-                    name: "vue-admin-dashboard",
-                    description: "Modern admin dashboard built with Vue 3 and Tailwind",
-                    language: "Vue",
-                    stars: 150,
-                    forks: 28,
-                    url: "https://github.com/tuusuario/vue-admin-dashboard"
+                    name: "shortener",
+                    description: "A simple and efficient URL shortener built with PHP for quick and easy link management.",
+                    language: "PHP",
+                    stars: 1,
+                    forks: 0,
+                    url: "https://github.com/automatape2/shortener"
                 }
             ]
         },
@@ -317,49 +315,49 @@ export const translations = {
                     content: "🚀 Just completed the migration from monolithic architecture to microservices. The result: 60% improvement in response time and infinite scalability. The lessons learned were invaluable. #Microservices #Architecture #DevOps",
                     likes: 234,
                     comments: 18,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
                     date: "5 days ago",
                     content: "💡 AI is transforming how we develop software. I implemented GPT-4 in our document processing system and reduced 200 hours of manual work per month. The future is now. #ArtificialIntelligence #Automation #Innovation",
                     likes: 456,
                     comments: 32,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
                     date: "1 week ago",
                     content: "🔒 API Security: Implemented JWT authentication with refresh tokens and rate limiting in our fintech API. Zero breaches since launch. Security is not optional, it's fundamental. #CyberSecurity #API #BestPractices",
                     likes: 189,
                     comments: 15,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
                     date: "2 weeks ago",
                     content: "⚡ Docker + Kubernetes = Magic. Our new infrastructure handles 10,000 concurrent users without breaking a sweat. If you're not using containers yet, you're wasting time and money. #Docker #Kubernetes #CloudNative",
                     likes: 312,
                     comments: 24,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
                     date: "3 weeks ago",
                     content: "📊 Real-time data with Vue.js and WebSockets. Built a dashboard that updates metrics every second. Users are delighted with the experience. #VueJS #RealTime #Frontend",
                     likes: 267,
                     comments: 21,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
                     date: "1 month ago",
-                    content: "🎯 From idea to MVP in 2 weeks. That's how we work in startups. Laravel + Vue.js + AWS = Perfect stack to iterate fast without sacrificing quality. #Startup #MVP #AgileDevelopment",
+                    content: "🎯 From idea to MVP in 2 weeks. That's how we work in startups. Laravel + Vue.js + AWS = Perfect stack to iterate fast without sacrificing quality. #Startup #MVP #AgileDevlopment",
                     likes: 398,
                     comments: 29,
-                    link: "https://linkedin.com/in/tuusuario"
+                    link: "https://www.linkedin.com/in/jjanicamatanta/"
                 }
             ]
         },
         contact: {
             title: "Ready to start?",
             description: "I'm currently available for new projects and collaborations. If you have an idea you want to take to the next level, let's talk.",
-            email: "your-email@example.com",
+            email: "j.j.anicamatanta@gmail.com",
             emailLabel: "Email",
             socialLabel: "Follow Me"
         },
