@@ -17,11 +17,9 @@ export const translations = {
             description: "Desarrollador FullStack especializado en crear soluciones automatizadas para startups. De la idea al MVP en tiempo récord.",
             cta1: "Ver Proyectos",
             cta2: "Contactar",
-            chatWithAI: "Chatea con IA",
             socialLinks: {
                 github: personalInfo.socialLinks.github,
-                linkedin: personalInfo.socialLinks.linkedin,
-                twitter: personalInfo.socialLinks.twitter
+                linkedin: personalInfo.socialLinks.linkedin
             }
         },
         projects: {
@@ -142,28 +140,28 @@ export const translations = {
                     link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
-                    date: "Hace 1 semana",
+                    date: "1 week ago",
                     content: "🔒 Seguridad en APIs: Implementé autenticación JWT con refresh tokens y rate limiting en nuestra API fintech. Cero brechas desde el lanzamiento. La seguridad no es opcional, es fundamental. #CyberSecurity #API #BestPractices",
                     likes: 189,
                     comments: 15,
                     link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
-                    date: "Hace 2 semanas",
+                    date: "2 weeks ago",
                     content: "⚡ Docker + Kubernetes = Magia. Nuestra nueva infraestructura maneja 10,000 usuarios concurrentes sin despeinarse. Si aún no estás usando contenedores, estás perdiendo tiempo y dinero. #Docker #Kubernetes #CloudNative",
                     likes: 312,
                     comments: 24,
                     link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
-                    date: "Hace 3 semanas",
+                    date: "3 weeks ago",
                     content: "📊 Datos en tiempo real con Vue.js y WebSockets. Construí un dashboard que actualiza métricas cada segundo. Los usuarios están encantados con la experiencia. #VueJS #RealTime #Frontend",
                     likes: 267,
                     comments: 21,
                     link: "https://www.linkedin.com/in/jjanicamatanta/"
                 },
                 {
-                    date: "Hace 1 mes",
+                    date: "1 month ago",
                     content: "🎯 De idea a MVP en 2 semanas. Así es como trabajamos en startups. Laravel + Vue.js + AWS = Stack perfecto para iterar rápido sin sacrificar calidad. #Startup #MVP #AgileDevlopment",
                     likes: 398,
                     comments: 29,
@@ -204,11 +202,9 @@ export const translations = {
             description: "FullStack Developer specialized in creating automated solutions for startups. From idea to MVP in record time.",
             cta1: "View Projects",
             cta2: "Contact Me",
-            chatWithAI: "Chat with AI",
             socialLinks: {
                 github: personalInfo.socialLinks.github,
-                linkedin: personalInfo.socialLinks.linkedin,
-                twitter: personalInfo.socialLinks.twitter
+                linkedin: personalInfo.socialLinks.linkedin
             }
         },
         projects: {
@@ -245,7 +241,7 @@ export const translations = {
                         "Intelligent document classification",
                         "Executive summary generation",
                         "Serverless architecture with AWS Lambda",
-                        "Batch processing of thousands of documents"
+                        "Procesamiento en lote de miles de documentos"
                     ],
                     challenges: "Optimizing the cost of OpenAI API calls while maintaining high accuracy. We implemented an intelligent caching system and pre-processing to reduce tokens.",
                     results: "85% reduction in document processing time. Savings of over 200 hours monthly in manual work. 94% accuracy in information extraction."
@@ -351,7 +347,7 @@ export const translations = {
                 },
                 {
                     date: "1 month ago",
-                    content: "🎯 From idea to MVP in 2 weeks. That's how we work in startups. Laravel + Vue.js + AWS = Perfect stack to iterate fast without sacrificing quality. #Startup #MVP #AgileDevlopment",
+                    content: "🎯 From idea to MVP in 2 weeks. That's how we work in startups. Laravel + Vue.js + AWS = Perfect stack to iterate fast without sacrificing quality. #Startup #MVP #AgileDevelopment",
                     likes: 398,
                     comments: 29,
                     link: "https://www.linkedin.com/in/jjanicamatanta/"
