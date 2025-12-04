@@ -48,6 +48,32 @@ const t = getTranslations(lang);
         <!-- DNS Prefetch for external resources -->
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
 
+        <!-- Critical CSS - Inline for instant render (prevents 250ms blocking) -->
+        <style is:inline>
+            /* Prevent white flash and enable instant paint */
+            html {
+                scroll-behavior: smooth;
+            }
+            body {
+                margin: 0;
+                background: #020617;
+                color: #e2e8f0;
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+            }
+            header {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                z-index: 50;
+            }
+            main {
+                padding-top: 5rem;
+            }
+        </style>
+
         <title>{title}</title>
     </head>
     <body

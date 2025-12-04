@@ -19,6 +19,21 @@ export default defineConfig({
     }
   },
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    build: {
+      // Inline CSS smaller than 4KB to prevent render blocking
+      assetsInlineLimit: 4096,
+      cssCodeSplit: true,
+      // Minify CSS aggressively
+      cssMinify: 'lightningcss',
+      rollupOptions: {
+        output: {
+          // Better chunking strategy
+          manualChunks: undefined,
+          // Inline small assets
+          inlineDynamicImports: false,
+        }
+      }
+    }
   }
 });
