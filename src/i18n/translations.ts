@@ -1,5 +1,10 @@
 import { personalInfo } from "../config/personal";
 
+// Import optimized project images
+import aiBotImage from "../assets/projects/ai-bot.png";
+import saasImage from "../assets/projects/saas-platform.png";
+import fintechImage from "../assets/projects/fintech-api.png";
+
 export const translations = {
     es: {
         nav: {
@@ -30,7 +35,7 @@ export const translations = {
                     title: "Portfolio Personal",
                     description: "Portfolio de Jose Anicama, construido con Astro, TailwindCSS y TypeScript.",
                     tech: ["Astro", "TailwindCSS", "TypeScript"],
-                    image: "/projects/ai-bot.png",
+                    image: aiBotImage,
                     fullDescription: "Mi portfolio personal, una PWA construida con Astro, TailwindCSS y TypeScript. Muestra mis proyectos, habilidades y experiencia de una manera moderna y accesible.",
                     features: [
                         "PWA (Progressive Web App) para una experiencia nativa.",
@@ -47,7 +52,7 @@ export const translations = {
                     title: "Clon de Netflix",
                     description: "Una aplicación web construida con PHP, HTML y Vue para transmitir y administrar contenido multimedia.",
                     tech: ["PHP", "HTML", "Vue"],
-                    image: "/projects/saas-platform.png",
+                    image: saasImage,
                     fullDescription: "Una aplicación web construida con PHP, HTML y Vue para transmitir y administrar contenido multimedia. Permite a los usuarios ver películas y series, y a los administradores gestionar el contenido.",
                     features: [
                         "Streaming de video.",
@@ -63,7 +68,7 @@ export const translations = {
                     title: "Acortador de URL",
                     description: "Un acortador de URL simple y eficiente construido con PHP para una gestión de enlaces rápida y sencilla.",
                     tech: ["PHP", "Docker", "Laravel"],
-                    image: "/projects/fintech-api.png",
+                    image: fintechImage,
                     fullDescription: "Un acortador de URL simple y eficiente construido con PHP para una gestión de enlaces rápida y sencilla. Permite a los usuarios acortar URLs largas y realizar un seguimiento de los clics.",
                     features: [
                         "Acortamiento de URL.",
@@ -210,7 +215,7 @@ export const translations = {
                     title: "Personal Portfolio",
                     description: "Jose Anicama's portfolio, built with Astro, TailwindCSS, and TypeScript.",
                     tech: ["Astro", "TailwindCSS", "TypeScript"],
-                    image: "/projects/ai-bot.png",
+                    image: aiBotImage,
                     fullDescription: "My personal portfolio, a PWA built with Astro, TailwindCSS, and TypeScript. It showcases my projects, skills, and experience in a modern and accessible way.",
                     features: [
                         "PWA (Progressive Web App) for a native-like experience.",
@@ -227,7 +232,7 @@ export const translations = {
                     title: "Netflix Clone",
                     description: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content.",
                     tech: ["PHP", "HTML", "Vue"],
-                    image: "/projects/saas-platform.png",
+                    image: saasImage,
                     fullDescription: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content. It allows users to watch movies and series, and administrators to manage the content.",
                     features: [
                         "Video streaming.",
@@ -243,7 +248,7 @@ export const translations = {
                     title: "URL Shortener",
                     description: "A simple and efficient URL shortener built with PHP for quick and easy link management.",
                     tech: ["PHP", "Docker", "Laravel"],
-                    image: "/projects/fintech-api.png",
+                    image: fintechImage,
                     fullDescription: "A simple and efficient URL shortener built with PHP for quick and easy link management. It allows users to shorten long URLs and track clicks.",
                     features: [
                         "URL shortening.",

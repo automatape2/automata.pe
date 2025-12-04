@@ -12,6 +12,12 @@ export default defineConfig({
       prefixDefaultLocale: false
     }
   },
+  image: {
+    // Enable image optimization with Sharp
+    service: {
+      entrypoint: 'astro/assets/services/sharp'
+    }
+  },
   vite: {
     plugins: [tailwindcss()]
   }
