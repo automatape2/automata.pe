@@ -5,6 +5,7 @@ import ScrollToTop from "../components/ScrollToTop.astro";
 import AIChat from "../components/AIChat.astro";
 import Footer from "../components/Footer.astro";
 import { getLangFromUrl, getTranslations } from "../i18n/utils";
+import { personalInfo } from "../config/personal";
 
 interface Props {
     title: string;
@@ -50,7 +51,7 @@ const t = getTranslations(lang);
                     href={lang === "es" ? "/" : "/en"}
                     class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent hover:scale-105 transition-transform"
                 >
-                    DevFullStack
+                    {personalInfo.brandName}
                 </a>
                 <div class="flex items-center gap-6">
                     <ul class="hidden md:flex space-x-8">

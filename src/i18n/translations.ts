@@ -1,3 +1,5 @@
+import { personalInfo } from "../config/personal";
+
 export const translations = {
     es: {
         nav: {
@@ -17,8 +19,9 @@ export const translations = {
             cta2: "Contactar",
             chatWithAI: "Chatea con IA",
             socialLinks: {
-                github: "https://github.com/automatape2",
-                linkedin: "https://www.linkedin.com/in/jjanicamatanta/"
+                github: personalInfo.socialLinks.github,
+                linkedin: personalInfo.socialLinks.linkedin,
+                twitter: personalInfo.socialLinks.twitter
             }
         },
         projects: {
@@ -171,7 +174,7 @@ export const translations = {
         contact: {
             title: "¿Listo para empezar?",
             description: "Actualmente estoy disponible para nuevos proyectos y colaboraciones. Si tienes una idea que quieres llevar al siguiente nivel, hablemos.",
-            email: "j.j.anicamatanta@gmail.com",
+            email: personalInfo.email,
             emailLabel: "Email",
             socialLabel: "Sígueme"
         },
@@ -203,8 +206,9 @@ export const translations = {
             cta2: "Contact Me",
             chatWithAI: "Chat with AI",
             socialLinks: {
-                github: "https://github.com/automatape2",
-                linkedin: "https://www.linkedin.com/in/jjanicamatanta/"
+                github: personalInfo.socialLinks.github,
+                linkedin: personalInfo.socialLinks.linkedin,
+                twitter: personalInfo.socialLinks.twitter
             }
         },
         projects: {
@@ -357,7 +361,7 @@ export const translations = {
         contact: {
             title: "Ready to start?",
             description: "I'm currently available for new projects and collaborations. If you have an idea you want to take to the next level, let's talk.",
-            email: "j.j.anicamatanta@gmail.com",
+            email: personalInfo.email,
             emailLabel: "Email",
             socialLabel: "Follow Me"
         },
