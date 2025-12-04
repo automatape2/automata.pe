@@ -6,16 +6,19 @@ interface Props {
 const { lang } = Astro.props;
 ---
 
-<div id="ai-chat-container" class="fixed bottom-6 right-6 z-50">
+<div
+    id="ai-chat-container"
+    class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50"
+>
     <!-- Chat Toggle Button -->
     <button
         id="chat-toggle"
-        class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-full shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_40px_rgba(6,182,212,0.6)] flex items-center justify-center transition-all duration-300 hover:scale-110 group"
+        class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-full shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_40px_rgba(6,182,212,0.6)] flex items-center justify-center transition-all duration-300 hover:scale-110 group"
         aria-label="Toggle AI Chat"
     >
         <svg
             id="chat-icon"
-            class="w-8 h-8 text-white transition-transform duration-300"
+            class="w-7 h-7 sm:w-8 sm:h-8 text-white transition-transform duration-300"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -29,7 +32,7 @@ const { lang } = Astro.props;
         </svg>
         <svg
             id="close-icon"
-            class="w-8 h-8 text-white absolute transition-transform duration-300 scale-0"
+            class="w-7 h-7 sm:w-8 sm:h-8 text-white absolute transition-transform duration-300 scale-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -50,11 +53,11 @@ const { lang } = Astro.props;
     <!-- Chat Window -->
     <div
         id="chat-window"
-        class="absolute bottom-20 right-0 w-96 h-[32rem] bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-[0_0_50px_rgba(6,182,212,0.3)] border border-slate-700/50 flex flex-col transform scale-0 origin-bottom-right transition-all duration-300 opacity-0"
+        class="fixed sm:absolute bottom-0 sm:bottom-20 right-0 left-0 sm:left-auto w-full sm:w-96 h-[100dvh] sm:h-[32rem] bg-slate-900/95 backdrop-blur-xl sm:rounded-2xl shadow-[0_0_50px_rgba(6,182,212,0.3)] border-t sm:border border-slate-700/50 flex flex-col transform scale-0 origin-bottom-right transition-all duration-300 opacity-0"
     >
         <!-- Chat Header -->
         <div
-            class="p-4 border-b border-slate-700/50 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-t-2xl"
+            class="p-3 sm:p-4 border-b border-slate-700/50 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 sm:rounded-t-2xl"
         >
             <div class="flex items-center gap-3">
                 <div class="relative">
@@ -73,13 +76,32 @@ const { lang } = Astro.props;
                         {lang === "es" ? "En línea" : "Online"}
                     </p>
                 </div>
+                <!-- Close button for mobile -->
+                <button
+                    id="mobile-close-btn"
+                    class="sm:hidden w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-800/50 transition-colors"
+                    aria-label="Close chat"
+                >
+                    <svg
+                        class="w-5 h-5 text-slate-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
             </div>
         </div>
 
         <!-- Chat Messages -->
         <div
             id="chat-messages"
-            class="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800/50"
+            class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800/50"
         >
             <!-- Welcome message -->
             <div class="flex gap-2 items-start">
@@ -103,7 +125,7 @@ const { lang } = Astro.props;
         </div>
 
         <!-- Quick Actions -->
-        <div id="quick-actions" class="px-4 pb-2 flex flex-wrap gap-2">
+        <div id="quick-actions" class="px-3 sm:px-4 pb-2 flex flex-wrap gap-2">
             <button
                 class="quick-action-btn text-xs px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-cyan-400 rounded-full transition-all duration-200 border border-slate-700/50 hover:border-cyan-500/50"
                 data-action={lang === "es"
@@ -131,7 +153,7 @@ const { lang } = Astro.props;
         </div>
 
         <!-- Chat Input -->
-        <div class="p-4 border-t border-slate-700/50">
+        <div class="p-3 sm:p-4 border-t border-slate-700/50">
             <div class="flex gap-2">
                 <input
                     type="text"
@@ -139,11 +161,11 @@ const { lang } = Astro.props;
                     placeholder={lang === "es"
                         ? "Escribe tu pregunta..."
                         : "Type your question..."}
-                    class="flex-1 bg-slate-800/80 border border-slate-700/50 rounded-xl px-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                    class="flex-1 bg-slate-800/80 border border-slate-700/50 rounded-xl px-3 sm:px-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all"
                 />
                 <button
                     id="send-btn"
-                    class="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white rounded-xl px-4 py-2 transition-all duration-200 shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white rounded-xl px-3 sm:px-4 py-2 transition-all duration-200 shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <svg
                         class="w-5 h-5"
@@ -434,11 +456,17 @@ What would you like to know more about?`,
             chatIcon?.classList.add("scale-0");
             closeIcon?.classList.remove("scale-0");
             chatInput?.focus();
+            // Prevent body scroll on mobile
+            if (window.innerWidth < 640) {
+                document.body.style.overflow = "hidden";
+            }
         } else {
             chatWindow?.classList.add("scale-0", "opacity-0");
             chatWindow?.classList.remove("scale-100", "opacity-100");
             chatIcon?.classList.remove("scale-0");
             closeIcon?.classList.add("scale-0");
+            // Restore body scroll
+            document.body.style.overflow = "";
         }
     }
 
@@ -514,6 +542,10 @@ What would you like to know more about?`,
 
     // Event listeners
     chatToggle?.addEventListener("click", toggleChat);
+
+    // Mobile close button
+    const mobileCloseBtn = document.getElementById("mobile-close-btn");
+    mobileCloseBtn?.addEventListener("click", toggleChat);
 
     sendBtn?.addEventListener("click", handleSendMessage);
 
