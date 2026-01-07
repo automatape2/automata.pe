@@ -7,6 +7,7 @@ import fintechImage from "../assets/projects/fintech-api.png";
 import msCrmImage from "../assets/projects/ms-crm.png";
 import msCrmImage2 from "../assets/projects/ms-crm-2.png";
 import msCrmImage3 from "../assets/projects/ms-crm-3.png";
+import netflicsPirateImage from "../assets/projects/netflics-pirate.svg";
 
 export const translations = {
     es: {
@@ -81,7 +82,7 @@ export const translations = {
                     title: "Clon de Netflix",
                     description: "Una aplicación web construida con PHP, HTML y Vue para transmitir y administrar contenido multimedia.",
                     tech: ["PHP", "HTML", "Vue"],
-                    image: saasImage,
+                    image: netflicsPirateImage,
                     fullDescription: "Una aplicación web construida con PHP, HTML y Vue para transmitir y administrar contenido multimedia. Permite a los usuarios ver películas y series, y a los administradores gestionar el contenido.",
                     features: [
                         "Streaming de video.",
@@ -294,7 +295,7 @@ export const translations = {
                     title: "Netflix Clone",
                     description: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content.",
                     tech: ["PHP", "HTML", "Vue"],
-                    image: saasImage,
+                    image: netflicsPirateImage,
                     fullDescription: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content. It allows users to watch movies and series, and administrators to manage the content.",
                     features: [
                         "Video streaming.",
