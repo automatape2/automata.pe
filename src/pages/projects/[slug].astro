@@ -170,6 +170,33 @@ const { project, locale, backText } = Astro.props;
                         </div>
                     </div>
 
+                    <!-- Screenshots Gallery -->
+                    {
+                        project.screenshots && project.screenshots.length > 0 && (
+                            <div class="bg-slate-900/50 rounded-2xl p-8 border border-slate-800">
+                                <h2 class="text-3xl font-bold text-slate-100 mb-6 flex items-center gap-3">
+                                    <span class="w-2 h-8 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></span>
+                                    {locale === "en" ? "Screenshots" : "Capturas de Pantalla"}
+                                </h2>
+                                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {project.screenshots.map((screenshot: any, index: number) => (
+                                        <div class="group relative overflow-hidden rounded-lg border border-slate-700 hover:border-cyan-500/30 transition-all">
+                                            <Image
+                                                src={screenshot}
+                                                alt={`${project.title} screenshot ${index + 1}`}
+                                                class="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+                                                loading="lazy"
+                                                width={400}
+                                                height={300}
+                                                format="webp"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )
+                    }
+
                     <!-- Challenges & Solutions -->
                     <div
                         class="bg-slate-900/50 rounded-2xl p-8 border border-slate-800"

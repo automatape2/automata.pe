@@ -4,6 +4,9 @@ import { personalInfo } from "../config/personal";
 import aiBotImage from "../assets/projects/ai-bot.png";
 import saasImage from "../assets/projects/saas-platform.png";
 import fintechImage from "../assets/projects/fintech-api.png";
+import msCrmImage from "../assets/projects/ms-crm.png";
+import msCrmImage2 from "../assets/projects/ms-crm-2.png";
+import msCrmImage3 from "../assets/projects/ms-crm-3.png";
 
 export const translations = {
     es: {
@@ -30,6 +33,31 @@ export const translations = {
         projects: {
             sectionTitle: "Proyectos Destacados",
             items: [
+                {
+                    slug: "ms_crm",
+                    title: "MS CRM",
+                    description: "Sistema de Gestión de Relaciones con Clientes simple y fácil para administrar contactos, organizaciones e interacciones comerciales.",
+                    tech: ["Laravel 11", "PHP 8.4", "Livewire 3", "MySQL", "Tailwind CSS"],
+                    image: msCrmImage2,
+                    screenshots: [msCrmImage, msCrmImage2, msCrmImage3],
+                    fullDescription: "MS CRM es un sistema de gestión de relaciones con clientes completo construido con Laravel 11 y Livewire 3. Ofrece gestión de contactos y organizaciones, timeline de interacciones, segmentos de audiencia, y un completo registro de auditoría. Con soporte bilingüe (español/inglés), modo oscuro y diseño responsive.",
+                    features: [
+                        "Dashboard con estadísticas en tiempo real",
+                        "Gestión completa de contactos (CRUD)",
+                        "Gestión de organizaciones (gobierno, ONGs, empresas, comunidades)",
+                        "Timeline de interacciones (emails, llamadas, reuniones, eventos, notas)",
+                        "Segmentos de audiencia (dinámicos y estáticos)",
+                        "Registro completo de auditoría",
+                        "Búsqueda y filtros avanzados",
+                        "Multi-idioma (español/inglés)",
+                        "Modo oscuro",
+                        "Diseño responsive (móvil, tablet, escritorio)",
+                        "Autenticación con Laravel Fortify (incluye 2FA)",
+                        "Testing con Pest PHP"
+                    ],
+                    challenges: "Implementar un sistema de segmentos dinámicos que se actualicen automáticamente basado en reglas configurables. Diseñar una arquitectura escalable con Livewire 3 para manejar interacciones en tiempo real sin sacrificar rendimiento. Integrar autenticación de doble factor y mantener un registro de auditoría completo para cumplir con estándares de seguridad.",
+                    results: "Un CRM completamente funcional desplegado en producción en https://automata.pe/ms_crm/. El sistema gestiona exitosamente contactos, organizaciones e interacciones con una interfaz moderna y responsive. Incluye características avanzadas como segmentos dinámicos, campaña de seguimiento, y autenticación segura con 2FA."
+                },
                 {
                     slug: "automata-pe",
                     title: "Portfolio Personal",
@@ -87,6 +115,14 @@ export const translations = {
             viewProfile: "Ver GitHub",
             items: [
                 {
+                    name: "ms_crm",
+                    description: "Sistema de Gestión de Relaciones con Clientes simple y fácil para administrar contactos, organizaciones e interacciones comerciales.",
+                    language: "PHP",
+                    stars: 0,
+                    forks: 0,
+                    url: "https://github.com/automatape2/ms_crm"
+                },
+                {
                     name: "automata.pe",
                     description: "Portfolio de Jose Anicama, construido con Astro, TailwindCSS y TypeScript.",
                     language: "Astro",
@@ -123,7 +159,6 @@ export const translations = {
         linkedInPosts: {
             sectionTitle: "Últimas Publicaciones en LinkedIn",
             subtitle: "Comparto conocimientos, experiencias y tendencias en desarrollo de software",
-            viewProfile: "Ver Perfil Completo",
             items: [
                 {
                     date: "Hace 2 días",
@@ -211,6 +246,31 @@ export const translations = {
             sectionTitle: "Featured Projects",
             items: [
                 {
+                    slug: "ms_crm",
+                    title: "MS CRM",
+                    description: "Simple and easy CRM system for managing contacts, organizations and business interactions.",
+                    tech: ["Laravel 11", "PHP 8.4", "Livewire 3", "MySQL", "Tailwind CSS"],
+                    image: msCrmImage2,
+                    screenshots: [msCrmImage, msCrmImage2, msCrmImage3],
+                    fullDescription: "MS CRM is a comprehensive customer relationship management system built with Laravel 11 and Livewire 3. It offers contact and organization management, interaction timeline, audience segments, and complete audit trail. With bilingual support (Spanish/English), dark mode, and responsive design.",
+                    features: [
+                        "Dashboard with real-time stats",
+                        "Complete contact management (CRUD)",
+                        "Organization management (government, NGOs, companies, communities)",
+                        "Interaction timeline (emails, calls, meetings, events, notes)",
+                        "Audience segments (dynamic and static)",
+                        "Complete audit trail",
+                        "Advanced search and filters",
+                        "Multi-language (Spanish/English)",
+                        "Dark mode",
+                        "Responsive design (mobile, tablet, desktop)",
+                        "Laravel Fortify authentication (with 2FA)",
+                        "Testing with Pest PHP"
+                    ],
+                    challenges: "Implementing a dynamic segments system that automatically updates based on configurable rules. Designing a scalable architecture with Livewire 3 to handle real-time interactions without sacrificing performance. Integrating two-factor authentication and maintaining a complete audit trail to meet security standards.",
+                    results: "A fully functional CRM deployed in production at https://automata.pe/ms_crm/. The system successfully manages contacts, organizations and interactions with a modern and responsive interface. Includes advanced features like dynamic segments, campaign tracking, and secure authentication with 2FA."
+                },
+                {
                     slug: "automata-pe",
                     title: "Personal Portfolio",
                     description: "Jose Anicama's portfolio, built with Astro, TailwindCSS, and TypeScript.",
@@ -266,6 +326,14 @@ export const translations = {
             subtitle: "Community contributions and personal projects",
             viewProfile: "View GitHub",
             items: [
+                {
+                    name: "ms_crm",
+                    description: "Simple and easy CRM system for managing contacts, organizations and business interactions.",
+                    language: "PHP",
+                    stars: 0,
+                    forks: 0,
+                    url: "https://github.com/automatape2/ms_crm"
+                },
                 {
                     name: "automata.pe",
                     description: "Jose Anicama's portfolio, built with Astro, TailwindCSS, and TypeScript.",
