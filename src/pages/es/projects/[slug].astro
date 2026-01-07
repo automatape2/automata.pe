@@ -1,26 +1,22 @@
 ---
 import { Image } from "astro:assets";
-import Layout from "../../layouts/Layout.astro";
-import { getLangFromUrl, getTranslations } from "../../i18n/utils";
+import Layout from "../../../layouts/Layout.astro";
 
 export async function getStaticPaths() {
-    const { translations } = await import(`../../i18n/translations.ts`);
+    const { translations } = await import(`../../../i18n/translations.ts`);
     const paths = [];
 
-    // English projects (default, no locale prefix)
-    for (const project of translations.en.projects.items) {
+    // Spanish projects (with /es/ prefix)
+    for (const project of translations.es.projects.items) {
         paths.push({
             params: { slug: project.slug },
             props: {
                 project,
-                locale: 'en',
-                backText: "Back to Projects",
+                locale: 'es',
+                backText: "Volver a Proyectos",
             },
         });
     }
-
-    // Spanish projects (with /es/ prefix) - these will be handled by /es/projects/[slug].astro
-    // So we don't include them here
 
     return paths;
 }
