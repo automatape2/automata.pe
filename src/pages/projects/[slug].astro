@@ -207,7 +207,12 @@ const { project, locale, backText } = Astro.props;
                                 </h2>
                                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {project.screenshots.map((screenshot: any, index: number) => (
-                                        <div class="group relative overflow-hidden rounded-lg border border-slate-700 hover:border-cyan-500/30 transition-all">
+                                        <a 
+                                            href={screenshot.src}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="group relative overflow-hidden rounded-lg border border-slate-700 hover:border-cyan-500/30 transition-all cursor-zoom-in block"
+                                        >
                                             <Image
                                                 src={screenshot}
                                                 alt={`${project.title} screenshot ${index + 1}`}
@@ -217,7 +222,22 @@ const { project, locale, backText } = Astro.props;
                                                 height={300}
                                                 format="webp"
                                             />
-                                        </div>
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                                                <svg 
+                                                    class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        </a>
                                     ))}
                                 </div>
                             </div>
