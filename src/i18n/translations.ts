@@ -8,6 +8,7 @@ import msCrmImage from "../assets/projects/ms-crm.png";
 import msCrmImage2 from "../assets/projects/ms-crm-2.png";
 import msCrmImage3 from "../assets/projects/ms-crm-3.png";
 import netflicsPirateImage from "../assets/projects/netflics-pirate.svg";
+import urlShortenerImage from "../assets/projects/url-shortener.svg";
 
 export const translations = {
     es: {
@@ -98,7 +99,7 @@ export const translations = {
                     title: "Acortador de URL",
                     description: "Un acortador de URL simple y eficiente construido con PHP para una gestión de enlaces rápida y sencilla.",
                     tech: ["PHP", "Docker", "Laravel"],
-                    image: fintechImage,
+                    image: urlShortenerImage,
                     fullDescription: "Un acortador de URL simple y eficiente construido con PHP para una gestión de enlaces rápida y sencilla. Permite a los usuarios acortar URLs largas y realizar un seguimiento de los clics.",
                     features: [
                         "Acortamiento de URL.",
@@ -311,7 +312,7 @@ export const translations = {
                     title: "URL Shortener",
                     description: "A simple and efficient URL shortener built with PHP for quick and easy link management.",
                     tech: ["PHP", "Docker", "Laravel"],
-                    image: fintechImage,
+                    image: urlShortenerImage,
                     fullDescription: "A simple and efficient URL shortener built with PHP for quick and easy link management. It allows users to shorten long URLs and track clicks.",
                     features: [
                         "URL shortening.",
