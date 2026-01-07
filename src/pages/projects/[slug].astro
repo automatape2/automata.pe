@@ -84,6 +84,33 @@ const { project, locale, backText } = Astro.props;
                                 ))
                             }
                         </div>
+                        {
+                            project.demoUrl && (
+                                <div class="pt-4">
+                                    <a
+                                        href={project.demoUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all hover:-translate-y-1"
+                                    >
+                                        <svg
+                                            class="w-5 h-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                            />
+                                        </svg>
+                                        <span>{locale === "en" ? "View Live Demo" : "Ver Demo en Vivo"}</span>
+                                    </a>
+                                </div>
+                            )
+                        }
                     </div>
 
                     <div

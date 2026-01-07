@@ -40,6 +40,7 @@ export const translations = {
                     tech: ["Laravel 11", "PHP 8.4", "Livewire 3", "MySQL", "Tailwind CSS"],
                     image: msCrmImage2,
                     screenshots: [msCrmImage, msCrmImage2, msCrmImage3],
+                    demoUrl: "https://automata.pe/ms_crm",
                     fullDescription: "MS CRM es un sistema de gestión de relaciones con clientes completo construido con Laravel 11 y Livewire 3. Ofrece gestión de contactos y organizaciones, timeline de interacciones, segmentos de audiencia, y un completo registro de auditoría. Con soporte bilingüe (español/inglés), modo oscuro y diseño responsive.",
                     features: [
                         "Dashboard con estadísticas en tiempo real",
@@ -252,6 +253,7 @@ export const translations = {
                     tech: ["Laravel 11", "PHP 8.4", "Livewire 3", "MySQL", "Tailwind CSS"],
                     image: msCrmImage2,
                     screenshots: [msCrmImage, msCrmImage2, msCrmImage3],
+                    demoUrl: "https://automata.pe/ms_crm",
                     fullDescription: "MS CRM is a comprehensive customer relationship management system built with Laravel 11 and Livewire 3. It offers contact and organization management, interaction timeline, audience segments, and complete audit trail. With bilingual support (Spanish/English), dark mode, and responsive design.",
                     features: [
                         "Dashboard with real-time stats",
