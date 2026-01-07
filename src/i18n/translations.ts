@@ -9,6 +9,7 @@ import msCrmImage2 from "../assets/projects/ms-crm-2.png";
 import msCrmImage3 from "../assets/projects/ms-crm-3.png";
 import netflicsPirateImage from "../assets/projects/netflics-pirate.svg";
 import urlShortenerImage from "../assets/projects/url-shortener.svg";
+import portfolioImage from "../assets/projects/portfolio.png";
 
 export const translations = {
     es: {
@@ -66,7 +67,7 @@ export const translations = {
                     title: "Portfolio Personal",
                     description: "Portfolio de Jose Anicama, construido con Astro, TailwindCSS y TypeScript.",
                     tech: ["Astro", "TailwindCSS", "TypeScript"],
-                    image: aiBotImage,
+                    image: portfolioImage,
                     fullDescription: "Mi portfolio personal, una PWA construida con Astro, TailwindCSS y TypeScript. Muestra mis proyectos, habilidades y experiencia de una manera moderna y accesible.",
                     features: [
                         "PWA (Progressive Web App) para una experiencia nativa.",
@@ -279,7 +280,7 @@ export const translations = {
                     title: "Personal Portfolio",
                     description: "Jose Anicama's portfolio, built with Astro, TailwindCSS, and TypeScript.",
                     tech: ["Astro", "TailwindCSS", "TypeScript"],
-                    image: aiBotImage,
+                    image: portfolioImage,
                     fullDescription: "My personal portfolio, a PWA built with Astro, TailwindCSS, and TypeScript. It showcases my projects, skills, and experience in a modern and accessible way.",
                     features: [
                         "PWA (Progressive Web App) for a native-like experience.",
