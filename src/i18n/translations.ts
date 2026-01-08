@@ -10,6 +10,7 @@ import msCrmImage3 from "../assets/projects/ms-crm-3.png";
 import netflicsPirateImage from "../assets/projects/netflics-pirate.svg";
 import urlShortenerImage from "../assets/projects/url-shortener.svg";
 import portfolioImage from "../assets/projects/portfolio.png";
+import educationPortalImage from "../assets/projects/education-portal.svg";
 
 export const translations = {
     es: {
@@ -36,6 +37,31 @@ export const translations = {
         projects: {
             sectionTitle: "Proyectos Destacados",
             items: [
+                {
+                    slug: "education_portal",
+                    title: "Portal Educativo",
+                    description: "Portal web educativo para estudiantes de ciencias de la salud con recursos, foros, grupos de estudio, calendario y mensajería.",
+                    tech: ["Laravel 11", "Livewire 3", "MySQL", "Tailwind CSS", "Fortify"],
+                    image: educationPortalImage,
+                    demoUrl: "https://automata.pe/education_portal",
+                    fullDescription: "Portal educativo completo para estudiantes de ciencias de la salud construido con Laravel 11 y Livewire 3. Ofrece repositorio de recursos académicos, foros de discusión, grupos de estudio, calendario de eventos, noticias y sistema de mensajería. Con diseño responsive, modo oscuro y búsqueda avanzada.",
+                    features: [
+                        "Repositorio de recursos académicos (apuntes, presentaciones, artículos, guías)",
+                        "Sistema de valoraciones y comentarios en recursos",
+                        "Foros de discusión por categorías con respuestas anidadas",
+                        "Grupos de estudio públicos/privados con límite de miembros",
+                        "Calendario de eventos académicos (exámenes, entregas, seminarios)",
+                        "Publicación de noticias y anuncios categorizados",
+                        "Búsqueda global avanzada en todo el portal",
+                        "Perfiles de usuario personalizados con información académica",
+                        "Sistema de autenticación con Laravel Fortify",
+                        "Diseño responsive con modo oscuro",
+                        "Filtros dinámicos por carrera, materia y semestre",
+                        "Feed de actividad en tiempo real"
+                    ],
+                    challenges: "Diseñar una arquitectura escalable que permita gestionar múltiples tipos de contenido (recursos, foros, grupos, eventos, noticias) de forma coherente. Implementar un sistema de búsqueda global eficiente que indexe todos los tipos de contenido. Crear una experiencia de usuario fluida con Livewire 3 sin sacrificar rendimiento, especialmente en listados con filtros dinámicos y paginación.",
+                    results: "Un portal educativo completamente funcional desplegado en https://automata.pe/education_portal/. El sistema gestiona exitosamente recursos académicos, foros, grupos de estudio y eventos con una interfaz moderna y responsive. Incluye 847 recursos, 234 temas de foro, 58 grupos de estudio y 42 eventos programados. Sistema completo con datos de prueba y documentación."
+                },
                 {
                     slug: "ms_crm",
                     title: "MS CRM",
@@ -118,6 +144,14 @@ export const translations = {
             subtitle: "Contribuciones a la comunidad y proyectos personales",
             viewProfile: "Ver GitHub",
             items: [
+                {
+                    name: "education_portal",
+                    description: "Portal web educativo para estudiantes de ciencias de la salud con recursos, foros, grupos de estudio, calendario y mensajería.",
+                    language: "PHP",
+                    stars: 0,
+                    forks: 0,
+                    url: "https://github.com/automatape2/education_portal"
+                },
                 {
                     name: "ms_crm",
                     description: "Sistema de Gestión de Relaciones con Clientes simple y fácil para administrar contactos, organizaciones e interacciones comerciales.",
@@ -250,6 +284,31 @@ export const translations = {
             sectionTitle: "Featured Projects",
             items: [
                 {
+                    slug: "education_portal",
+                    title: "Education Portal",
+                    description: "Educational web portal for health sciences students with resources, forums, study groups, calendar & messaging.",
+                    tech: ["Laravel 11", "Livewire 3", "MySQL", "Tailwind CSS", "Fortify"],
+                    image: educationPortalImage,
+                    demoUrl: "https://automata.pe/education_portal",
+                    fullDescription: "Complete educational portal for health sciences students built with Laravel 11 and Livewire 3. Offers academic resources repository, discussion forums, study groups, events calendar, news and messaging system. With responsive design, dark mode and advanced search.",
+                    features: [
+                        "Academic resources repository (notes, presentations, articles, guides)",
+                        "Rating and commenting system for resources",
+                        "Discussion forums by category with nested replies",
+                        "Public/private study groups with member limits",
+                        "Academic events calendar (exams, submissions, seminars)",
+                        "Categorized news and announcements publication",
+                        "Advanced global search across the portal",
+                        "Personalized user profiles with academic information",
+                        "Authentication system with Laravel Fortify",
+                        "Responsive design with dark mode",
+                        "Dynamic filters by career, subject and semester",
+                        "Real-time activity feed"
+                    ],
+                    challenges: "Designing a scalable architecture that allows managing multiple types of content (resources, forums, groups, events, news) in a coherent way. Implementing an efficient global search system that indexes all content types. Creating a fluid user experience with Livewire 3 without sacrificing performance, especially in listings with dynamic filters and pagination.",
+                    results: "A fully functional educational portal deployed at https://automata.pe/education_portal/. The system successfully manages academic resources, forums, study groups and events with a modern and responsive interface. Includes 847 resources, 234 forum topics, 58 study groups and 42 scheduled events. Complete system with test data and documentation."
+                },
+                {
                     slug: "ms_crm",
                     title: "MS CRM",
                     description: "Simple and easy CRM system for managing contacts, organizations and business interactions.",
@@ -331,6 +390,14 @@ export const translations = {
             subtitle: "Community contributions and personal projects",
             viewProfile: "View GitHub",
             items: [
+                {
+                    name: "education_portal",
+                    description: "Educational web portal for health sciences students with resources, forums, study groups, calendar & messaging.",
+                    language: "PHP",
+                    stars: 0,
+                    forks: 0,
+                    url: "https://github.com/automatape2/education_portal"
+                },
                 {
                     name: "ms_crm",
                     description: "Simple and easy CRM system for managing contacts, organizations and business interactions.",

@@ -1,0 +1,110 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="eduBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="eduAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="url(#eduBg)"/>
+  
+  <!-- Graduation cap icon (main) -->
+  <g transform="translate(400, 120)">
+    <path d="M 0 -60 L -80 -30 L 0 0 L 80 -30 Z" fill="url(#eduAccent)"/>
+    <path d="M 0 0 L 0 40 L -40 20 L 0 0 L 40 20 Z" fill="#3b82f6" opacity="0.8"/>
+    <circle cx="0" cy="-60" r="8" fill="#fbbf24"/>
+    <rect x="-3" y="-60" width="6" height="30" fill="#fbbf24"/>
+  </g>
+  
+  <!-- Dashboard interface mockup -->
+  <g transform="translate(80, 220)">
+    <!-- Main container -->
+    <rect width="640" height="320" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    
+    <!-- Header -->
+    <rect width="640" height="50" rx="12" fill="#334155"/>
+    <text x="20" y="32" font-family="Arial, sans-serif" font-size="18" fill="#f1f5f9" font-weight="bold">Portal Educativo</text>
+    
+    <!-- Stats cards -->
+    <g transform="translate(20, 70)">
+      <!-- Resources card -->
+      <rect width="140" height="100" rx="8" fill="#1e40af"/>
+      <text x="15" y="30" font-family="Arial, sans-serif" font-size="12" fill="#93c5fd">Recursos</text>
+      <text x="15" y="60" font-family="Arial, sans-serif" font-size="32" fill="#ffffff" font-weight="bold">847</text>
+      <text x="15" y="85" font-family="Arial, sans-serif" font-size="11" fill="#93c5fd">📚 Materiales</text>
+      
+      <!-- Forums card -->
+      <rect x="160" width="140" height="100" rx="8" fill="#065f46"/>
+      <text x="175" y="30" font-family="Arial, sans-serif" font-size="12" fill="#6ee7b7">Foros</text>
+      <text x="175" y="60" font-family="Arial, sans-serif" font-size="32" fill="#ffffff" font-weight="bold">234</text>
+      <text x="175" y="85" font-family="Arial, sans-serif" font-size="11" fill="#6ee7b7">💬 Temas</text>
+      
+      <!-- Groups card -->
+      <rect x="320" width="140" height="100" rx="8" fill="#7c2d12"/>
+      <text x="335" y="30" font-family="Arial, sans-serif" font-size="12" fill="#fed7aa">Grupos</text>
+      <text x="335" y="60" font-family="Arial, sans-serif" font-size="32" fill="#ffffff" font-weight="bold">58</text>
+      <text x="335" y="85" font-family="Arial, sans-serif" font-size="11" fill="#fed7aa">👥 Estudio</text>
+      
+      <!-- Calendar card -->
+      <rect x="480" width="140" height="100" rx="8" fill="#701a75"/>
+      <text x="495" y="30" font-family="Arial, sans-serif" font-size="12" fill="#f0abfc">Eventos</text>
+      <text x="495" y="60" font-family="Arial, sans-serif" font-size="32" fill="#ffffff" font-weight="bold">42</text>
+      <text x="495" y="85" font-family="Arial, sans-serif" font-size="11" fill="#f0abfc">📅 Próximos</text>
+    </g>
+    
+    <!-- Activity feed -->
+    <g transform="translate(20, 190)">
+      <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" fill="#cbd5e1" font-weight="bold">Actividad Reciente</text>
+      
+      <!-- Activity items -->
+      <g transform="translate(0, 15)">
+        <circle cx="10" cy="10" r="6" fill="#3b82f6"/>
+        <text x="25" y="14" font-family="Arial, sans-serif" font-size="11" fill="#e2e8f0">María compartió "Anatomía Cardiovascular"</text>
+      </g>
+      
+      <g transform="translate(0, 40)">
+        <circle cx="10" cy="10" r="6" fill="#10b981"/>
+        <text x="25" y="14" font-family="Arial, sans-serif" font-size="11" fill="#e2e8f0">Nuevo tema: "Preparación para examen final"</text>
+      </g>
+      
+      <g transform="translate(0, 65)">
+        <circle cx="10" cy="10" r="6" fill="#f59e0b"/>
+        <text x="25" y="14" font-family="Arial, sans-serif" font-size="11" fill="#e2e8f0">Evento: Seminario de Fisiología - Mañana 10AM</text>
+      </g>
+    </g>
+  </g>
+  
+  <!-- Features icons -->
+  <g transform="translate(100, 40)">
+    <circle cx="0" cy="0" r="20" fill="#3b82f6" opacity="0.2"/>
+    <text x="-8" y="8" font-size="20">📚</text>
+    <text x="30" y="5" font-family="Arial, sans-serif" font-size="12" fill="#93c5fd">Recursos</text>
+  </g>
+  
+  <g transform="translate(250, 40)">
+    <circle cx="0" cy="0" r="20" fill="#10b981" opacity="0.2"/>
+    <text x="-8" y="8" font-size="20">💬</text>
+    <text x="30" y="5" font-family="Arial, sans-serif" font-size="12" fill="#6ee7b7">Foros</text>
+  </g>
+  
+  <g transform="translate(400, 40)">
+    <circle cx="0" cy="0" r="20" fill="#f59e0b" opacity="0.2"/>
+    <text x="-8" y="8" font-size="20">👥</text>
+    <text x="30" y="5" font-family="Arial, sans-serif" font-size="12" fill="#fcd34d">Grupos</text>
+  </g>
+  
+  <g transform="translate(550, 40)">
+    <circle cx="0" cy="0" r="20" fill="#a855f7" opacity="0.2"/>
+    <text x="-8" y="8" font-size="20">📅</text>
+    <text x="30" y="5" font-family="Arial, sans-serif" font-size="12" fill="#e9d5ff">Calendario</text>
+  </g>
+  
+  <!-- Bottom accent -->
+  <rect x="0" y="580" width="800" height="20" fill="url(#eduAccent)"/>
+</svg>
