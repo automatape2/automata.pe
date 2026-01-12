@@ -1,27 +1,26 @@
-# Portfolio Personal - Astro + TailwindCSS
+# Professional Portfolio - Astro + TailwindCSS
 
-Portfolio profesional de desarrollador FullStack construido con Astro, TailwindCSS y TypeScript. Una PWA (Progressive Web App) moderna, rápida y optimizada que muestra proyectos, habilidades y experiencia de manera impactante.
+Modern, high-performance portfolio website built with cutting-edge web technologies. Features PWA capabilities, multi-language support, and enterprise-level optimizations achieving 90+ PageSpeed scores.
 
-## ✨ Características Principales
+## ✨ Key Features
 
-- 🚀 **PWA (Progressive Web App)** - Experiencia nativa con capacidad offline
-- 🎨 **Diseño Moderno** - UI minimalista con gradientes vibrantes y animaciones suaves
-- 🌍 **Multi-idioma** - Soporte completo para español e inglés
-- ⚡ **Rendimiento Optimizado** - Score 90+ en PageSpeed Insights
-- 📱 **Totalmente Responsive** - Adaptado a móvil, tablet y escritorio
-- 🖼️ **Imágenes Optimizadas** - Conversión automática a WebP, lazy loading
-- 🔄 **View Transitions** - Navegación fluida entre páginas
-- 📊 **Tracking de Visitas** - Analytics integrado con API Laravel
-- 🔒 **Seguro** - Headers de seguridad y PWA con service worker
+- 🚀 **Progressive Web App** - Offline-first architecture with service worker caching
+- 🌍 **Internationalization** - Multi-language support (i18n ready)
+- ⚡ **Performance Optimized** - 90+ PageSpeed Insights score with advanced optimization techniques
+- 📱 **Fully Responsive** - Mobile-first design approach
+- 🖼️ **Image Optimization** - WebP conversion, lazy loading, and responsive images
+- 🔄 **Smooth Transitions** - View transitions for seamless navigation
+- 📊 **Analytics Integration** - Custom visit tracking with REST API
+- 🔒 **Security Headers** - Production-ready security configuration
 
-## 🛠️ Stack Tecnológico
+## 🛠️ Tech Stack
 
-- **Framework**: [Astro](https://astro.build) - Generador de sitios estáticos
-- **Estilos**: [TailwindCSS](https://tailwindcss.com) - Framework CSS utility-first
-- **Lenguaje**: TypeScript - Type safety
-- **Optimización de Imágenes**: Sharp (vía @astrojs/image)
-- **Deployment**: GitHub Actions + SSH (automatizado)
-- **Backend**: Laravel API para tracking de visitas
+- **Framework**: [Astro](https://astro.build) - Static Site Generator
+- **Styling**: [TailwindCSS](https://tailwindcss.com) - Utility-first CSS framework
+- **Language**: TypeScript - Type-safe development
+- **Image Processing**: Sharp - Automated WebP conversion and optimization
+- **CI/CD**: GitHub Actions - Automated deployment pipeline
+- **API Integration**: RESTful API for analytics and data fetching
 
 ## 📂 Estructura del Proyecto
 
