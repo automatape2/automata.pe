@@ -22,66 +22,62 @@ Modern, high-performance portfolio website built with cutting-edge web technolog
 - **CI/CD**: GitHub Actions - Automated deployment pipeline
 - **API Integration**: RESTful API for analytics and data fetching
 
-## 📂 Estructura del Proyecto
+## 📂 Project Structure
 
 ```
 portfolio/
 ├── src/
-│   ├── assets/          # Imágenes optimizadas
-│   ├── components/      # Componentes reutilizables
-│   ├── config/          # Configuración personal centralizada
-│   ├── i18n/            # Traducciones ES/EN
-│   ├── layouts/         # Layouts de página
-│   ├── pages/           # Rutas del sitio
-│   └── styles/          # Estilos globales
+│   ├── assets/          # Optimized images and media
+│   ├── components/      # Reusable UI components
+│   ├── config/          # Centralized configuration
+│   ├── i18n/            # Internationalization files
+│   ├── layouts/         # Page layouts
+│   ├── pages/           # File-based routing
+│   └── styles/          # Global styles
 ├── public/
 │   ├── sw.js            # Service Worker
 │   ├── manifest.json    # PWA Manifest
-│   └── _headers         # Headers de seguridad
-└── .github/workflows/   # CI/CD automatizado
+│   └── _headers         # Security headers
+└── .github/workflows/   # CI/CD automation
 ```
 
-## 🚀 Instalación y Uso
+## 🚀 Getting Started
 
 ```bash
-# Clonar repositorio
-git clone https://github.com/automatape2/automata.pe.git
-cd automata.pe
+# Clone repository
+git clone <repository-url>
+cd portfolio
 
-# Instalar dependencias
+# Install dependencies
 npm install
 
-# Desarrollo local
+# Start development server
 npm run dev
 
-# Build para producción
+# Build for production
 npm run build
 
-# Preview del build
+# Preview production build
 npm run preview
 ```
 
-## ⚙️ Configuración Personal
+## ⚙️ Configuration
 
-Toda la información personal está centralizada en `src/config/personal.ts`. Solo actualiza este archivo para cambiar:
+All personal information is centralized in configuration files for easy customization:
 
-- Nombre de marca
-- Email de contacto
-- Links de redes sociales (GitHub, LinkedIn, Twitter)
-- Usernames
+- Contact information
+- Social media links
+- Branding and metadata
+- API endpoints
 
-Ver `CONFIGURACION.md` para más detalles.
+## 📊 Performance Achievements
 
-## 📊 Optimizaciones de Rendimiento
-
-- **Imágenes**: Reducción del 93% en tamaño (1.74 MB → 120 KB)
-- **Cache Strategy**: Caché agresiva con `max-age=31536000` para assets
-- **Service Worker**: Offline-first con estrategia cache-first
-- **Critical CSS**: Inlined para eliminar render-blocking
-- **Lazy Loading**: Carga diferida de imágenes below-the-fold
-- **WebP Conversion**: Conversión automática para mejor compresión
-
-Ver `PERFORMANCE_SUMMARY.md` para métricas detalladas.
+- **93% image size reduction** - Optimized asset delivery
+- **Aggressive caching strategy** - Long-term browser caching
+- **Offline-first PWA** - Works without internet connection
+- **Critical CSS inlining** - Eliminated render-blocking resources
+- **Lazy loading** - Deferred loading for below-the-fold content
+- **WebP format** - Modern image compression
 
 ## 🚢 Deployment
 
