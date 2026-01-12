@@ -81,47 +81,48 @@ All personal information is centralized in configuration files for easy customiz
 
 ## 🚢 Deployment
 
-El proyecto usa GitHub Actions para deployment automático via SSH.
+Automated deployment pipeline using GitHub Actions:
 
 ```bash
-# Push a main despliega automáticamente
+# Deploy to production
 git push origin main
 ```
 
-Ver `DEPLOY.md` para guía completa de configuración.
+Supports SSH deployment, static hosting, and CDN integration.
 
-## 🧞 Comandos
+## 🧞 Available Commands
 
-| Comando                   | Acción                                           |
+| Command                   | Action                                           |
 | :------------------------ | :----------------------------------------------- |
-| `npm install`             | Instala las dependencias                         |
-| `npm run dev`             | Inicia servidor local en `localhost:4321`        |
-| `npm run build`           | Build de producción en `./dist/`                 |
-| `npm run preview`         | Preview del build antes de desplegar             |
-| `npm run astro ...`       | Ejecuta comandos CLI de Astro                    |
+| `npm install`             | Install dependencies                             |
+| `npm run dev`             | Start dev server at `localhost:4321`             |
+| `npm run build`           | Build production site to `./dist/`               |
+| `npm run preview`         | Preview production build locally                 |
+| `npm run astro ...`       | Run Astro CLI commands                           |
 
-## 📝 Secciones del Portfolio
+## 🎯 Technical Highlights
 
-1. **Hero** - Presentación con CTA y links sociales
-2. **Proyectos Destacados** - Cards con imágenes, tech stack y links a demo
-3. **Repositorios GitHub** - Integración con GitHub API
-4. **LinkedIn Posts** - Últimas publicaciones profesionales
-5. **Contacto** - Email y redes sociales
+- **Component-based architecture** - Modular and maintainable codebase
+- **Type-safe development** - TypeScript for fewer runtime errors
+- **SEO optimized** - Meta tags, semantic HTML, and sitemap generation
+- **API integration** - RESTful endpoints for dynamic content
+- **Modern build tooling** - Vite-powered development experience
+- **Production-ready** - Security headers and performance best practices
 
-## 🌐 Demo en Vivo
+## 📝 Features Showcase
 
-**URL**: [https://automata.pe](https://automata.pe)
+- Hero section with call-to-action
+- Featured projects gallery
+- GitHub repositories integration
+- Social media content feed
+- Contact section with multiple channels
+- Smooth page transitions
+- Dark/light mode support
 
-## 📄 Licencia
+## 🌐 Live Demo
 
-© 2024 Jose Anicama. Todos los derechos reservados.
-
-## 📧 Contacto
-
-- **Email**: j.j.anicamatanta@gmail.com
-- **LinkedIn**: [jjanicamatanta](https://www.linkedin.com/in/jjanicamatanta/)
-- **GitHub**: [automatape2](https://github.com/automatape2)
+Visit the live site to see the portfolio in action.
 
 ---
 
-**Built with** ❤️ **using Astro + TailwindCSS**
+**Built with modern web standards and best practices**
