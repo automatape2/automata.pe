@@ -3,6 +3,7 @@ import "../styles/global.css";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import ScrollToTop from "../components/ScrollToTop.astro";
 import Footer from "../components/Footer.astro";
+import VisitTracker from "../components/VisitTracker.astro";
 import { getLangFromUrl, getTranslations } from "../i18n/utils";
 import { personalInfo } from "../config/personal";
 
@@ -145,6 +146,9 @@ const t = getTranslations(lang);
 
         <!-- Scroll to top button -->
         <ScrollToTop />
+
+        <!-- Visit Tracker -->
+        <VisitTracker />
 
         <!-- Service Worker Registration -->
         <script src="/sw-register.js" defer></script>

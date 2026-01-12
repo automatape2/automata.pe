@@ -1,0 +1,55 @@
+---
+// src/components/VisitTracker.astro
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
+---
+
+<script define:vars={{ API_URL }}>
+  async function trackVisit() {
+    console.log('🔍 VisitTracker - Iniciando...');
+    console.log('📍 API_URL:', API_URL);
+    console.log('🌐 Current URL:', window.location.href);
+    
+    // Generar o recuperar session ID
+    let sessionId = sessionStorage.getItem('portfolio_session_id');
+    if (!sessionId) {
+      sessionId = crypto.randomUUID();
+      sessionStorage.setItem('portfolio_session_id', sessionId);
+      console.log('✨ Nueva sesión creada:', sessionId);
+    } else {
+      console.log('🔄 Sesión existente:', sessionId);
+    }
+
+    const endpoint = `${API_URL}/api/v1/visits`;
+    console.log('📡 Enviando a:', endpoint);
+    
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: window.location.href,
+          session_id: sessionId
+        })
+      });
+      
+      console.log('✅ Respuesta recibida:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        console.error('⚠️ Respuesta no exitosa:', await response.text());
+      }
+    } catch (error) {
+      console.error('❌ Error tracking visit:', error);
+    }
+  }
+
+  // Ejecutar en carga inicial
+  trackVisit();
+
+  // Ejecutar en cada navegación de Astro (View Transitions)
+  document.addEventListener('astro:page-load', () => {
+    console.log('🔄 Astro page load event');
+    trackVisit();
+  });
+</script>
