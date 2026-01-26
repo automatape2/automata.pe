@@ -11,6 +11,7 @@ import netflicsPirateImage from "../assets/projects/netflics-pirate.svg";
 import urlShortenerImage from "../assets/projects/url-shortener.svg";
 import portfolioImage from "../assets/projects/portfolio.png";
 import educationPortalImage from "../assets/projects/education-portal.svg";
+import landingpagerImage from "../assets/projects/landingpager.svg";
 
 export const translations = {
     es: {
@@ -37,6 +38,31 @@ export const translations = {
         projects: {
             sectionTitle: "Proyectos Destacados",
             items: [
+                {
+                    slug: "landingpager",
+                    title: "LandingPager.ai",
+                    description: "Plataforma SaaS para crear landing pages profesionales en minutos con IA y editor visual drag & drop.",
+                    tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "AI"],
+                    image: landingpagerImage,
+                    demoUrl: "https://landingpager.ai",
+                    fullDescription: "LandingPager.ai es una plataforma SaaS que permite crear landing pages profesionales en minutos. Con un editor visual de arrastrar y soltar, más de 30 componentes prediseñados y generación automática con IA, cualquier persona puede diseñar páginas de alta conversión sin escribir código.",
+                    features: [
+                        "Editor visual drag & drop intuitivo",
+                        "Más de 30 componentes prediseñados (Hero, Pricing, Testimonios, FAQ, etc.)",
+                        "Generación automática de contenido con IA",
+                        "Personalización completa de diseño y temas",
+                        "Optimización SEO integrada",
+                        "Secciones Hero básicas y modernas",
+                        "Galerías y carruseles de imágenes",
+                        "Tablas de precios y comparativas",
+                        "Formularios de contacto y newsletter",
+                        "Mapas interactivos",
+                        "Cronómetros regresivos y líneas de tiempo",
+                        "Widgets de sidebar (búsqueda, categorías, posts recientes)"
+                    ],
+                    challenges: "Diseñar una arquitectura que permita renderizado híbrido con componentes del servidor y cliente para máximo rendimiento. Implementar un sistema de drag & drop fluido y responsivo. Integrar generación de contenido con IA manteniendo la personalización del usuario.",
+                    results: "Una plataforma SaaS funcional que permite a usuarios sin conocimientos técnicos crear landing pages profesionales en minutos. El sistema combina la potencia de la IA con un editor visual intuitivo para maximizar la conversión."
+                },
                 {
                     slug: "education_portal",
                     title: "Portal Educativo",
@@ -283,6 +309,31 @@ export const translations = {
         projects: {
             sectionTitle: "Featured Projects",
             items: [
+                {
+                    slug: "landingpager",
+                    title: "LandingPager.ai",
+                    description: "SaaS platform to create professional landing pages in minutes with AI and visual drag & drop editor.",
+                    tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "AI"],
+                    image: landingpagerImage,
+                    demoUrl: "https://landingpager.ai",
+                    fullDescription: "LandingPager.ai is a SaaS platform that allows you to create professional landing pages in minutes. With a visual drag-and-drop editor, over 30 pre-designed components, and automatic AI generation, anyone can design high-converting pages without writing code.",
+                    features: [
+                        "Intuitive drag & drop visual editor",
+                        "Over 30 pre-designed components (Hero, Pricing, Testimonials, FAQ, etc.)",
+                        "Automatic content generation with AI",
+                        "Full design and theme customization",
+                        "Built-in SEO optimization",
+                        "Basic and modern Hero sections",
+                        "Image galleries and carousels",
+                        "Pricing tables and comparison charts",
+                        "Contact forms and newsletter",
+                        "Interactive maps",
+                        "Countdown timers and timelines",
+                        "Sidebar widgets (search, categories, recent posts)"
+                    ],
+                    challenges: "Designing an architecture that allows hybrid rendering with server and client components for maximum performance. Implementing a smooth and responsive drag & drop system. Integrating AI content generation while maintaining user customization.",
+                    results: "A functional SaaS platform that allows users without technical knowledge to create professional landing pages in minutes. The system combines the power of AI with an intuitive visual editor to maximize conversion."
+                },
                 {
                     slug: "education_portal",
                     title: "Education Portal",
