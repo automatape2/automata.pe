@@ -1,22 +1,24 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Hero from "../components/Hero.astro";
-import Projects from "../components/Projects.astro";
-import GitRepositories from "../components/GitRepositories.astro";
-import LinkedInPosts from "../components/LinkedInPosts.astro";
+import Services from "../components/Services.astro";
+import Solutions from "../components/Solutions.astro";
+import TechStack from "../components/TechStack.astro";
+import Metrics from "../components/Metrics.astro";
 import Contact from "../components/Contact.astro";
 import { getLangFromUrl, getTranslations } from "../i18n/utils";
 
 const t = getTranslations(getLangFromUrl(Astro.url));
 ---
 
-<Layout title="Jose Anicama | Desarrollador FullStack">
+<Layout title="Automata | Automatizacion Inteligente con IA">
 	<div class="container mx-auto px-6 md:px-8 lg:px-12 pt-24 pb-12 max-w-7xl">
 		<Hero t={t.hero} />
-		<Projects t={t.projects} />
+		<Services t={t.services} />
+		<Solutions t={t.solutions} />
+		<TechStack t={t.techStack} />
 	</div>
-	<GitRepositories t={t.gitRepositories} />
-	<LinkedInPosts t={t.linkedInPosts} />
+	<Metrics t={t.metrics} />
 	<div class="container mx-auto px-6 md:px-8 lg:px-12 pt-24 pb-12 max-w-7xl">
 		<Contact t={t.contact} />
 	</div>
