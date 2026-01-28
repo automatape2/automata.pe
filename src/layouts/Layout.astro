@@ -17,7 +17,7 @@ const t = getTranslations(lang);
 ---
 
 <!doctype html>
-<html lang={lang} class="scroll-smooth">
+<html lang={lang} class="lenis lenis-smooth">
     <head>
         <meta charset="UTF-8" />
         <meta
@@ -73,31 +73,38 @@ const t = getTranslations(lang);
             main {
                 padding-top: 5rem;
             }
+            /* Hide elements before GSAP loads */
+            [data-animate] {
+                opacity: 0;
+            }
         </style>
 
         <title>{title}</title>
     </head>
     <body
-        class="bg-slate-950 text-slate-200 font-sans antialiased selection:bg-cyan-500 selection:text-white"
+        class="bg-slate-950 text-slate-200 font-sans antialiased"
     >
-        <div
-            class="fixed inset-0 -z-10 h-full w-full bg-slate-950 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"
-        >
-            <div
-                class="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-cyan-500 opacity-20 blur-[100px]"
-            >
-            </div>
+        <!-- Modern Gradient Background -->
+        <div class="fixed inset-0 -z-10 overflow-hidden bg-slate-950">
+            <!-- Subtle grid pattern -->
+            <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
+
+            <!-- Gradient orbs - subtle and elegant -->
+            <div class="absolute -top-[300px] -left-[300px] w-[600px] h-[600px] rounded-full bg-cyan-500/10 blur-[150px]"></div>
+            <div class="absolute top-1/2 -right-[200px] w-[500px] h-[500px] rounded-full bg-purple-500/10 blur-[150px]"></div>
+            <div class="absolute -bottom-[200px] left-1/4 w-[400px] h-[400px] rounded-full bg-blue-500/10 blur-[150px]"></div>
+
+            <!-- Radial gradient overlay -->
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,transparent_0%,#020617_70%)]"></div>
         </div>
 
-        <header
-            class="fixed top-0 z-50 w-full backdrop-blur-sm border-b border-white/10"
-        >
+        <header class="glass-strong fixed top-0 z-50 w-full">
             <nav
                 class="container mx-auto px-6 py-4 flex justify-between items-center"
             >
                 <a
                     href={lang === "es" ? "/" : "/en"}
-                    class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent hover:scale-105 transition-transform"
+                    class="text-2xl font-bold gradient-text magnetic"
                 >
                     {personalInfo.brandName}
                 </a>
@@ -106,28 +113,28 @@ const t = getTranslations(lang);
                         <li>
                             <a
                                 href="#projects"
-                                class="hover:text-cyan-400 transition-colors"
+                                class="link-underline hover:text-cyan-400 transition-colors"
                                 >{t.nav.projects}</a
                             >
                         </li>
                         <li>
                             <a
                                 href="#git-repos"
-                                class="hover:text-cyan-400 transition-colors"
+                                class="link-underline hover:text-cyan-400 transition-colors"
                                 >{t.nav.git}</a
                             >
                         </li>
                         <li>
                             <a
                                 href="#linkedin"
-                                class="hover:text-cyan-400 transition-colors"
+                                class="link-underline hover:text-cyan-400 transition-colors"
                                 >{t.nav.linkedin}</a
                             >
                         </li>
                         <li>
                             <a
                                 href="#contact"
-                                class="hover:text-cyan-400 transition-colors"
+                                class="link-underline hover:text-cyan-400 transition-colors"
                                 >{t.nav.contact}</a
                             >
                         </li>
@@ -152,5 +159,169 @@ const t = getTranslations(lang);
 
         <!-- Service Worker Registration -->
         <script src="/sw-register.js" defer></script>
+
+        <!-- Lenis Smooth Scroll -->
+        <script>
+            import Lenis from 'lenis';
+
+            const lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                orientation: 'vertical',
+                gestureOrientation: 'vertical',
+                smoothWheel: true,
+            });
+
+            function raf(time: number) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+
+            requestAnimationFrame(raf);
+        </script>
+
+        <!-- GSAP Scroll Animations -->
+        <script>
+            import { gsap } from 'gsap';
+            import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Wait for DOM to be ready
+            document.addEventListener('DOMContentLoaded', () => {
+                // Animate all elements with data-animate attribute
+                const animatedElements = document.querySelectorAll('[data-animate]');
+
+                animatedElements.forEach((element) => {
+                    const animationType = element.getAttribute('data-animate');
+                    const delay = element.getAttribute('data-delay') || 0;
+                    const duration = element.getAttribute('data-duration') || 0.8;
+
+                    let fromProps: gsap.TweenVars = { opacity: 0 };
+
+                    switch (animationType) {
+                        case 'fade-up':
+                            fromProps.y = 40;
+                            break;
+                        case 'fade-down':
+                            fromProps.y = -40;
+                            break;
+                        case 'fade-left':
+                            fromProps.x = 40;
+                            break;
+                        case 'fade-right':
+                            fromProps.x = -40;
+                            break;
+                        case 'scale':
+                            fromProps.scale = 0.9;
+                            break;
+                        case 'blur':
+                            fromProps.filter = 'blur(10px)';
+                            break;
+                    }
+
+                    gsap.fromTo(
+                        element,
+                        fromProps,
+                        {
+                            opacity: 1,
+                            x: 0,
+                            y: 0,
+                            scale: 1,
+                            filter: 'blur(0px)',
+                            duration: Number(duration),
+                            delay: Number(delay),
+                            ease: 'power3.out',
+                            scrollTrigger: {
+                                trigger: element,
+                                start: 'top 85%',
+                                toggleActions: 'play none none none',
+                            },
+                        }
+                    );
+                });
+
+                // Stagger animations for grid items
+                const staggerContainers = document.querySelectorAll('[data-stagger]');
+
+                staggerContainers.forEach((container) => {
+                    const children = container.children;
+                    const staggerDelay = container.getAttribute('data-stagger') || 0.1;
+
+                    gsap.fromTo(
+                        children,
+                        { opacity: 0, y: 30 },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.6,
+                            stagger: Number(staggerDelay),
+                            ease: 'power2.out',
+                            scrollTrigger: {
+                                trigger: container,
+                                start: 'top 80%',
+                                toggleActions: 'play none none none',
+                            },
+                        }
+                    );
+                });
+
+                // Parallax effect for hero section
+                const heroSection = document.querySelector('[data-parallax]');
+                if (heroSection) {
+                    gsap.to(heroSection, {
+                        y: 100,
+                        ease: 'none',
+                        scrollTrigger: {
+                            trigger: heroSection,
+                            start: 'top top',
+                            end: 'bottom top',
+                            scrub: true,
+                        },
+                    });
+                }
+
+                // Cursor glow effect
+                const cursorGlow = document.createElement('div');
+                cursorGlow.className = 'cursor-glow';
+                document.body.appendChild(cursorGlow);
+
+                document.addEventListener('mousemove', (e) => {
+                    gsap.to(cursorGlow, {
+                        x: e.clientX,
+                        y: e.clientY,
+                        duration: 0.3,
+                        ease: 'power2.out',
+                    });
+                });
+
+                // Magnetic effect for buttons
+                const magneticElements = document.querySelectorAll('.magnetic');
+
+                magneticElements.forEach((el) => {
+                    el.addEventListener('mousemove', (e) => {
+                        const rect = (el as HTMLElement).getBoundingClientRect();
+                        const x = (e as MouseEvent).clientX - rect.left - rect.width / 2;
+                        const y = (e as MouseEvent).clientY - rect.top - rect.height / 2;
+
+                        gsap.to(el, {
+                            x: x * 0.3,
+                            y: y * 0.3,
+                            duration: 0.3,
+                            ease: 'power2.out',
+                        });
+                    });
+
+                    el.addEventListener('mouseleave', () => {
+                        gsap.to(el, {
+                            x: 0,
+                            y: 0,
+                            duration: 0.5,
+                            ease: 'elastic.out(1, 0.3)',
+                        });
+                    });
+                });
+            });
+        </script>
     </body>
 </html>
