@@ -1,558 +1,431 @@
 import { personalInfo } from "../config/personal";
 
-// Import optimized project images
-import aiBotImage from "../assets/projects/ai-bot.png";
-import saasImage from "../assets/projects/saas-platform.png";
-import fintechImage from "../assets/projects/fintech-api.png";
+// Import project images
 import msCrmImage from "../assets/projects/ms-crm.png";
 import msCrmImage2 from "../assets/projects/ms-crm-2.png";
 import msCrmImage3 from "../assets/projects/ms-crm-3.png";
-import netflicsPirateImage from "../assets/projects/netflics-pirate.svg";
-import urlShortenerImage from "../assets/projects/url-shortener.svg";
-import portfolioImage from "../assets/projects/portfolio.png";
-import educationPortalImage from "../assets/projects/education-portal.svg";
 import landingpagerImage from "../assets/projects/landingpager.svg";
+import educationPortalImage from "../assets/projects/education-portal.svg";
 
 export const translations = {
     es: {
         nav: {
-            about: "Sobre mí",
-            projects: "Proyectos",
-            git: "Repositorios",
-            linkedin: "LinkedIn",
+            home: "Inicio",
+            services: "Servicios",
+            solutions: "Soluciones",
+            tech: "Tecnologias",
             contact: "Contacto"
         },
         hero: {
-            greeting: "CONSTRUCTOR DE APPS PARA STARTUPS",
-            title: "Transformo Ideas en ",
-            titleHighlight: "Aplicaciones Escalables",
-            titleEnd: " con Automatización IA.",
-            description: "Desarrollador FullStack especializado en crear soluciones automatizadas para startups. De la idea al MVP en tiempo récord.",
-            cta1: "Ver Proyectos",
-            cta2: "Contactar",
+            greeting: "AUTOMATIZACION INTELIGENTE",
+            title: "Automatizamos tu negocio ",
+            titleHighlight: "con IA",
+            titleEnd: "",
+            description: "Soluciones que eliminan tareas repetitivas, integran sistemas y optimizan procesos. Workflows con n8n, integraciones con GPT y Claude, pipelines de datos automatizados.",
+            cta1: "Ver Soluciones",
+            cta2: "Agenda una Demo",
             socialLinks: {
                 github: personalInfo.socialLinks.github,
                 linkedin: personalInfo.socialLinks.linkedin
             }
         },
-        projects: {
-            sectionTitle: "Proyectos Destacados",
+        services: {
+            sectionTitle: "Servicios",
+            subtitle: "Soluciones de automatizacion para cada necesidad",
+            items: [
+                {
+                    name: "Workflows n8n",
+                    description: "Automatizacion visual sin codigo. Conecta apps, APIs y bases de datos en minutos.",
+                    icon: "workflow",
+                    gradient: "from-orange-500 to-red-500"
+                },
+                {
+                    name: "Integracion IA",
+                    description: "GPT-4, Claude, LangChain integrados en tus procesos de negocio.",
+                    icon: "brain",
+                    gradient: "from-purple-500 to-pink-500"
+                },
+                {
+                    name: "ETL & Data Pipelines",
+                    description: "Extraccion, transformacion y carga de datos automatizada.",
+                    icon: "database",
+                    gradient: "from-blue-500 to-cyan-500"
+                },
+                {
+                    name: "RPA",
+                    description: "Automatizacion robotica de procesos repetitivos en cualquier aplicacion.",
+                    icon: "robot",
+                    gradient: "from-green-500 to-emerald-500"
+                },
+                {
+                    name: "Chatbots IA",
+                    description: "Asistentes inteligentes para atencion al cliente y soporte 24/7.",
+                    icon: "chat",
+                    gradient: "from-cyan-500 to-blue-500"
+                },
+                {
+                    name: "Web Scraping",
+                    description: "Extraccion automatizada de datos de cualquier sitio web.",
+                    icon: "globe",
+                    gradient: "from-yellow-500 to-orange-500"
+                }
+            ]
+        },
+        solutions: {
+            sectionTitle: "Soluciones",
+            subtitle: "Productos y casos de uso reales",
             items: [
                 {
                     slug: "landingpager",
                     title: "LandingPager.ai",
                     description: "Plataforma SaaS para crear landing pages profesionales en minutos con IA y editor visual drag & drop.",
-                    tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "AI"],
+                    tech: ["Next.js", "OpenAI", "TypeScript", "Tailwind CSS"],
                     image: landingpagerImage,
                     demoUrl: "https://landingpager.ai",
-                    fullDescription: "LandingPager.ai es una plataforma SaaS que permite crear landing pages profesionales en minutos. Con un editor visual de arrastrar y soltar, más de 30 componentes prediseñados y generación automática con IA, cualquier persona puede diseñar páginas de alta conversión sin escribir código.",
-                    features: [
-                        "Editor visual drag & drop intuitivo",
-                        "Más de 30 componentes prediseñados (Hero, Pricing, Testimonios, FAQ, etc.)",
-                        "Generación automática de contenido con IA",
-                        "Personalización completa de diseño y temas",
-                        "Optimización SEO integrada",
-                        "Secciones Hero básicas y modernas",
-                        "Galerías y carruseles de imágenes",
-                        "Tablas de precios y comparativas",
-                        "Formularios de contacto y newsletter",
-                        "Mapas interactivos",
-                        "Cronómetros regresivos y líneas de tiempo",
-                        "Widgets de sidebar (búsqueda, categorías, posts recientes)"
-                    ],
-                    challenges: "Diseñar una arquitectura que permita renderizado híbrido con componentes del servidor y cliente para máximo rendimiento. Implementar un sistema de drag & drop fluido y responsivo. Integrar generación de contenido con IA manteniendo la personalización del usuario.",
-                    results: "Una plataforma SaaS funcional que permite a usuarios sin conocimientos técnicos crear landing pages profesionales en minutos. El sistema combina la potencia de la IA con un editor visual intuitivo para maximizar la conversión."
-                },
-                {
-                    slug: "education_portal",
-                    title: "Portal Educativo",
-                    description: "Portal web educativo para estudiantes de ciencias de la salud con recursos, foros, grupos de estudio, calendario y mensajería.",
-                    tech: ["Laravel 11", "Livewire 3", "MySQL", "Tailwind CSS", "Fortify"],
-                    image: educationPortalImage,
-                    demoUrl: "https://automata.pe/education_portal",
-                    fullDescription: "Portal educativo completo para estudiantes de ciencias de la salud construido con Laravel 11 y Livewire 3. Ofrece repositorio de recursos académicos, foros de discusión, grupos de estudio, calendario de eventos, noticias y sistema de mensajería. Con diseño responsive, modo oscuro y búsqueda avanzada.",
-                    features: [
-                        "Repositorio de recursos académicos (apuntes, presentaciones, artículos, guías)",
-                        "Sistema de valoraciones y comentarios en recursos",
-                        "Foros de discusión por categorías con respuestas anidadas",
-                        "Grupos de estudio públicos/privados con límite de miembros",
-                        "Calendario de eventos académicos (exámenes, entregas, seminarios)",
-                        "Publicación de noticias y anuncios categorizados",
-                        "Búsqueda global avanzada en todo el portal",
-                        "Perfiles de usuario personalizados con información académica",
-                        "Sistema de autenticación con Laravel Fortify",
-                        "Diseño responsive con modo oscuro",
-                        "Filtros dinámicos por carrera, materia y semestre",
-                        "Feed de actividad en tiempo real"
-                    ],
-                    challenges: "Diseñar una arquitectura escalable que permita gestionar múltiples tipos de contenido (recursos, foros, grupos, eventos, noticias) de forma coherente. Implementar un sistema de búsqueda global eficiente que indexe todos los tipos de contenido. Crear una experiencia de usuario fluida con Livewire 3 sin sacrificar rendimiento, especialmente en listados con filtros dinámicos y paginación.",
-                    results: "Un portal educativo completamente funcional desplegado en https://automata.pe/education_portal/. El sistema gestiona exitosamente recursos académicos, foros, grupos de estudio y eventos con una interfaz moderna y responsive. Incluye 847 recursos, 234 temas de foro, 58 grupos de estudio y 42 eventos programados. Sistema completo con datos de prueba y documentación."
+                    type: "producto"
                 },
                 {
                     slug: "ms_crm",
                     title: "MS CRM",
-                    description: "Sistema de Gestión de Relaciones con Clientes simple y fácil para administrar contactos, organizaciones e interacciones comerciales.",
-                    tech: ["Laravel 11", "PHP 8.4", "Livewire 3", "MySQL", "Tailwind CSS"],
+                    description: "Sistema CRM con automatizacion de seguimiento, segmentos dinamicos y timeline de interacciones.",
+                    tech: ["Laravel", "Livewire", "MySQL", "n8n"],
                     image: msCrmImage2,
                     screenshots: [msCrmImage, msCrmImage2, msCrmImage3],
                     demoUrl: "https://automata.pe/ms_crm",
-                    fullDescription: "MS CRM es un sistema de gestión de relaciones con clientes completo construido con Laravel 11 y Livewire 3. Ofrece gestión de contactos y organizaciones, timeline de interacciones, segmentos de audiencia, y un completo registro de auditoría. Con soporte bilingüe (español/inglés), modo oscuro y diseño responsive.",
-                    features: [
-                        "Dashboard con estadísticas en tiempo real",
-                        "Gestión completa de contactos (CRUD)",
-                        "Gestión de organizaciones (gobierno, ONGs, empresas, comunidades)",
-                        "Timeline de interacciones (emails, llamadas, reuniones, eventos, notas)",
-                        "Segmentos de audiencia (dinámicos y estáticos)",
-                        "Registro completo de auditoría",
-                        "Búsqueda y filtros avanzados",
-                        "Multi-idioma (español/inglés)",
-                        "Modo oscuro",
-                        "Diseño responsive (móvil, tablet, escritorio)",
-                        "Autenticación con Laravel Fortify (incluye 2FA)",
-                        "Testing con Pest PHP"
-                    ],
-                    challenges: "Implementar un sistema de segmentos dinámicos que se actualicen automáticamente basado en reglas configurables. Diseñar una arquitectura escalable con Livewire 3 para manejar interacciones en tiempo real sin sacrificar rendimiento. Integrar autenticación de doble factor y mantener un registro de auditoría completo para cumplir con estándares de seguridad.",
-                    results: "Un CRM completamente funcional desplegado en producción en https://automata.pe/ms_crm/. El sistema gestiona exitosamente contactos, organizaciones e interacciones con una interfaz moderna y responsive. Incluye características avanzadas como segmentos dinámicos, campaña de seguimiento, y autenticación segura con 2FA."
+                    type: "producto"
                 },
                 {
-                    slug: "automata-pe",
-                    title: "Portfolio Personal",
-                    description: "Portfolio de Jose Anicama, construido con Astro, TailwindCSS y TypeScript.",
-                    tech: ["Astro", "TailwindCSS", "TypeScript"],
-                    image: portfolioImage,
-                    fullDescription: "Mi portfolio personal, una PWA construida con Astro, TailwindCSS y TypeScript. Muestra mis proyectos, habilidades y experiencia de una manera moderna y accesible.",
-                    features: [
-                        "PWA (Progressive Web App) para una experiencia nativa.",
-                        "Diseño responsive y moderno con TailwindCSS.",
-                        "Componentes interactivos con Astro.",
-                        "Integración con GitHub para mostrar repositorios.",
-                        "Soporte multi-idioma (inglés y español)."
-                    ],
-                    challenges: "Aprender a usar Astro y sus características, como la hidratación parcial y la generación de sitios estáticos. Integrar la API de GitHub para mostrar los repositorios de forma dinámica.",
-                    results: "Un portfolio moderno, rápido y accesible que muestra mis habilidades y proyectos. Una excelente herramienta para mostrar mi trabajo a posibles empleadores y clientes."
+                    slug: "education_portal",
+                    title: "Portal Educativo",
+                    description: "Portal con recursos automatizados, notificaciones inteligentes y sincronizacion de calendarios.",
+                    tech: ["Laravel", "Livewire", "MySQL", "APIs"],
+                    image: educationPortalImage,
+                    demoUrl: "https://automata.pe/education_portal",
+                    type: "producto"
                 },
                 {
-                    slug: "netflics2",
-                    title: "Clon de Netflix",
-                    description: "Una aplicación web construida con PHP, HTML y Vue para transmitir y administrar contenido multimedia.",
-                    tech: ["PHP", "HTML", "Vue"],
-                    image: netflicsPirateImage,
-                    fullDescription: "Una aplicación web construida con PHP, HTML y Vue para transmitir y administrar contenido multimedia. Permite a los usuarios ver películas y series, y a los administradores gestionar el contenido.",
-                    features: [
-                        "Streaming de video.",
-                        "Gestión de contenido multimedia.",
-                        "Autenticación de usuarios.",
-                        "Panel de administración para gestionar películas y series."
-                    ],
-                    challenges: "Implementar un sistema de streaming de video eficiente y escalable. Diseñar una base de datos para almacenar y gestionar el contenido multimedia.",
-                    results: "Una aplicación web funcional para transmitir y administrar contenido multimedia. Una excelente manera de aprender sobre streaming de video y gestión de contenido."
+                    slug: "whatsapp-cotizador",
+                    title: "Bot Cotizador WhatsApp",
+                    description: "Chatbot que responde consultas 24/7, calcula cotizaciones desde tu catalogo y agenda citas automaticamente.",
+                    tech: ["n8n", "WhatsApp API", "OpenAI", "Google Sheets"],
+                    image: msCrmImage,
+                    type: "caso"
                 },
                 {
-                    slug: "shortener",
-                    title: "Acortador de URL",
-                    description: "Un acortador de URL simple y eficiente construido con PHP para una gestión de enlaces rápida y sencilla.",
-                    tech: ["PHP", "Docker", "Laravel"],
-                    image: urlShortenerImage,
-                    fullDescription: "Un acortador de URL simple y eficiente construido con PHP para una gestión de enlaces rápida y sencilla. Permite a los usuarios acortar URLs largas y realizar un seguimiento de los clics.",
-                    features: [
-                        "Acortamiento de URL.",
-                        "Seguimiento de clics.",
-                        "API para acortar URLs mediante programación.",
-                        "Contenedorizado con Docker."
-                    ],
-                    challenges: "Generar URLs cortas únicas y evitar colisiones. Implementar un sistema de seguimiento de clics eficiente.",
-                    results: "Un acortador de URL funcional y eficiente. Una herramienta útil para compartir enlaces en redes sociales y otras plataformas."
+                    slug: "facturas-automaticas",
+                    title: "Facturacion Automatica",
+                    description: "Detecta pagos en Stripe/PayPal, genera facturas electronicas y las envia al cliente. Cero trabajo manual.",
+                    tech: ["n8n", "Stripe", "SUNAT API", "Email"],
+                    image: msCrmImage3,
+                    type: "caso"
+                },
+                {
+                    slug: "monitor-precios",
+                    title: "Monitor de Precios Competencia",
+                    description: "Scraper que revisa precios de competidores diariamente y te alerta cuando hay cambios importantes.",
+                    tech: ["Python", "n8n", "Telegram", "PostgreSQL"],
+                    image: educationPortalImage,
+                    type: "caso"
+                },
+                {
+                    slug: "onboarding-empleados",
+                    title: "Onboarding Automatico",
+                    description: "Bot que envia documentos a nuevos empleados, programa reuniones de induccion y hace seguimiento automatico.",
+                    tech: ["n8n", "Slack", "Google Calendar", "Notion"],
+                    image: msCrmImage,
+                    type: "caso"
+                },
+                {
+                    slug: "contenido-social",
+                    title: "Generador de Contenido Social",
+                    description: "Crea posts para redes con IA, los programa automaticamente y te envia reportes de metricas semanales.",
+                    tech: ["n8n", "OpenAI", "Buffer API", "Google Sheets"],
+                    image: msCrmImage2,
+                    type: "caso"
+                },
+                {
+                    slug: "alertas-stock",
+                    title: "Alertas de Stock Inteligentes",
+                    description: "Monitorea inventario en multiples canales de venta y notifica cuando hay que reponer productos.",
+                    tech: ["n8n", "Shopify API", "WhatsApp", "PostgreSQL"],
+                    image: msCrmImage3,
+                    type: "caso"
+                },
+                {
+                    slug: "transcriptor-reuniones",
+                    title: "Transcriptor de Reuniones",
+                    description: "Graba tus calls de Zoom/Meet, transcribe con IA, extrae tareas y envia resumenes al equipo.",
+                    tech: ["n8n", "Whisper AI", "OpenAI", "Slack"],
+                    image: educationPortalImage,
+                    type: "caso"
+                },
+                {
+                    slug: "pipeline-cvs",
+                    title: "Pipeline de CVs con IA",
+                    description: "Recibe CVs por email o formulario, los analiza con IA y pre-califica candidatos automaticamente.",
+                    tech: ["n8n", "OpenAI", "Airtable", "Email"],
+                    image: msCrmImage,
+                    type: "caso"
                 }
             ]
         },
-        gitRepositories: {
-            sectionTitle: "Repositorios Open Source",
-            subtitle: "Contribuciones a la comunidad y proyectos personales",
-            viewProfile: "Ver GitHub",
-            items: [
+        techStack: {
+            sectionTitle: "Stack Tecnologico",
+            subtitle: "Herramientas que dominamos",
+            categories: [
                 {
-                    name: "education_portal",
-                    description: "Portal web educativo para estudiantes de ciencias de la salud con recursos, foros, grupos de estudio, calendario y mensajería.",
-                    language: "PHP",
-                    stars: 0,
-                    forks: 0,
-                    url: "https://github.com/automatape2/education_portal"
+                    name: "Automatizacion",
+                    items: ["n8n", "Make", "Zapier", "Python"]
                 },
                 {
-                    name: "ms_crm",
-                    description: "Sistema de Gestión de Relaciones con Clientes simple y fácil para administrar contactos, organizaciones e interacciones comerciales.",
-                    language: "PHP",
-                    stars: 0,
-                    forks: 0,
-                    url: "https://github.com/automatape2/ms_crm"
+                    name: "Inteligencia Artificial",
+                    items: ["OpenAI", "Anthropic", "LangChain", "Hugging Face"]
                 },
                 {
-                    name: "automata.pe",
-                    description: "Portfolio de Jose Anicama, construido con Astro, TailwindCSS y TypeScript.",
-                    language: "Astro",
-                    stars: 0,
-                    forks: 0,
-                    url: "https://github.com/automatape2/automata.pe"
+                    name: "Backend",
+                    items: ["Laravel", "Node.js", "Python", "PostgreSQL"]
                 },
                 {
-                    name: "inven2",
-                    description: "Offline backup of the original inven2 website downloaded with wget",
-                    language: "HTML",
-                    stars: 0,
-                    forks: 0,
-                    url: "https://github.com/automatape2/inven2"
-                },
-                {
-                    name: "netflics2",
-                    description: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content",
-                    language: "PHP",
-                    stars: 1,
-                    forks: 0,
-                    url: "https://github.com/automatape2/netflics2"
-                },
-                {
-                    name: "shortener",
-                    description: "A simple and efficient URL shortener built with PHP for quick and easy link management.",
-                    language: "PHP",
-                    stars: 1,
-                    forks: 0,
-                    url: "https://github.com/automatape2/shortener"
+                    name: "Cloud & DevOps",
+                    items: ["AWS", "Docker", "GitHub Actions", "Vercel"]
                 }
             ]
         },
-        linkedInPosts: {
-            sectionTitle: "Últimas Publicaciones en LinkedIn",
-            subtitle: "Comparto conocimientos, experiencias y tendencias en desarrollo de software",
+        metrics: {
+            sectionTitle: "Impacto",
+            subtitle: "Resultados que hablan por si solos",
             items: [
-                {
-                    date: "Hace 2 días",
-                    content: "🚀 Acabo de completar la migración de nuestra arquitectura monolítica a microservicios. El resultado: 60% de mejora en tiempo de respuesta y escalabilidad infinita. Las lecciones aprendidas fueron invaluables. #Microservicios #Arquitectura #DevOps",
-                    likes: 234,
-                    comments: 18,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                },
-                {
-                    date: "Hace 5 días",
-                    content: "💡 La IA está transformando cómo desarrollamos software. Implementé GPT-4 en nuestro sistema de procesamiento de documentos y redujimos 200 horas de trabajo manual al mes. El futuro es ahora. #InteligenciaArtificial #Automatización #Innovation",
-                    likes: 456,
-                    comments: 32,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                },
-                {
-                    date: "1 week ago",
-                    content: "🔒 Seguridad en APIs: Implementé autenticación JWT con refresh tokens y rate limiting en nuestra API fintech. Cero brechas desde el lanzamiento. La seguridad no es opcional, es fundamental. #CyberSecurity #API #BestPractices",
-                    likes: 189,
-                    comments: 15,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                },
-                {
-                    date: "Hace 2 semanas",
-                    content: "⚡ Docker + Kubernetes = Magia. Nuestra nueva infraestructura maneja 10,000 usuarios concurrentes sin despeinarse. Si aún no estás usando contenedores, estás perdiendo tiempo y dinero. #Docker #Kubernetes #CloudNative",
-                    likes: 312,
-                    comments: 24,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                },
-                {
-                    date: "Hace 3 semanas",
-                    content: "📊 Datos en tiempo real con Vue.js y WebSockets. Construí un dashboard que actualiza métricas cada segundo. Los usuarios están encantados con la experiencia. #VueJS #RealTime #Frontend",
-                    likes: 267,
-                    comments: 21,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                },
-                {
-                    date: "Hace 1 mes",
-                    content: "🎯 De idea a MVP en 2 semanas. Así es como trabajamos en startups. Laravel + Vue.js + AWS = Stack perfecto para iterar rápido sin sacrificar calidad. #Startup #MVP #AgileDevlopment",
-                    likes: 398,
-                    comments: 29,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                }
+                { value: "500+", label: "Horas ahorradas" },
+                { value: "50+", label: "Automatizaciones" },
+                { value: "99.9%", label: "Uptime" },
+                { value: "10+", label: "Integraciones" }
             ]
         },
         contact: {
-            title: "¿Listo para empezar?",
-            description: "Actualmente estoy disponible para nuevos proyectos y colaboraciones. Si tienes una idea que quieres llevar al siguiente nivel, hablemos.",
+            title: "Automatiza tu negocio hoy",
+            description: "Agenda una consulta gratuita. Analizamos tus procesos y te mostramos como automatizarlos.",
             email: personalInfo.email,
             emailLabel: "Email",
-            socialLabel: "Sígueme"
+            ctaLabel: "Agenda una Demo",
+            socialLabel: "Siguenos"
         },
         footer: {
-            copyright: "Desarrollador FullStack. Todos los derechos reservados.",
-            tagline: "Transformando ideas en aplicaciones escalables con automatización IA.",
-            quickLinks: "Enlaces Rápidos",
+            copyright: "Automata. Todos los derechos reservados.",
+            tagline: "Automatizacion inteligente para tu negocio.",
+            quickLinks: "Enlaces",
             contactTitle: "Contacto",
-            socialTitle: "Sígueme",
+            socialTitle: "Redes",
             privacy: "Privacidad",
-            terms: "Términos"
+            terms: "Terminos"
         }
     },
     en: {
         nav: {
-            about: "About",
-            projects: "Projects",
-            git: "Repositories",
-            linkedin: "LinkedIn",
+            home: "Home",
+            services: "Services",
+            solutions: "Solutions",
+            tech: "Tech",
             contact: "Contact"
         },
         hero: {
-            greeting: "APP BUILDER FOR STARTUPS",
-            title: "Transforming Ideas into ",
-            titleHighlight: "Scalable Applications",
-            titleEnd: " with AI Automation.",
-            description: "FullStack Developer specialized in creating automated solutions for startups. From idea to MVP in record time.",
-            cta1: "View Projects",
-            cta2: "Contact Me",
+            greeting: "INTELLIGENT AUTOMATION",
+            title: "We automate your business ",
+            titleHighlight: "with AI",
+            titleEnd: "",
+            description: "Solutions that eliminate repetitive tasks, integrate systems and optimize processes. n8n workflows, GPT and Claude integrations, automated data pipelines.",
+            cta1: "View Solutions",
+            cta2: "Book a Demo",
             socialLinks: {
                 github: personalInfo.socialLinks.github,
                 linkedin: personalInfo.socialLinks.linkedin
             }
         },
-        projects: {
-            sectionTitle: "Featured Projects",
+        services: {
+            sectionTitle: "Services",
+            subtitle: "Automation solutions for every need",
+            items: [
+                {
+                    name: "n8n Workflows",
+                    description: "Visual no-code automation. Connect apps, APIs and databases in minutes.",
+                    icon: "workflow",
+                    gradient: "from-orange-500 to-red-500"
+                },
+                {
+                    name: "AI Integration",
+                    description: "GPT-4, Claude, LangChain integrated into your business processes.",
+                    icon: "brain",
+                    gradient: "from-purple-500 to-pink-500"
+                },
+                {
+                    name: "ETL & Data Pipelines",
+                    description: "Automated data extraction, transformation and loading.",
+                    icon: "database",
+                    gradient: "from-blue-500 to-cyan-500"
+                },
+                {
+                    name: "RPA",
+                    description: "Robotic process automation for repetitive tasks in any application.",
+                    icon: "robot",
+                    gradient: "from-green-500 to-emerald-500"
+                },
+                {
+                    name: "AI Chatbots",
+                    description: "Intelligent assistants for customer service and 24/7 support.",
+                    icon: "chat",
+                    gradient: "from-cyan-500 to-blue-500"
+                },
+                {
+                    name: "Web Scraping",
+                    description: "Automated data extraction from any website.",
+                    icon: "globe",
+                    gradient: "from-yellow-500 to-orange-500"
+                }
+            ]
+        },
+        solutions: {
+            sectionTitle: "Solutions",
+            subtitle: "Products and real use cases",
             items: [
                 {
                     slug: "landingpager",
                     title: "LandingPager.ai",
                     description: "SaaS platform to create professional landing pages in minutes with AI and visual drag & drop editor.",
-                    tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "AI"],
+                    tech: ["Next.js", "OpenAI", "TypeScript", "Tailwind CSS"],
                     image: landingpagerImage,
                     demoUrl: "https://landingpager.ai",
-                    fullDescription: "LandingPager.ai is a SaaS platform that allows you to create professional landing pages in minutes. With a visual drag-and-drop editor, over 30 pre-designed components, and automatic AI generation, anyone can design high-converting pages without writing code.",
-                    features: [
-                        "Intuitive drag & drop visual editor",
-                        "Over 30 pre-designed components (Hero, Pricing, Testimonials, FAQ, etc.)",
-                        "Automatic content generation with AI",
-                        "Full design and theme customization",
-                        "Built-in SEO optimization",
-                        "Basic and modern Hero sections",
-                        "Image galleries and carousels",
-                        "Pricing tables and comparison charts",
-                        "Contact forms and newsletter",
-                        "Interactive maps",
-                        "Countdown timers and timelines",
-                        "Sidebar widgets (search, categories, recent posts)"
-                    ],
-                    challenges: "Designing an architecture that allows hybrid rendering with server and client components for maximum performance. Implementing a smooth and responsive drag & drop system. Integrating AI content generation while maintaining user customization.",
-                    results: "A functional SaaS platform that allows users without technical knowledge to create professional landing pages in minutes. The system combines the power of AI with an intuitive visual editor to maximize conversion."
-                },
-                {
-                    slug: "education_portal",
-                    title: "Education Portal",
-                    description: "Educational web portal for health sciences students with resources, forums, study groups, calendar & messaging.",
-                    tech: ["Laravel 11", "Livewire 3", "MySQL", "Tailwind CSS", "Fortify"],
-                    image: educationPortalImage,
-                    demoUrl: "https://automata.pe/education_portal",
-                    fullDescription: "Complete educational portal for health sciences students built with Laravel 11 and Livewire 3. Offers academic resources repository, discussion forums, study groups, events calendar, news and messaging system. With responsive design, dark mode and advanced search.",
-                    features: [
-                        "Academic resources repository (notes, presentations, articles, guides)",
-                        "Rating and commenting system for resources",
-                        "Discussion forums by category with nested replies",
-                        "Public/private study groups with member limits",
-                        "Academic events calendar (exams, submissions, seminars)",
-                        "Categorized news and announcements publication",
-                        "Advanced global search across the portal",
-                        "Personalized user profiles with academic information",
-                        "Authentication system with Laravel Fortify",
-                        "Responsive design with dark mode",
-                        "Dynamic filters by career, subject and semester",
-                        "Real-time activity feed"
-                    ],
-                    challenges: "Designing a scalable architecture that allows managing multiple types of content (resources, forums, groups, events, news) in a coherent way. Implementing an efficient global search system that indexes all content types. Creating a fluid user experience with Livewire 3 without sacrificing performance, especially in listings with dynamic filters and pagination.",
-                    results: "A fully functional educational portal deployed at https://automata.pe/education_portal/. The system successfully manages academic resources, forums, study groups and events with a modern and responsive interface. Includes 847 resources, 234 forum topics, 58 study groups and 42 scheduled events. Complete system with test data and documentation."
+                    type: "product"
                 },
                 {
                     slug: "ms_crm",
                     title: "MS CRM",
-                    description: "Simple and easy CRM system for managing contacts, organizations and business interactions.",
-                    tech: ["Laravel 11", "PHP 8.4", "Livewire 3", "MySQL", "Tailwind CSS"],
+                    description: "CRM system with automated follow-up, dynamic segments and interaction timeline.",
+                    tech: ["Laravel", "Livewire", "MySQL", "n8n"],
                     image: msCrmImage2,
                     screenshots: [msCrmImage, msCrmImage2, msCrmImage3],
                     demoUrl: "https://automata.pe/ms_crm",
-                    fullDescription: "MS CRM is a comprehensive customer relationship management system built with Laravel 11 and Livewire 3. It offers contact and organization management, interaction timeline, audience segments, and complete audit trail. With bilingual support (Spanish/English), dark mode, and responsive design.",
-                    features: [
-                        "Dashboard with real-time stats",
-                        "Complete contact management (CRUD)",
-                        "Organization management (government, NGOs, companies, communities)",
-                        "Interaction timeline (emails, calls, meetings, events, notes)",
-                        "Audience segments (dynamic and static)",
-                        "Complete audit trail",
-                        "Advanced search and filters",
-                        "Multi-language (Spanish/English)",
-                        "Dark mode",
-                        "Responsive design (mobile, tablet, desktop)",
-                        "Laravel Fortify authentication (with 2FA)",
-                        "Testing with Pest PHP"
-                    ],
-                    challenges: "Implementing a dynamic segments system that automatically updates based on configurable rules. Designing a scalable architecture with Livewire 3 to handle real-time interactions without sacrificing performance. Integrating two-factor authentication and maintaining a complete audit trail to meet security standards.",
-                    results: "A fully functional CRM deployed in production at https://automata.pe/ms_crm/. The system successfully manages contacts, organizations and interactions with a modern and responsive interface. Includes advanced features like dynamic segments, campaign tracking, and secure authentication with 2FA."
+                    type: "product"
                 },
                 {
-                    slug: "automata-pe",
-                    title: "Personal Portfolio",
-                    description: "Jose Anicama's portfolio, built with Astro, TailwindCSS, and TypeScript.",
-                    tech: ["Astro", "TailwindCSS", "TypeScript"],
-                    image: portfolioImage,
-                    fullDescription: "My personal portfolio, a PWA built with Astro, TailwindCSS, and TypeScript. It showcases my projects, skills, and experience in a modern and accessible way.",
-                    features: [
-                        "PWA (Progressive Web App) for a native-like experience.",
-                        "Modern and responsive design with TailwindCSS.",
-                        "Interactive components with Astro.",
-                        "GitHub integration to display repositories.",
-                        "Multi-language support (English and Spanish)."
-                    ],
-                    challenges: "Learning to use Astro and its features, such as partial hydration and static site generation. Integrating the GitHub API to display repositories dynamically.",
-                    results: "A modern, fast, and accessible portfolio that showcases my skills and projects. An excellent tool to show my work to potential employers and clients."
+                    slug: "education_portal",
+                    title: "Education Portal",
+                    description: "Portal with automated resources, smart notifications and calendar sync.",
+                    tech: ["Laravel", "Livewire", "MySQL", "APIs"],
+                    image: educationPortalImage,
+                    demoUrl: "https://automata.pe/education_portal",
+                    type: "product"
                 },
                 {
-                    slug: "netflics2",
-                    title: "Netflix Clone",
-                    description: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content.",
-                    tech: ["PHP", "HTML", "Vue"],
-                    image: netflicsPirateImage,
-                    fullDescription: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content. It allows users to watch movies and series, and administrators to manage the content.",
-                    features: [
-                        "Video streaming.",
-                        "Multimedia content management.",
-                        "User authentication.",
-                        "Admin panel to manage movies and series."
-                    ],
-                    challenges: "Implementing an efficient and scalable video streaming system. Designing a database to store and manage multimedia content.",
-                    results: "A functional and efficient web application for streaming and managing multimedia content. A great way to learn about video streaming and content management."
+                    slug: "whatsapp-cotizador",
+                    title: "WhatsApp Quote Bot",
+                    description: "Chatbot that answers inquiries 24/7, calculates quotes from your catalog and schedules appointments automatically.",
+                    tech: ["n8n", "WhatsApp API", "OpenAI", "Google Sheets"],
+                    image: msCrmImage,
+                    type: "case"
                 },
                 {
-                    slug: "shortener",
-                    title: "URL Shortener",
-                    description: "A simple and efficient URL shortener built with PHP for quick and easy link management.",
-                    tech: ["PHP", "Docker", "Laravel"],
-                    image: urlShortenerImage,
-                    fullDescription: "A simple and efficient URL shortener built with PHP for quick and easy link management. It allows users to shorten long URLs and track clicks.",
-                    features: [
-                        "URL shortening.",
-                        "Click tracking.",
-                        "API to shorten URLs programmatically.",
-                        "Containerized with Docker."
-                    ],
-                    challenges: "Generating unique short URLs and avoiding collisions. Implementing an efficient click tracking system.",
-                    results: "A functional and efficient URL shortener. A useful tool for sharing links on social media and other platforms."
+                    slug: "facturas-automaticas",
+                    title: "Automatic Invoicing",
+                    description: "Detects payments in Stripe/PayPal, generates electronic invoices and sends them to the client. Zero manual work.",
+                    tech: ["n8n", "Stripe", "Tax API", "Email"],
+                    image: msCrmImage3,
+                    type: "case"
+                },
+                {
+                    slug: "monitor-precios",
+                    title: "Competitor Price Monitor",
+                    description: "Scraper that checks competitor prices daily and alerts you when significant changes occur.",
+                    tech: ["Python", "n8n", "Telegram", "PostgreSQL"],
+                    image: educationPortalImage,
+                    type: "case"
+                },
+                {
+                    slug: "onboarding-empleados",
+                    title: "Automatic Onboarding",
+                    description: "Bot that sends documents to new employees, schedules onboarding meetings and follows up automatically.",
+                    tech: ["n8n", "Slack", "Google Calendar", "Notion"],
+                    image: msCrmImage,
+                    type: "case"
+                },
+                {
+                    slug: "contenido-social",
+                    title: "Social Content Generator",
+                    description: "Creates social media posts with AI, schedules them automatically and sends weekly metrics reports.",
+                    tech: ["n8n", "OpenAI", "Buffer API", "Google Sheets"],
+                    image: msCrmImage2,
+                    type: "case"
+                },
+                {
+                    slug: "alertas-stock",
+                    title: "Smart Stock Alerts",
+                    description: "Monitors inventory across multiple sales channels and notifies when products need restocking.",
+                    tech: ["n8n", "Shopify API", "WhatsApp", "PostgreSQL"],
+                    image: msCrmImage3,
+                    type: "case"
+                },
+                {
+                    slug: "transcriptor-reuniones",
+                    title: "Meeting Transcriber",
+                    description: "Records your Zoom/Meet calls, transcribes with AI, extracts tasks and sends summaries to the team.",
+                    tech: ["n8n", "Whisper AI", "OpenAI", "Slack"],
+                    image: educationPortalImage,
+                    type: "case"
+                },
+                {
+                    slug: "pipeline-cvs",
+                    title: "CV Pipeline with AI",
+                    description: "Receives CVs via email or form, analyzes them with AI and pre-qualifies candidates automatically.",
+                    tech: ["n8n", "OpenAI", "Airtable", "Email"],
+                    image: msCrmImage,
+                    type: "case"
                 }
             ]
         },
-        gitRepositories: {
-            sectionTitle: "Open Source Repositories",
-            subtitle: "Community contributions and personal projects",
-            viewProfile: "View GitHub",
-            items: [
+        techStack: {
+            sectionTitle: "Tech Stack",
+            subtitle: "Tools we master",
+            categories: [
                 {
-                    name: "education_portal",
-                    description: "Educational web portal for health sciences students with resources, forums, study groups, calendar & messaging.",
-                    language: "PHP",
-                    stars: 0,
-                    forks: 0,
-                    url: "https://github.com/automatape2/education_portal"
+                    name: "Automation",
+                    items: ["n8n", "Make", "Zapier", "Python"]
                 },
                 {
-                    name: "ms_crm",
-                    description: "Simple and easy CRM system for managing contacts, organizations and business interactions.",
-                    language: "PHP",
-                    stars: 0,
-                    forks: 0,
-                    url: "https://github.com/automatape2/ms_crm"
+                    name: "Artificial Intelligence",
+                    items: ["OpenAI", "Anthropic", "LangChain", "Hugging Face"]
                 },
                 {
-                    name: "automata.pe",
-                    description: "Jose Anicama's portfolio, built with Astro, TailwindCSS, and TypeScript.",
-                    language: "Astro",
-                    stars: 0,
-                    forks: 0,
-                    url: "https://github.com/automatape2/automata.pe"
+                    name: "Backend",
+                    items: ["Laravel", "Node.js", "Python", "PostgreSQL"]
                 },
                 {
-                    name: "inven2",
-                    description: "Offline backup of the original inven2 website downloaded with wget",
-                    language: "HTML",
-                    stars: 0,
-                    forks: 0,
-                    url: "https://github.com/automatape2/inven2"
-                },
-                {
-                    name: "netflics2",
-                    description: "A web application built with PHP, HTML, and Vue for streaming and managing multimedia content",
-                    language: "PHP",
-                    stars: 1,
-                    forks: 0,
-                    url: "https://github.com/automatape2/netflics2"
-                },
-                {
-                    name: "shortener",
-                    description: "A simple and efficient URL shortener built with PHP for quick and easy link management.",
-                    language: "PHP",
-                    stars: 1,
-                    forks: 0,
-                    url: "https://github.com/automatape2/shortener"
+                    name: "Cloud & DevOps",
+                    items: ["AWS", "Docker", "GitHub Actions", "Vercel"]
                 }
             ]
         },
-        linkedInPosts: {
-            sectionTitle: "Latest LinkedIn Posts",
-            subtitle: "Sharing insights, experiences, and trends in software development",
-            viewProfile: "View Full Profile",
+        metrics: {
+            sectionTitle: "Impact",
+            subtitle: "Results that speak for themselves",
             items: [
-                {
-                    date: "2 days ago",
-                    content: "🚀 Just completed the migration from monolithic architecture to microservices. The result: 60% improvement in response time and infinite scalability. The lessons learned were invaluable. #Microservices #Architecture #DevOps",
-                    likes: 234,
-                    comments: 18,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                },
-                {
-                    date: "5 days ago",
-                    content: "💡 AI is transforming how we develop software. I implemented GPT-4 in our document processing system and reduced 200 hours of manual work per month. The future is now. #ArtificialIntelligence #Automation #Innovation",
-                    likes: 456,
-                    comments: 32,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                },
-                {
-                    date: "1 week ago",
-                    content: "🔒 API Security: Implemented JWT authentication with refresh tokens and rate limiting in our fintech API. Zero breaches since launch. Security is not optional, it's fundamental. #CyberSecurity #API #BestPractices",
-                    likes: 189,
-                    comments: 15,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                },
-                {
-                    date: "2 weeks ago",
-                    content: "⚡ Docker + Kubernetes = Magic. Our new infrastructure handles 10,000 concurrent users without breaking a sweat. If you're not using containers yet, you're wasting time and money. #Docker #Kubernetes #CloudNative",
-                    likes: 312,
-                    comments: 24,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                },
-                {
-                    date: "3 weeks ago",
-                    content: "📊 Real-time data with Vue.js and WebSockets. Built a dashboard that updates metrics every second. Users are delighted with the experience. #VueJS #RealTime #Frontend",
-                    likes: 267,
-                    comments: 21,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                },
-                {
-                    date: "1 month ago",
-                    content: "🎯 From idea to MVP in 2 weeks. That's how we work in startups. Laravel + Vue.js + AWS = Perfect stack to iterate fast without sacrificing quality. #Startup #MVP #AgileDevlopment",
-                    likes: 398,
-                    comments: 29,
-                    link: "https://www.linkedin.com/in/jjanicamatanta/"
-                }
+                { value: "500+", label: "Hours saved" },
+                { value: "50+", label: "Automations" },
+                { value: "99.9%", label: "Uptime" },
+                { value: "10+", label: "Integrations" }
             ]
         },
         contact: {
-            title: "Ready to start?",
-            description: "I'm currently available for new projects and collaborations. If you have an idea you want to take to the next level, let's talk.",
+            title: "Automate your business today",
+            description: "Book a free consultation. We analyze your processes and show you how to automate them.",
             email: personalInfo.email,
             emailLabel: "Email",
-            socialLabel: "Follow Me"
+            ctaLabel: "Book a Demo",
+            socialLabel: "Follow Us"
         },
         footer: {
-            copyright: "FullStack Developer. All rights reserved.",
-            tagline: "Transforming ideas into scalable applications with AI automation.",
-            quickLinks: "Quick Links",
+            copyright: "Automata. All rights reserved.",
+            tagline: "Intelligent automation for your business.",
+            quickLinks: "Links",
             contactTitle: "Contact",
-            socialTitle: "Follow Me",
+            socialTitle: "Social",
             privacy: "Privacy",
             terms: "Terms"
         }
