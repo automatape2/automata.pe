@@ -51,11 +51,11 @@ const { t } = Astro.props;
                 data-delay="0.3"
                 class="flex flex-wrap gap-4 pt-4"
             >
-                <a href="#projects" class="btn-modern btn-primary magnetic">
+                <a href="#solutions" class="btn-modern btn-primary magnetic">
                     <span>{t.cta1}</span>
                 </a>
                 <a href="#contact" class="btn-modern btn-outline magnetic">
-                    <span>Contact Me</span>
+                    <span>{t.cta2}</span>
                 </a>
             </div>
 
@@ -141,22 +141,35 @@ const { t } = Astro.props;
                 />
             </div>
 
-            <!-- Floating tech icons (optional decoration) -->
+            <!-- Floating tech icons -->
             <div
                 class="absolute top-10 right-10 w-14 h-14 glass rounded-2xl flex items-center justify-center animate-float"
+                title="n8n"
             >
-                <span class="text-2xl">⚡</span>
+                <svg class="w-8 h-8 text-orange-500" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
             </div>
             <div
                 class="absolute bottom-20 left-10 w-14 h-14 glass rounded-2xl flex items-center justify-center animate-float-slow"
+                title="AI"
             >
-                <span class="text-2xl">🚀</span>
+                <svg class="w-8 h-8 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/>
+                    <path d="M6 10v4a6 6 0 0 0 12 0v-4"/>
+                    <line x1="12" y1="18" x2="12" y2="22"/>
+                    <line x1="8" y1="22" x2="16" y2="22"/>
+                </svg>
             </div>
             <div
                 class="absolute top-1/2 -right-5 w-14 h-14 glass rounded-2xl flex items-center justify-center animate-float"
                 style="animation-delay: 1s;"
+                title="API"
             >
-                <span class="text-2xl">🤖</span>
+                <svg class="w-8 h-8 text-cyan-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>
+                    <path d="M7 10v4M17 10v4M10 7h4M10 17h4"/>
+                </svg>
             </div>
         </div>
     </div>
