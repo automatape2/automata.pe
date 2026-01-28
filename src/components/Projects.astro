@@ -8,26 +8,33 @@ interface Props {
 const { t } = Astro.props;
 ---
 
-<section id="projects" class="py-20">
-    <h2 class="text-3xl font-bold mb-12 text-center">
-        {t.sectionTitle}
-    </h2>
+<section id="projects" class="py-24">
+    <div class="text-center mb-16" data-animate="fade-up">
+        <span class="tag-modern mb-4 inline-block">Featured Work</span>
+        <h2 class="text-4xl md:text-5xl font-bold gradient-text-static">
+            {t.sectionTitle}
+        </h2>
+        <div class="section-divider max-w-xs mx-auto mt-6"></div>
+    </div>
 
-    <div class="grid md:grid-cols-3 gap-8">
+    <div class="bento-grid" data-stagger="0.1">
         {
-            t.items.map((project) => (
+            t.items.map((project, index) => (
                 <a
                     href={`/projects/${project.slug}`}
-                    class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-500/30 transition-all hover:-translate-y-2 group block cursor-pointer"
+                    class:list={[
+                        "card-modern card-glow img-hover-zoom block cursor-pointer group",
+                        index === 0 && "bento-span-2",
+                    ]}
                 >
-                    <div class="h-48 overflow-hidden">
+                    <div class="h-52 overflow-hidden rounded-t-[1.5rem]">
                         <Image
                             src={project.image}
                             alt={project.title}
-                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            class="w-full h-full object-cover"
                             loading="lazy"
-                            width={400}
-                            height={192}
+                            width={600}
+                            height={300}
                             format="webp"
                         />
                     </div>
@@ -35,18 +42,21 @@ const { t } = Astro.props;
                         <h3 class="text-xl font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">
                             {project.title}
                         </h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">
+                        <p class="text-slate-400 text-sm leading-relaxed line-clamp-2">
                             {project.description}
                         </p>
                         <div class="flex flex-wrap gap-2 pt-2">
-                            {project.tech.map((tech) => (
-                                <span class="text-xs font-mono text-cyan-400 bg-cyan-950/30 px-2 py-1 rounded">
-                                    {tech}
-                                </span>
+                            {project.tech.slice(0, 4).map((tech) => (
+                                <span class="tag-modern">{tech}</span>
                             ))}
+                            {project.tech.length > 4 && (
+                                <span class="tag-modern">
+                                    +{project.tech.length - 4}
+                                </span>
+                            )}
                         </div>
-                        <div class="flex items-center gap-2 text-cyan-400 text-sm font-medium pt-2">
-                            <span>View Details</span>
+                        <div class="flex items-center gap-2 text-cyan-400 text-sm font-medium pt-2 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all">
+                            <span>View Project</span>
                             <svg
                                 class="w-4 h-4 transition-transform group-hover:translate-x-1"
                                 fill="none"
@@ -57,7 +67,7 @@ const { t } = Astro.props;
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                     stroke-width="2"
-                                    d="M9 5l7 7-7 7"
+                                    d="M17 8l4 4m0 0l-4 4m4-4H3"
                                 />
                             </svg>
                         </div>
