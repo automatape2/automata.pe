@@ -1,30 +1,31 @@
 /**
- * Personal Information Configuration
- * 
- * This file contains all personal information used throughout the portfolio.
- * Update these values to change your personal information across the entire site.
+ * Company Information Configuration
+ *
+ * This file contains all company information used throughout the landing page.
+ * Update these values to change information across the entire site.
  */
 
 export const personalInfo = {
-    // Brand/Name
+    // Brand/Company
     brandName: "Automata",
-    fullName: "Jose Anicama",
+    fullName: "Automata",
+    tagline: "Automatizacion Inteligente",
 
     // Contact Information
-    email: "j.j.anicamatanta@gmail.com",
+    email: "contacto@automata.pe",
 
     // Social Media Links
     socialLinks: {
         github: "https://github.com/automatape2",
-        linkedin: "https://www.linkedin.com/in/jjanicamatanta/",
-        twitter: "https://x.com/JJAnicamaTanta"
+        linkedin: "https://www.linkedin.com/company/automata-pe/",
+        twitter: "https://x.com/automata_pe"
     },
 
     // Social Media Usernames (display only)
     socialUsernames: {
         github: "automatape2",
-        linkedin: "jjanicamatanta",
-        twitter: "@JJAnicamaTanta"
+        linkedin: "automata-pe",
+        twitter: "@automata_pe"
     }
 } as const;
 
