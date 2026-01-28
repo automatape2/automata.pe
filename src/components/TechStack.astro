@@ -1,0 +1,83 @@
+---
+interface Category {
+    name: string;
+    items: string[];
+}
+
+interface Props {
+    t: {
+        sectionTitle: string;
+        subtitle: string;
+        categories: Category[];
+    };
+}
+
+const { t } = Astro.props;
+
+const techIcons: Record<string, { color: string; icon: string }> = {
+    "n8n": { color: "text-orange-500", icon: "N8N" },
+    "Make": { color: "text-purple-500", icon: "MK" },
+    "Zapier": { color: "text-orange-400", icon: "ZP" },
+    "Python": { color: "text-yellow-500", icon: "PY" },
+    "OpenAI": { color: "text-green-500", icon: "AI" },
+    "Anthropic": { color: "text-orange-300", icon: "CL" },
+    "LangChain": { color: "text-green-400", icon: "LC" },
+    "Hugging Face": { color: "text-yellow-400", icon: "HF" },
+    "Laravel": { color: "text-red-500", icon: "LV" },
+    "Node.js": { color: "text-green-500", icon: "JS" },
+    "PostgreSQL": { color: "text-blue-500", icon: "PG" },
+    "AWS": { color: "text-orange-500", icon: "AWS" },
+    "Docker": { color: "text-blue-400", icon: "DK" },
+    "GitHub Actions": { color: "text-slate-300", icon: "GH" },
+    "Vercel": { color: "text-white", icon: "VC" }
+};
+
+const categoryGradients: Record<string, string> = {
+    "Automatizacion": "from-orange-500 to-red-500",
+    "Automation": "from-orange-500 to-red-500",
+    "Inteligencia Artificial": "from-purple-500 to-pink-500",
+    "Artificial Intelligence": "from-purple-500 to-pink-500",
+    "Backend": "from-blue-500 to-cyan-500",
+    "Cloud & DevOps": "from-green-500 to-emerald-500"
+};
+---
+
+<section id="tech" class="py-24">
+    <div class="text-center mb-16" data-animate="fade-up">
+        <span class="tag-modern mb-4 inline-block">Our Stack</span>
+        <h2 class="text-4xl md:text-5xl font-bold gradient-text-static">
+            {t.sectionTitle}
+        </h2>
+        <p class="mt-6 text-lg text-slate-400 max-w-2xl mx-auto">
+            {t.subtitle}
+        </p>
+        <div class="section-divider max-w-xs mx-auto mt-6"></div>
+    </div>
+
+    <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        data-stagger="0.1"
+    >
+        {
+            t.categories.map((category) => (
+                <div class="card-modern p-6 group">
+                    <h3 class={`text-lg font-bold mb-6 bg-gradient-to-r ${categoryGradients[category.name] || 'from-cyan-500 to-blue-500'} bg-clip-text text-transparent`}>
+                        {category.name}
+                    </h3>
+                    <div class="space-y-3">
+                        {category.items.map((tech) => (
+                            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                <div class={`w-10 h-10 rounded-lg glass flex items-center justify-center text-xs font-bold ${techIcons[tech]?.color || 'text-cyan-400'}`}>
+                                    {techIcons[tech]?.icon || tech.slice(0, 2).toUpperCase()}
+                                </div>
+                                <span class="text-slate-300 text-sm font-medium">
+                                    {tech}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))
+        }
+    </div>
+</section>

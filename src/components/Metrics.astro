@@ -1,0 +1,59 @@
+---
+interface MetricItem {
+    value: string;
+    label: string;
+}
+
+interface Props {
+    t: {
+        sectionTitle: string;
+        subtitle: string;
+        items: MetricItem[];
+    };
+}
+
+const { t } = Astro.props;
+
+const gradients = [
+    "from-cyan-500 to-blue-500",
+    "from-purple-500 to-pink-500",
+    "from-green-500 to-emerald-500",
+    "from-orange-500 to-yellow-500"
+];
+---
+
+<section id="metrics" class="py-24 relative overflow-hidden">
+    <!-- Background decoration -->
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent"></div>
+
+    <div class="relative z-10">
+        <div class="text-center mb-16" data-animate="fade-up">
+            <span class="tag-modern mb-4 inline-block">Results</span>
+            <h2 class="text-4xl md:text-5xl font-bold gradient-text-static">
+                {t.sectionTitle}
+            </h2>
+            <p class="mt-6 text-lg text-slate-400 max-w-2xl mx-auto">
+                {t.subtitle}
+            </p>
+            <div class="section-divider max-w-xs mx-auto mt-6"></div>
+        </div>
+
+        <div
+            class="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto px-6"
+            data-stagger="0.1"
+        >
+            {
+                t.items.map((metric, index) => (
+                    <div class="card-modern card-glow p-8 text-center group">
+                        <div class={`text-4xl md:text-5xl font-bold bg-gradient-to-r ${gradients[index % gradients.length]} bg-clip-text text-transparent mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                            {metric.value}
+                        </div>
+                        <div class="text-slate-400 text-sm font-medium uppercase tracking-wider">
+                            {metric.label}
+                        </div>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>

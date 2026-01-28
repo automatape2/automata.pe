@@ -1,0 +1,109 @@
+---
+interface ServiceItem {
+    name: string;
+    description: string;
+    icon: string;
+    gradient: string;
+}
+
+interface Props {
+    t: {
+        sectionTitle: string;
+        subtitle: string;
+        items: ServiceItem[];
+    };
+}
+
+const { t } = Astro.props;
+
+const iconMap: Record<string, string> = {
+    workflow: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="6" height="6" rx="1"/>
+        <rect x="15" y="3" width="6" height="6" rx="1"/>
+        <rect x="9" y="15" width="6" height="6" rx="1"/>
+        <path d="M6 9v3a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V9"/>
+        <path d="M12 12v3"/>
+    </svg>`,
+    brain: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2a4 4 0 0 1 4 4v1a3 3 0 0 1 3 3v1a3 3 0 0 1-1 2.2"/>
+        <path d="M12 2a4 4 0 0 0-4 4v1a3 3 0 0 0-3 3v1a3 3 0 0 0 1 2.2"/>
+        <path d="M12 22v-6"/>
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M7 17a5 5 0 0 0 10 0"/>
+    </svg>`,
+    database: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <ellipse cx="12" cy="5" rx="9" ry="3"/>
+        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+    </svg>`,
+    robot: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="8" width="18" height="12" rx="2"/>
+        <circle cx="9" cy="14" r="2"/>
+        <circle cx="15" cy="14" r="2"/>
+        <path d="M12 2v4"/>
+        <path d="M8 2h8"/>
+    </svg>`,
+    chat: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        <path d="M8 10h.01"/>
+        <path d="M12 10h.01"/>
+        <path d="M16 10h.01"/>
+    </svg>`,
+    globe: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>`
+};
+---
+
+<section id="services" class="py-24">
+    <div class="text-center mb-16" data-animate="fade-up">
+        <span class="tag-modern mb-4 inline-block">What We Do</span>
+        <h2 class="text-4xl md:text-5xl font-bold gradient-text-static">
+            {t.sectionTitle}
+        </h2>
+        <p class="mt-6 text-lg text-slate-400 max-w-2xl mx-auto">
+            {t.subtitle}
+        </p>
+        <div class="section-divider max-w-xs mx-auto mt-6"></div>
+    </div>
+
+    <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        data-stagger="0.08"
+    >
+        {
+            t.items.map((service) => (
+                <div class="card-modern card-glow group cursor-default p-8 relative overflow-hidden">
+                    <div
+                        class={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                    />
+                    <div class="relative z-10">
+                        <div class={`w-16 h-16 rounded-2xl glass flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                            <span class={`text-transparent bg-gradient-to-br ${service.gradient} bg-clip-text`} set:html={iconMap[service.icon] || iconMap.workflow} />
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-100 group-hover:text-white transition-colors mb-3">
+                            {service.name}
+                        </h3>
+                        <p class="text-slate-400 text-sm leading-relaxed group-hover:text-slate-300 transition-colors">
+                            {service.description}
+                        </p>
+                    </div>
+                    <div
+                        class={`absolute bottom-0 left-0 h-1 w-0 group-hover:w-full bg-gradient-to-r ${service.gradient} transition-all duration-500`}
+                    />
+                </div>
+            ))
+        }
+    </div>
+</section>
+
+<style>
+    .card-modern svg {
+        stroke: currentColor;
+    }
+    .card-modern:hover svg {
+        stroke: url(#gradient);
+    }
+</style>
