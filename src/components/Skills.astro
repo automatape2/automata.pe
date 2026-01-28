@@ -8,28 +8,79 @@ interface Props {
 const { t } = Astro.props;
 
 const skills = [
-    { name: "Laravel", icon: "devicon-laravel-plain" },
-    { name: "Python", icon: "devicon-python-plain" },
-    { name: "AWS", icon: "devicon-amazonwebservices-original" },
-    { name: "Docker", icon: "devicon-docker-plain" },
-    { name: "AI Automation", icon: "devicon-robot-plain" }, // Placeholder icon class
-    { name: "Architecture", icon: "devicon-archlinux-plain" }, // Placeholder
-    { name: "Security", icon: "devicon-security-plain" }, // Placeholder
+    {
+        name: "Laravel",
+        description: "PHP Framework",
+        gradient: "from-red-500 to-orange-500",
+    },
+    {
+        name: "Python",
+        description: "AI & Automation",
+        gradient: "from-blue-500 to-yellow-500",
+    },
+    {
+        name: "AWS",
+        description: "Cloud Services",
+        gradient: "from-orange-500 to-yellow-500",
+    },
+    {
+        name: "Docker",
+        description: "Containerization",
+        gradient: "from-blue-500 to-cyan-500",
+    },
+    {
+        name: "AI Automation",
+        description: "LLM & Agents",
+        gradient: "from-purple-500 to-pink-500",
+    },
+    {
+        name: "Architecture",
+        description: "System Design",
+        gradient: "from-cyan-500 to-blue-500",
+    },
+    {
+        name: "Security",
+        description: "InfoSec & DevSecOps",
+        gradient: "from-green-500 to-emerald-500",
+    },
+    {
+        name: "TypeScript",
+        description: "Full-Stack Dev",
+        gradient: "from-blue-600 to-blue-400",
+    },
 ];
 ---
 
-<section id="skills" class="py-20">
-    <h2 class="text-3xl font-bold mb-12 text-center">
-        {t.sectionTitle}
-    </h2>
+<section id="skills" class="py-24">
+    <div class="text-center mb-16" data-animate="fade-up">
+        <span class="tag-modern mb-4 inline-block">Expertise</span>
+        <h2 class="text-4xl md:text-5xl font-bold gradient-text-static">
+            {t.sectionTitle}
+        </h2>
+        <div class="section-divider max-w-xs mx-auto mt-6"></div>
+    </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div
+        class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6"
+        data-stagger="0.05"
+    >
         {
             skills.map((skill) => (
-                <div class="bg-slate-800/50 p-6 rounded-lg border border-slate-700 hover:border-cyan-400/50 hover:bg-slate-800 transition-all group">
-                    <h3 class="text-lg font-semibold text-slate-200 group-hover:text-cyan-400 transition-colors">
-                        {skill.name}
-                    </h3>
+                <div class="card-modern group cursor-default p-6 relative overflow-hidden">
+                    <div
+                        class={`absolute inset-0 bg-gradient-to-br ${skill.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                    />
+                    <div class="relative z-10">
+                        <h3 class="text-lg font-semibold text-slate-100 group-hover:text-white transition-colors">
+                            {skill.name}
+                        </h3>
+                        <p class="text-sm text-slate-500 mt-1 group-hover:text-slate-400 transition-colors">
+                            {skill.description}
+                        </p>
+                    </div>
+                    <div
+                        class={`absolute bottom-0 left-0 h-1 w-0 group-hover:w-full bg-gradient-to-r ${skill.gradient} transition-all duration-500`}
+                    />
                 </div>
             ))
         }
