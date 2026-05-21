@@ -59,6 +59,86 @@ const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
     </div>
 </div>
 
+<style is:global>
+    /* ============ Mermaid C4 — remap inline fills/strokes to terminal palette ============ */
+    /* Mermaid C4 paints colors as inline SVG attributes (not classes), so we target the
+       known default fills/strokes and remap them. */
+
+    /* Person (fill #08427B / stroke #073B6F)  →  panel + green */
+    .mv-svg svg rect[fill="#08427B"],
+    .mv-svg svg path[fill="#08427B"] { fill: #0D1117 !important; stroke: #4ADE80 !important; }
+    .mv-svg svg [stroke="#073B6F"] { stroke: #4ADE80 !important; }
+
+    /* System (fill #1168BD)  →  panel + cyan */
+    .mv-svg svg rect[fill="#1168BD"],
+    .mv-svg svg path[fill="#1168BD"] { fill: #0D1117 !important; stroke: #06B6D4 !important; }
+
+    /* Container (fill #438DD5)  →  panel + cyan */
+    .mv-svg svg rect[fill="#438DD5"],
+    .mv-svg svg path[fill="#438DD5"] { fill: #0D1117 !important; stroke: #06B6D4 !important; }
+    .mv-svg svg [stroke="#3C7FC0"] { stroke: #06B6D4 !important; }
+
+    /* Component (fill #85BBF0)  →  panel + green */
+    .mv-svg svg rect[fill="#85BBF0"],
+    .mv-svg svg path[fill="#85BBF0"] { fill: #0D1117 !important; stroke: #4ADE80 !important; }
+    .mv-svg svg [stroke="#78A8D8"] { stroke: #4ADE80 !important; }
+
+    /* External (fill #999999 / stroke #8A8A8A)  →  dim panel + muted */
+    .mv-svg svg rect[fill="#999999"],
+    .mv-svg svg path[fill="#999999"] { fill: #111827 !important; stroke: #6B7280 !important; }
+    .mv-svg svg [stroke="#8A8A8A"] { stroke: #6B7280 !important; }
+
+    /* Relation labels (text fill #444444)  →  muted text */
+    .mv-svg svg text[fill="#444444"] { fill: #9CA3AF !important; }
+
+    /* Relation arrows / icon strokes (#444444, black)  →  muted line */
+    .mv-svg svg path[stroke="#444444"],
+    .mv-svg svg path[stroke="#000000"],
+    .mv-svg svg line[stroke="#444444"],
+    .mv-svg svg line[stroke="#000000"] { stroke: #6B7280 !important; }
+
+    /* Person icon body (filled black) — keep visible on dark bg */
+    .mv-svg svg .person-man path[fill="black"] { fill: #4ADE80 !important; }
+
+    /* Title and footer text */
+    .mv-svg svg text { fill: #E5E7EB; }
+    /* "<<system>>" / "<<person>>" stereotype labels above shapes — make them subtle */
+    .mv-svg svg text[font-style="italic"] {
+        fill: #9CA3AF !important;
+        opacity: 0.7;
+        font-size: 10px !important;
+        text-transform: lowercase;
+    }
+
+    /* Flowchart node defaults (used in infrastructure diagrams) */
+    .mv-svg svg .node rect,
+    .mv-svg svg .node polygon,
+    .mv-svg svg .node circle,
+    .mv-svg svg .node path,
+    .mv-svg svg .node .label-container {
+        fill: #0D1117 !important;
+        stroke: #4ADE80 !important;
+    }
+    .mv-svg svg .node.ext rect,
+    .mv-svg svg .node.ext .label-container { stroke: #6B7280 !important; fill: #111827 !important; }
+    .mv-svg svg .node.db rect,
+    .mv-svg svg .node.db path,
+    .mv-svg svg .node.db .label-container { stroke: #06B6D4 !important; }
+    .mv-svg svg .node.edge rect,
+    .mv-svg svg .node.edge .label-container { stroke: #4ADE80 !important; }
+
+    /* Flowchart edges */
+    .mv-svg svg .flowchart-link,
+    .mv-svg svg .edge-thickness-normal {
+        stroke: #6B7280 !important;
+        stroke-width: 1.5px !important;
+    }
+    .mv-svg svg .marker { fill: #6B7280 !important; stroke: #6B7280 !important; }
+    .mv-svg svg .edgeLabel { background: #0A0A0A !important; color: #9CA3AF !important; }
+    .mv-svg svg .edgeLabel foreignObject > div,
+    .mv-svg svg .edgeLabel rect { background-color: #000 !important; color: #9CA3AF !important; }
+</style>
+
 <script>
     // Lazy-load mermaid from CDN (ESM build). Only ships when a viewer is on the page.
     let mermaidPromise: Promise<any> | null = null;
