@@ -101,23 +101,25 @@ export const translations = {
                     ],
                     architecture: {
                         context: {
-                            mermaid: `C4Context
-    title Contexto del Sistema — LandingPager.ai
+                            mermaid: `flowchart TD
+    user((("Marketer / Pequeña empresa<br/><i>quiere validar oferta rapido</i>")))
+    sys["<b>LandingPager.ai</b><br/><i>SaaS landing builder</i><br/>con IA + drag/drop"]
+    openai["<b>OpenAI API</b><br/><i>genera copy y secciones</i>"]
+    s3["<b>AWS S3 + CDN</b><br/><i>assets de usuario</i>"]
+    stripe["<b>Stripe</b><br/><i>billing + customer portal</i>"]
 
-    Person(marketer, "Marketer / Pequeña empresa", "Quiere validar oferta rapido")
+    user -->|describe meta, publica landing| sys
+    sys -->|genera copy via| openai
+    sys -->|guarda assets en| s3
+    sys -->|factura via| stripe
 
-    System(landingpager, "LandingPager.ai", "Builder SaaS con IA + drag/drop")
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef system fill:#0D1117,stroke:#06B6D4,color:#E5E7EB,stroke-width:1.5px
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
 
-    System_Ext(openai, "OpenAI API", "Genera copy y secciones")
-    System_Ext(s3, "AWS S3 + CDN", "Assets de usuario")
-    System_Ext(stripe, "Stripe", "Billing & customer portal")
-
-    Rel(marketer, landingpager, "describe meta, publica landing")
-    Rel(landingpager, openai, "genera copy via")
-    Rel(landingpager, s3, "guarda assets en")
-    Rel(landingpager, stripe, "factura via")
-
-    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")`,
+    class user person
+    class sys system
+    class openai,s3,stripe ext`,
                             ascii: `                  ┌──────────────────┐
                   │   Marketer /     │
                   │   Small biz      │
@@ -137,25 +139,36 @@ export const translations = {
           └────────┘ └──────┘ └────────┘`
                         },
                         container: {
-                            mermaid: `C4Container
-    title Vista de Contenedores — LandingPager.ai
+                            mermaid: `flowchart TD
+    user((("Marketer")))
 
-    Person(user, "Marketer")
+    subgraph lp ["LandingPager.ai"]
+        direction LR
+        web["<b>Web App</b><br/><i>Next.js 14, React/TS</i><br/>UI principal"]
+        api["<b>API Routes</b><br/><i>Edge + Node, tRPC + Zod</i><br/>endpoints tipados"]
+        builder["<b>Builder iframe</b><br/><i>dnd-kit + realtime</i><br/>editor visual"]
+        db[("<b>PostgreSQL</b><br/><i>Neon, Drizzle ORM</i><br/>datos de proyectos")]
+    end
 
-    System_Boundary(lp, "LandingPager.ai") {
-        Container(web, "Web App", "Next.js 14, React/TS", "UI principal")
-        Container(api, "API Routes", "Edge + Node, tRPC + Zod", "Endpoints tipados")
-        Container(builder, "Builder iframe", "dnd-kit + realtime preview", "Editor visual")
-        ContainerDb(db, "PostgreSQL", "Neon, Drizzle ORM", "Datos de proyectos")
-    }
+    openai["<b>OpenAI gpt-4o</b><br/><i>copy + secciones</i>"]
 
-    System_Ext(openai, "OpenAI gpt-4o", "Copy + secciones")
+    user -->|usa &middot; HTTPS| web
+    web -->|llama &middot; tRPC| api
+    api -->|R/W| db
+    api -->|genera copy| openai
+    web -->|renderiza preview| builder
 
-    Rel(user, web, "Usa", "HTTPS")
-    Rel(web, api, "Llama", "tRPC")
-    Rel(api, db, "Lee/escribe")
-    Rel(api, openai, "Genera copy")
-    Rel(web, builder, "Renderiza preview")`,
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef container fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class user person
+    class web,api,builder container
+    class db db
+    class openai ext
+
+    style lp fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
                             ascii: `┌──────────────────────────────────────────────────────┐
 │                  LandingPager.ai                     │
 │                                                      │
@@ -179,21 +192,26 @@ export const translations = {
 └──────────────────────────────────────────────────────┘`
                         },
                         component: {
-                            mermaid: `C4Component
-    title Builder · Vista de Componentes
+                            mermaid: `flowchart TD
+    subgraph builder ["Builder &middot; vista de componentes"]
+        direction LR
+        canvas["<b>Canvas</b><br/><i>React</i><br/>DnD context + seleccion"]
+        palette["<b>BlockPalette</b><br/><i>React</i><br/>30+ bloques + filtros"]
+        tree["<b>BlockTree</b><br/><i>Zustand</i><br/>store + history"]
+        inspector["<b>Inspector</b><br/><i>React</i><br/>props + bindings"]
+        renderer["<b>Renderer</b><br/><i>iframe</i><br/>preview en vivo"]
+    end
 
-    Container_Boundary(builder, "Builder") {
-        Component(canvas, "Canvas", "React", "DnD context + seleccion")
-        Component(palette, "BlockPalette", "React", "30+ bloques + filtros")
-        Component(tree, "BlockTree", "Zustand", "Store + history")
-        Component(inspector, "Inspector", "React", "Props + bindings")
-        Component(renderer, "Renderer", "iframe", "Preview en vivo")
-    }
+    palette -->|drag| canvas
+    canvas -->|drop → mutate| tree
+    tree -->|renderiza a| renderer
+    tree -->|nodo seleccionado| inspector
 
-    Rel(palette, canvas, "drag")
-    Rel(canvas, tree, "drop → mutate")
-    Rel(tree, renderer, "renderiza a")
-    Rel(tree, inspector, "nodo seleccionado")`,
+    classDef component fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+
+    class canvas,palette,tree,inspector,renderer component
+
+    style builder fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
                             ascii: `┌────────────────────────────────────────────────────┐
 │           Builder · vista de componentes           │
 │                                                    │
@@ -683,23 +701,25 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                     ],
                     architecture: {
                         context: {
-                            mermaid: `C4Context
-    title System Context — LandingPager.ai
+                            mermaid: `flowchart TD
+    user((("Marketer / Small business<br/><i>wants to validate offer fast</i>")))
+    sys["<b>LandingPager.ai</b><br/><i>SaaS landing builder</i><br/>with AI + drag/drop"]
+    openai["<b>OpenAI API</b><br/><i>generates copy and sections</i>"]
+    s3["<b>AWS S3 + CDN</b><br/><i>user assets</i>"]
+    stripe["<b>Stripe</b><br/><i>billing + customer portal</i>"]
 
-    Person(marketer, "Marketer / Small business", "Wants to validate offer fast")
+    user -->|describes goal, publishes landing| sys
+    sys -->|generates copy via| openai
+    sys -->|stores assets in| s3
+    sys -->|bills via| stripe
 
-    System(landingpager, "LandingPager.ai", "SaaS landing builder with AI + drag/drop")
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef system fill:#0D1117,stroke:#06B6D4,color:#E5E7EB,stroke-width:1.5px
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
 
-    System_Ext(openai, "OpenAI API", "Generates copy and sections")
-    System_Ext(s3, "AWS S3 + CDN", "User assets")
-    System_Ext(stripe, "Stripe", "Billing & customer portal")
-
-    Rel(marketer, landingpager, "describes goal, publishes landing")
-    Rel(landingpager, openai, "generates copy via")
-    Rel(landingpager, s3, "stores assets in")
-    Rel(landingpager, stripe, "bills via")
-
-    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")`,
+    class user person
+    class sys system
+    class openai,s3,stripe ext`,
                             ascii: `                  ┌──────────────────┐
                   │   Marketer /     │
                   │   Small business │
@@ -719,25 +739,36 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
           └────────┘ └──────┘ └────────┘`
                         },
                         container: {
-                            mermaid: `C4Container
-    title Container view — LandingPager.ai
+                            mermaid: `flowchart TD
+    user((("Marketer")))
 
-    Person(user, "Marketer")
+    subgraph lp ["LandingPager.ai"]
+        direction LR
+        web["<b>Web App</b><br/><i>Next.js 14, React/TS</i><br/>main UI"]
+        api["<b>API Routes</b><br/><i>Edge + Node, tRPC + Zod</i><br/>typed endpoints"]
+        builder["<b>Builder iframe</b><br/><i>dnd-kit + realtime</i><br/>visual editor"]
+        db[("<b>PostgreSQL</b><br/><i>Neon, Drizzle ORM</i><br/>project data")]
+    end
 
-    System_Boundary(lp, "LandingPager.ai") {
-        Container(web, "Web App", "Next.js 14, React/TS", "Main UI")
-        Container(api, "API Routes", "Edge + Node, tRPC + Zod", "Typed endpoints")
-        Container(builder, "Builder iframe", "dnd-kit + realtime preview", "Visual editor")
-        ContainerDb(db, "PostgreSQL", "Neon, Drizzle ORM", "Project data")
-    }
+    openai["<b>OpenAI gpt-4o</b><br/><i>copy + sections</i>"]
 
-    System_Ext(openai, "OpenAI gpt-4o", "Copy + sections")
+    user -->|uses &middot; HTTPS| web
+    web -->|calls &middot; tRPC| api
+    api -->|R/W| db
+    api -->|generates copy| openai
+    web -->|renders preview| builder
 
-    Rel(user, web, "Uses", "HTTPS")
-    Rel(web, api, "Calls", "tRPC")
-    Rel(api, db, "Reads/writes")
-    Rel(api, openai, "Generates copy")
-    Rel(web, builder, "Renders preview")`,
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef container fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class user person
+    class web,api,builder container
+    class db db
+    class openai ext
+
+    style lp fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
                             ascii: `┌──────────────────────────────────────────────────────┐
 │                  LandingPager.ai                     │
 │                                                      │
@@ -761,21 +792,26 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
 └──────────────────────────────────────────────────────┘`
                         },
                         component: {
-                            mermaid: `C4Component
-    title Builder · Component view
+                            mermaid: `flowchart TD
+    subgraph builder ["Builder &middot; component view"]
+        direction LR
+        canvas["<b>Canvas</b><br/><i>React</i><br/>DnD context + selection"]
+        palette["<b>BlockPalette</b><br/><i>React</i><br/>30+ blocks + filters"]
+        tree["<b>BlockTree</b><br/><i>Zustand</i><br/>store + history"]
+        inspector["<b>Inspector</b><br/><i>React</i><br/>props + bindings"]
+        renderer["<b>Renderer</b><br/><i>iframe</i><br/>live preview"]
+    end
 
-    Container_Boundary(builder, "Builder") {
-        Component(canvas, "Canvas", "React", "DnD context + selection")
-        Component(palette, "BlockPalette", "React", "30+ blocks + filters")
-        Component(tree, "BlockTree", "Zustand", "Store + history")
-        Component(inspector, "Inspector", "React", "Props + bindings")
-        Component(renderer, "Renderer", "iframe", "Live preview")
-    }
+    palette -->|drag| canvas
+    canvas -->|drop → mutate| tree
+    tree -->|renders to| renderer
+    tree -->|selected node| inspector
 
-    Rel(palette, canvas, "drag")
-    Rel(canvas, tree, "drop → mutate")
-    Rel(tree, renderer, "renders to")
-    Rel(tree, inspector, "selected node")`,
+    classDef component fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+
+    class canvas,palette,tree,inspector,renderer component
+
+    style builder fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
                             ascii: `┌────────────────────────────────────────────────────┐
 │             Builder · Component view               │
 │                                                    │
