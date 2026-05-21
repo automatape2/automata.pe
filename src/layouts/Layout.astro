@@ -33,6 +33,25 @@ const lang = getLangFromUrl(Astro.url);
 const t = getTranslations(lang);
 const homeHref = lang === "es" ? "/" : "/en";
 
+// Compute alternate-language URL for the current path so we can emit hreflang tags.
+// /            ↔ /es        (root defaults to en)
+// /en          ↔ /es
+// /es          ↔ /en
+// /projects/x  ↔ /es/projects/x
+// /es/projects/x ↔ /projects/x
+function altPathFor(pathname: string): { en: string; es: string } {
+    let cleaned = pathname.replace(/\/+$/, "") || "/";
+    // Strip leading /en or /es
+    const stripped = cleaned.replace(/^\/(en|es)(?=\/|$)/, "") || "/";
+    const en = stripped === "/" ? "/en" : stripped;
+    const es = stripped === "/" ? "/es" : `/es${stripped}`;
+    return { en, es };
+}
+const alts = altPathFor(Astro.url.pathname);
+const siteBase = (Astro.site || Astro.url).toString().replace(/\/+$/, "");
+const altEn = `${siteBase}${alts.en}`;
+const altEs = `${siteBase}${alts.es}`;
+
 const projectsBase = lang === "es" ? "/es/projects" : "/projects";
 const langItems = (translations[lang] as any).solutions.items as any[];
 const cmdkCommands = [
@@ -96,6 +115,12 @@ const ldPayload = structuredData ?? (
         <meta name="viewport" content="width=device-width" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="canonical" href={canonical} />
+
+        <!-- hreflang: tell search engines about the EN ↔ ES counterparts -->
+        <link rel="alternate" hreflang="en" href={altEn} />
+        <link rel="alternate" hreflang="es" href={altEs} />
+        <link rel="alternate" hreflang="x-default" href={altEn} />
+
         <link rel="alternate" type="application/rss+xml" title="Automata Projects" href="/rss.xml" />
         <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
         <meta name="generator" content={Astro.generator} />
