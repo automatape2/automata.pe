@@ -1,6 +1,8 @@
 ---
 import { Image } from "astro:assets";
 import MermaidViewer from "./MermaidViewer.astro";
+import MasterDetail from "./MasterDetail.astro";
+import Carousel from "./Carousel.astro";
 
 interface Props {
     project: any;
@@ -292,12 +294,14 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 03 · Architecture (master-detail: sidebar picker + active diagram) -->
     {project.architecture && (() => {
-        const levels = [
-            { key: "context",   label: L.sections.c4Context,   level: "c4-level-1", diagram: normalizeDiagram(project.architecture.context) },
-            { key: "container", label: L.sections.c4Container, level: "c4-level-2", diagram: normalizeDiagram(project.architecture.container) },
-            { key: "component", label: L.sections.c4Component, level: "c4-level-3", diagram: normalizeDiagram(project.architecture.component) },
-        ].filter(l => l.diagram);
-        if (levels.length === 0) return null;
+        const ctx = normalizeDiagram(project.architecture.context);
+        const ctn = normalizeDiagram(project.architecture.container);
+        const cmp = normalizeDiagram(project.architecture.component);
+        const items = [];
+        if (ctx) items.push({ key: "context",   label: L.sections.c4Context,   sublabel: "c4-level-1" });
+        if (ctn) items.push({ key: "container", label: L.sections.c4Container, sublabel: "c4-level-2" });
+        if (cmp) items.push({ key: "component", label: L.sections.c4Component, sublabel: "c4-level-3" });
+        if (items.length === 0) return null;
         return (
             <section class="mb-10">
                 <div class="border-b border-[var(--line)] pb-3 mb-5">
@@ -307,50 +311,44 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
                     </h2>
                 </div>
 
-                <div class="grid md:grid-cols-[200px_1fr] border border-[var(--line)]" data-arch-picker>
-                    <!-- Sidebar -->
-                    <nav class="border-b md:border-b-0 md:border-r border-[var(--line)] p-3 bg-[var(--bg-elev)]/30">
-                        <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-3 px-2">// levels</div>
-                        <ul class="space-y-1">
-                            {levels.map((lv, i) => (
-                                <li>
-                                    <button
-                                        type="button"
-                                        data-arch-pick={lv.key}
-                                        data-active={i === 0 ? "true" : "false"}
-                                        class="arch-pick-btn w-full text-left px-2 py-2 text-sm font-mono group flex flex-col gap-0.5 border border-transparent transition-colors"
-                                    >
-                                        <span class="flex items-center gap-2">
-                                            <span class="arch-marker text-[var(--fg-muted)]">○</span>
-                                            <span class="arch-label text-[var(--fg-dim)]">{lv.label}</span>
-                                        </span>
-                                        <span class="text-[10px] text-[var(--fg-muted)] pl-5">{lv.level}</span>
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
-
-                    <!-- Diagram viewer area: render all, hide non-active -->
-                    <div class="arch-viewers">
-                        {levels.map((lv, i) => (
-                            <div data-arch-level={lv.key} class={i === 0 ? "" : "hidden"}>
-                                {lv.diagram.mermaid ? (
-                                    <MermaidViewer
-                                        source={lv.diagram.mermaid}
-                                        label={`${lv.label} · ${lv.level}`}
-                                        fallback={lv.diagram.ascii}
-                                    />
-                                ) : (
-                                    <div class="panel border-0">
-                                        <div class="window-chrome"><div class="window-chrome-title">{lv.label} · {lv.level}</div></div>
-                                        <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{lv.diagram.ascii}</pre>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                <MasterDetail items={items} title="// levels">
+                    {ctx && (
+                        <div data-md-key="context">
+                            {ctx.mermaid ? (
+                                <MermaidViewer source={ctx.mermaid} label={`${L.sections.c4Context} · c4-level-1`} fallback={ctx.ascii} />
+                            ) : (
+                                <div class="panel border-0">
+                                    <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Context} · c4-level-1</div></div>
+                                    <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{ctx.ascii}</pre>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {ctn && (
+                        <div data-md-key="container" class="hidden">
+                            {ctn.mermaid ? (
+                                <MermaidViewer source={ctn.mermaid} label={`${L.sections.c4Container} · c4-level-2`} fallback={ctn.ascii} />
+                            ) : (
+                                <div class="panel border-0">
+                                    <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Container} · c4-level-2</div></div>
+                                    <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{ctn.ascii}</pre>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {cmp && (
+                        <div data-md-key="component" class="hidden">
+                            {cmp.mermaid ? (
+                                <MermaidViewer source={cmp.mermaid} label={`${L.sections.c4Component} · c4-level-3`} fallback={cmp.ascii} />
+                            ) : (
+                                <div class="panel border-0">
+                                    <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Component} · c4-level-3</div></div>
+                                    <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{cmp.ascii}</pre>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </MasterDetail>
             </section>
         );
     })()}
@@ -443,7 +441,7 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 06 · Technical Challenges (carousel) -->
     {project.techChallenges && project.techChallenges.length > 0 && (
-        <section class="mb-10" data-challenges-section>
+        <section class="mb-10">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 06 · {L.sections.techChallenges}</div>
                 <h2 class="heading-mono text-2xl">
@@ -454,93 +452,62 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
                 </p>
             </div>
 
-            <!-- Controls bar -->
-            <div class="flex items-center justify-between mb-3 text-xs font-mono">
-                <button type="button" data-challenges-prev class="px-2.5 py-1 border border-[var(--line-bright)] text-[var(--fg-dim)] hover:border-[var(--green)] hover:text-[var(--green)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-                    [ ◂ prev ]
-                </button>
-                <div class="text-[var(--fg-muted)]">
-                    <span data-challenges-counter class="text-[var(--green)]">01</span>
-                    <span class="mx-1">/</span>
-                    <span>{String(project.techChallenges.length).padStart(2, '0')}</span>
-                </div>
-                <button type="button" data-challenges-next class="px-2.5 py-1 border border-[var(--line-bright)] text-[var(--fg-dim)] hover:border-[var(--green)] hover:text-[var(--green)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-                    [ next ▸ ]
-                </button>
-            </div>
-
-            <!-- Carousel track -->
-            <div class="border border-[var(--line)] overflow-hidden">
-                <div data-challenges-track class="flex transition-transform duration-300 ease-out will-change-transform">
-                    {project.techChallenges.map((ch: any, i: number) => (
-                        <article data-challenge-slide class="w-full shrink-0">
-                            <div class="window-chrome">
-                                <div class="window-chrome-title">
-                                    {`challenge-${String(i + 1).padStart(2, '0')}.md`}{ch.tags && ch.tags.length > 0 ? `  ·  ${ch.tags.join(' · ')}` : ''}
-                                </div>
+            <Carousel count={project.techChallenges.length} id="challenges">
+                {project.techChallenges.map((ch: any, i: number) => (
+                    <article data-carousel-slide class="w-full shrink-0">
+                        <div class="window-chrome">
+                            <div class="window-chrome-title">
+                                {`challenge-${String(i + 1).padStart(2, '0')}.md`}{ch.tags && ch.tags.length > 0 ? `  ·  ${ch.tags.join(' · ')}` : ''}
                             </div>
-                            <div class="p-5 md:p-7 space-y-4">
-                                <div>
-                                    <div class="text-[10px] text-[var(--amber)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcProblem}</div>
-                                    <h3 class="text-lg font-semibold text-[var(--fg)] leading-tight">{ch.problem}</h3>
-                                    {ch.constraint && (
-                                        <p class="mt-2 text-sm text-[var(--fg-dim)]">
-                                            <span class="text-[var(--fg-muted)]">{L.sections.tcConstraint}: </span>{ch.constraint}
-                                        </p>
-                                    )}
-                                </div>
+                        </div>
+                        <div class="p-5 md:p-7 space-y-4">
+                            <div>
+                                <div class="text-[10px] text-[var(--amber)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcProblem}</div>
+                                <h3 class="text-lg font-semibold text-[var(--fg)] leading-tight">{ch.problem}</h3>
+                                {ch.constraint && (
+                                    <p class="mt-2 text-sm text-[var(--fg-dim)]">
+                                        <span class="text-[var(--fg-muted)]">{L.sections.tcConstraint}: </span>{ch.constraint}
+                                    </p>
+                                )}
+                            </div>
 
-                                <div class="grid md:grid-cols-2 gap-5 border-t border-[var(--line)] pt-4">
-                                    {ch.approach && (
-                                        <div>
-                                            <div class="text-[10px] text-[var(--cyan)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcApproach}</div>
-                                            <p class="text-sm text-[var(--fg)] leading-relaxed">{ch.approach}</p>
-                                        </div>
-                                    )}
-                                    {ch.algorithm && (
-                                        <div>
-                                            <div class="text-[10px] text-[var(--cyan)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcAlgorithm}</div>
-                                            <p class="text-sm text-[var(--cyan-bright)] leading-relaxed">{ch.algorithm}</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {ch.code && (
-                                    <div class="border border-[var(--line)] bg-black">
-                                        {ch.codeLang && (
-                                            <div class="px-4 py-2 border-b border-[var(--line)] text-[11px] text-[var(--fg-muted)] flex justify-between">
-                                                <span>{ch.codeFile || `snippet-${i + 1}`}</span>
-                                                <span>{ch.codeLang}</span>
-                                            </div>
-                                        )}
-                                        <pre class="p-4 overflow-x-auto text-[12.5px] leading-[1.6] text-[var(--fg)] font-mono">{ch.code}</pre>
+                            <div class="grid md:grid-cols-2 gap-5 border-t border-[var(--line)] pt-4">
+                                {ch.approach && (
+                                    <div>
+                                        <div class="text-[10px] text-[var(--cyan)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcApproach}</div>
+                                        <p class="text-sm text-[var(--fg)] leading-relaxed">{ch.approach}</p>
                                     </div>
                                 )}
-
-                                {ch.outcome && (
-                                    <div class="border-t border-[var(--line)] pt-3">
-                                        <div class="text-[10px] text-[var(--green)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcOutcome}</div>
-                                        <p class="text-sm text-[var(--green)] leading-relaxed">{ch.outcome}</p>
+                                {ch.algorithm && (
+                                    <div>
+                                        <div class="text-[10px] text-[var(--cyan)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcAlgorithm}</div>
+                                        <p class="text-sm text-[var(--cyan-bright)] leading-relaxed">{ch.algorithm}</p>
                                     </div>
                                 )}
                             </div>
-                        </article>
-                    ))}
-                </div>
-            </div>
 
-            <!-- Dot indicators -->
-            <div class="flex justify-center gap-2 mt-4">
-                {project.techChallenges.map((_: any, i: number) => (
-                    <button
-                        type="button"
-                        data-challenges-dot={i}
-                        data-active={i === 0 ? "true" : "false"}
-                        class="challenges-dot w-2 h-2 transition-colors border border-[var(--line-bright)]"
-                        aria-label={`Go to slide ${i + 1}`}
-                    ></button>
+                            {ch.code && (
+                                <div class="border border-[var(--line)] bg-black">
+                                    {ch.codeLang && (
+                                        <div class="px-4 py-2 border-b border-[var(--line)] text-[11px] text-[var(--fg-muted)] flex justify-between">
+                                            <span>{ch.codeFile || `snippet-${i + 1}`}</span>
+                                            <span>{ch.codeLang}</span>
+                                        </div>
+                                    )}
+                                    <pre class="p-4 overflow-x-auto text-[12.5px] leading-[1.6] text-[var(--fg)] font-mono">{ch.code}</pre>
+                                </div>
+                            )}
+
+                            {ch.outcome && (
+                                <div class="border-t border-[var(--line)] pt-3">
+                                    <div class="text-[10px] text-[var(--green)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcOutcome}</div>
+                                    <p class="text-sm text-[var(--green)] leading-relaxed">{ch.outcome}</p>
+                                </div>
+                            )}
+                        </div>
+                    </article>
                 ))}
-            </div>
+            </Carousel>
         </section>
     )}
 
@@ -660,86 +627,3 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
         </a>
     </section>
 </div>
-
-<style>
-    /* Architecture sidebar picker */
-    .arch-pick-btn[data-active="true"] {
-        background: rgba(74, 222, 128, 0.05);
-        border-color: var(--line-bright);
-    }
-    .arch-pick-btn[data-active="true"] .arch-marker { color: var(--green); }
-    .arch-pick-btn[data-active="true"] .arch-marker::before { content: "▸"; }
-    .arch-pick-btn[data-active="true"] .arch-marker > * { display: none; }
-    .arch-pick-btn[data-active="true"] .arch-label { color: var(--fg); font-weight: 600; }
-    .arch-pick-btn:hover { background: rgba(74, 222, 128, 0.03); }
-    .arch-pick-btn:hover .arch-label { color: var(--green); }
-
-    /* Challenges carousel */
-    [data-challenges-track]::-webkit-scrollbar { display: none; }
-
-    .challenges-dot {
-        background: transparent;
-    }
-    .challenges-dot[data-active="true"] {
-        background: var(--green);
-        border-color: var(--green);
-    }
-    .challenges-dot:hover {
-        border-color: var(--green);
-    }
-</style>
-
-<script>
-    // ============ Architecture sidebar picker ============
-    document.querySelectorAll<HTMLElement>("[data-arch-picker]").forEach((picker) => {
-        const buttons = picker.querySelectorAll<HTMLButtonElement>("[data-arch-pick]");
-        const viewers = picker.querySelectorAll<HTMLElement>("[data-arch-level]");
-        buttons.forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const target = btn.getAttribute("data-arch-pick");
-                buttons.forEach((b) => b.setAttribute("data-active", String(b === btn)));
-                viewers.forEach((v) => v.classList.toggle("hidden", v.getAttribute("data-arch-level") !== target));
-                // Trigger window resize so Mermaid SVGs that were hidden recalc their viewport
-                window.dispatchEvent(new Event("resize"));
-            });
-        });
-    });
-
-    // ============ Challenges carousel (transform-based) ============
-    document.querySelectorAll<HTMLElement>("[data-challenges-section]").forEach((section) => {
-        const track = section.querySelector<HTMLElement>("[data-challenges-track]");
-        const slides = section.querySelectorAll<HTMLElement>("[data-challenge-slide]");
-        const counter = section.querySelector<HTMLElement>("[data-challenges-counter]");
-        const dots = section.querySelectorAll<HTMLButtonElement>("[data-challenges-dot]");
-        const prev = section.querySelector<HTMLButtonElement>("[data-challenges-prev]");
-        const next = section.querySelector<HTMLButtonElement>("[data-challenges-next]");
-        if (!track || slides.length === 0) return;
-        let current = 0;
-
-        const update = (i: number) => {
-            current = Math.max(0, Math.min(slides.length - 1, i));
-            track.style.transform = `translateX(-${current * 100}%)`;
-            if (counter) counter.textContent = String(current + 1).padStart(2, "0");
-            dots.forEach((d, di) => d.setAttribute("data-active", String(di === current)));
-            if (prev) prev.disabled = current === 0;
-            if (next) next.disabled = current === slides.length - 1;
-        };
-
-        prev?.addEventListener("click", () => update(current - 1));
-        next?.addEventListener("click", () => update(current + 1));
-        dots.forEach((d) => {
-            d.addEventListener("click", () => {
-                const idx = Number(d.getAttribute("data-challenges-dot"));
-                update(idx);
-            });
-        });
-
-        // Keyboard arrows when section is focused
-        section.addEventListener("keydown", (e: KeyboardEvent) => {
-            if (e.key === "ArrowLeft") { e.preventDefault(); update(current - 1); }
-            if (e.key === "ArrowRight") { e.preventDefault(); update(current + 1); }
-        });
-
-        update(0);
-    });
-</script>

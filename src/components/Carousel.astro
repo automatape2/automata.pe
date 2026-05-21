@@ -1,0 +1,103 @@
+---
+// Carousel — transform-based horizontal carousel with prev/next, counter, dots.
+// Each child slide must have `data-carousel-slide` and `w-full shrink-0`.
+// The inner track translates by N * 100% to expose the active slide.
+
+interface Props {
+    /** Number of slides — used for the counter and dot indicators. */
+    count: number;
+    /** Optional id, useful when there are multiple carousels on the same page. */
+    id?: string;
+}
+
+const { count, id } = Astro.props;
+---
+
+<section data-carousel-section data-carousel-id={id}>
+    <!-- Controls -->
+    <div class="flex items-center justify-between mb-3 text-xs font-mono">
+        <button
+            type="button"
+            data-carousel-prev
+            class="px-2.5 py-1 border border-[var(--line-bright)] text-[var(--fg-dim)] hover:border-[var(--green)] hover:text-[var(--green)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        >[ ◂ prev ]</button>
+
+        <div class="text-[var(--fg-muted)]">
+            <span data-carousel-counter class="text-[var(--green)]">01</span>
+            <span class="mx-1">/</span>
+            <span>{String(count).padStart(2, "0")}</span>
+        </div>
+
+        <button
+            type="button"
+            data-carousel-next
+            class="px-2.5 py-1 border border-[var(--line-bright)] text-[var(--fg-dim)] hover:border-[var(--green)] hover:text-[var(--green)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        >[ next ▸ ]</button>
+    </div>
+
+    <!-- Track -->
+    <div class="border border-[var(--line)] overflow-hidden">
+        <div data-carousel-track class="flex transition-transform duration-300 ease-out will-change-transform">
+            <slot />
+        </div>
+    </div>
+
+    <!-- Dot indicators -->
+    <div class="flex justify-center gap-2 mt-4">
+        {Array.from({ length: count }, (_, i) => (
+            <button
+                type="button"
+                data-carousel-dot={i}
+                data-active={i === 0 ? "true" : "false"}
+                class="carousel-dot w-2 h-2 transition-colors border border-[var(--line-bright)]"
+                aria-label={`Go to slide ${i + 1}`}
+            ></button>
+        ))}
+    </div>
+</section>
+
+<style>
+    .carousel-dot { background: transparent; }
+    .carousel-dot[data-active="true"] {
+        background: var(--green);
+        border-color: var(--green);
+    }
+    .carousel-dot:hover { border-color: var(--green); }
+</style>
+
+<script>
+    document.querySelectorAll<HTMLElement>("[data-carousel-section]").forEach((section) => {
+        const track = section.querySelector<HTMLElement>("[data-carousel-track]");
+        const slides = section.querySelectorAll<HTMLElement>("[data-carousel-slide]");
+        const counter = section.querySelector<HTMLElement>("[data-carousel-counter]");
+        const dots = section.querySelectorAll<HTMLButtonElement>("[data-carousel-dot]");
+        const prev = section.querySelector<HTMLButtonElement>("[data-carousel-prev]");
+        const next = section.querySelector<HTMLButtonElement>("[data-carousel-next]");
+        if (!track || slides.length === 0) return;
+        let current = 0;
+
+        const update = (i: number) => {
+            current = Math.max(0, Math.min(slides.length - 1, i));
+            track.style.transform = `translateX(-${current * 100}%)`;
+            if (counter) counter.textContent = String(current + 1).padStart(2, "0");
+            dots.forEach((d, di) => d.setAttribute("data-active", String(di === current)));
+            if (prev) prev.disabled = current === 0;
+            if (next) next.disabled = current === slides.length - 1;
+        };
+
+        prev?.addEventListener("click", () => update(current - 1));
+        next?.addEventListener("click", () => update(current + 1));
+        dots.forEach((d) => {
+            d.addEventListener("click", () => update(Number(d.getAttribute("data-carousel-dot"))));
+        });
+
+        // Arrow keys when section is focused
+        section.tabIndex = section.tabIndex >= 0 ? section.tabIndex : -1;
+        section.addEventListener("keydown", (e: KeyboardEvent) => {
+            if (e.key === "ArrowLeft") { e.preventDefault(); update(current - 1); }
+            if (e.key === "ArrowRight") { e.preventDefault(); update(current + 1); }
+        });
+
+        update(0);
+    });
+</script>

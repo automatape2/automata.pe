@@ -1,0 +1,118 @@
+---
+// MasterDetail — sidebar list on the left, content panes on the right.
+// Caller passes items (key, label, sublabel?) and renders pane elements with
+// data-md-key matching each key. Add `class="hidden"` to non-active panes;
+// the script toggles visibility on click. Example:
+//
+//   <MasterDetail items={[{ key: "a", label: "A" }, { key: "b", label: "B" }]} title="// levels">
+//       <div data-md-key="a">First</div>
+//       <div data-md-key="b" class="hidden">Second</div>
+//   </MasterDetail>
+
+interface Item {
+    key: string;
+    label: string;
+    sublabel?: string;
+}
+
+interface Props {
+    items: Item[];
+    title?: string;
+}
+
+const { items, title = "items" } = Astro.props;
+---
+
+<div class="md-grid border border-[var(--line)]" data-masterdetail>
+    <nav class="md-sidebar p-3">
+        <div class="md-title">{title}</div>
+        <ul>
+            {items.map((it, i) => (
+                <li>
+                    <button
+                        type="button"
+                        data-md-pick={it.key}
+                        data-active={i === 0 ? "true" : "false"}
+                        class="md-pick-btn"
+                    >
+                        <span class="md-row">
+                            <span class="md-marker"></span>
+                            <span class="md-label">{it.label}</span>
+                        </span>
+                        {it.sublabel && <span class="md-sub">{it.sublabel}</span>}
+                    </button>
+                </li>
+            ))}
+        </ul>
+    </nav>
+
+    <div class="md-panes">
+        <slot />
+    </div>
+</div>
+
+<style>
+    .md-grid { display: grid; grid-template-columns: 1fr; }
+    @media (min-width: 768px) {
+        .md-grid { grid-template-columns: 200px 1fr; }
+    }
+    .md-sidebar {
+        border-bottom: 1px solid var(--line);
+        background: rgba(10, 10, 10, 0.3);
+    }
+    @media (min-width: 768px) {
+        .md-sidebar { border-bottom: 0; border-right: 1px solid var(--line); }
+    }
+    .md-title {
+        font-size: 10px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        margin-bottom: 12px;
+        padding: 0 8px;
+    }
+    .md-pick-btn {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        width: 100%;
+        text-align: left;
+        padding: 8px;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--fg-dim);
+        background: transparent;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 120ms;
+    }
+    .md-pick-btn .md-row { display: flex; align-items: center; gap: 8px; }
+    .md-pick-btn .md-marker { display: inline-block; width: 10px; color: var(--fg-muted); }
+    .md-pick-btn .md-marker::before { content: "\25CB"; }
+    .md-pick-btn .md-label { color: var(--fg-dim); }
+    .md-pick-btn .md-sub { display: block; font-size: 10px; color: var(--fg-muted); padding-left: 18px; }
+    .md-pick-btn:hover { background: rgba(74, 222, 128, 0.03); }
+    .md-pick-btn:hover .md-label { color: var(--green); }
+    .md-pick-btn[data-active="true"] {
+        background: rgba(74, 222, 128, 0.05);
+        border-color: var(--line-bright);
+    }
+    .md-pick-btn[data-active="true"] .md-marker { color: var(--green); }
+    .md-pick-btn[data-active="true"] .md-marker::before { content: "\25B8"; }
+    .md-pick-btn[data-active="true"] .md-label { color: var(--fg); font-weight: 600; }
+</style>
+
+<script>
+    document.querySelectorAll("[data-masterdetail]").forEach((root) => {
+        const buttons = root.querySelectorAll("[data-md-pick]");
+        const panes = root.querySelectorAll("[data-md-key]");
+        buttons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const target = btn.getAttribute("data-md-pick");
+                buttons.forEach((b) => b.setAttribute("data-active", String(b === btn)));
+                panes.forEach((p) => p.classList.toggle("hidden", p.getAttribute("data-md-key") !== target));
+                window.dispatchEvent(new Event("resize"));
+            });
+        });
+    });
+</script>
