@@ -42,7 +42,7 @@ const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
 
     <!-- View pane (rendered SVG) -->
     <div class="mv-pane" data-pane="view">
-        <div class="mv-svg p-6 overflow-x-auto bg-[var(--bg)] flex items-center justify-center min-h-[200px]">
+        <div class="mv-svg p-4 overflow-auto bg-[var(--bg)] flex items-center justify-center min-h-[120px] max-h-[420px]">
             <pre class="mv-source-raw whitespace-pre font-mono text-[12px] text-[var(--fg-dim)]">{source}</pre>
         </div>
         {fallback && (
@@ -60,6 +60,16 @@ const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
 </div>
 
 <style is:global>
+    /* ============ Mermaid size cap — diagrams render at natural size; constrain proportionally ============ */
+    .mv-svg svg {
+        max-width: min(100%, 720px) !important;
+        max-height: 380px !important;
+        width: auto !important;
+        height: auto !important;
+        display: block;
+        margin: 0 auto;
+    }
+
     /* ============ Mermaid C4 — remap inline fills/strokes to terminal palette ============ */
     /* Mermaid C4 paints colors as inline SVG attributes (not classes), so we target the
        known default fills/strokes and remap them. */

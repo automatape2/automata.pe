@@ -217,8 +217,8 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
         </div>
     )}
 
-    <!-- 01 · Discovery -->
-    {(project.fullDescription || project.problem || project.audience) && (
+    <!-- 01 · Discovery — hidden for now (toggle the `false &&` below to bring it back) -->
+    {false && (project.fullDescription || project.problem || project.audience) && (
         <section class="mb-12">
             <div class="border-b border-[var(--line)] pb-4 mb-6">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 01 · {L.sections.discovery}</div>
