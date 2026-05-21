@@ -38,6 +38,10 @@ const homeHref = lang === "es" ? "/" : "/en";
 // to your registered domain (e.g. "automata.pe"). Leave empty to disable.
 const PLAUSIBLE_DOMAIN = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN || "";
 
+// Webmention.io endpoint for this domain. Set PUBLIC_WEBMENTION_DOMAIN to your
+// registered handle (e.g. "automata.pe") to advertise the endpoint.
+const WEBMENTION_DOMAIN = import.meta.env.PUBLIC_WEBMENTION_DOMAIN || "";
+
 // Compute alternate-language URL for the current path so we can emit hreflang tags.
 // /            ↔ /es        (root defaults to en)
 // /en          ↔ /es
@@ -129,6 +133,12 @@ const ldPayload = structuredData ?? (
 
         <link rel="alternate" type="application/rss+xml" title="Automata Projects" href="/rss.xml" />
         <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+        {WEBMENTION_DOMAIN && (
+            <>
+                <link rel="webmention" href={`https://webmention.io/${WEBMENTION_DOMAIN}/webmention`} />
+                <link rel="pingback" href={`https://webmention.io/${WEBMENTION_DOMAIN}/xmlrpc`} />
+            </>
+        )}
         <meta name="generator" content={Astro.generator} />
 
         <!-- JSON-LD structured data -->

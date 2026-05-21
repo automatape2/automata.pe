@@ -801,6 +801,47 @@ if (project.lessons && project.lessons.length > 0) {
         </section>
     )}
 
+    <!-- Webmentions (hidden until at least one mention arrives) -->
+    <section id="sec-webmentions" class="mb-10 hidden" data-webmentions>
+        <div class="border-b border-[var(--line)] pb-3 mb-5">
+            <div class="text-xs text-[var(--fg-muted)] mb-1">// {lang === "es" ? "menciones" : "mentions"}</div>
+            <h2 class="heading-mono text-2xl">
+                <span class="text-[var(--green)]">$</span> grep -r "this-url" ./web
+            </h2>
+            <p class="mt-2 text-sm text-[var(--fg-dim)]">
+                <span class="text-[var(--fg-muted)]">// </span>
+                {lang === "es" ? "respuestas, reposts y likes desde la web abierta" : "replies, reposts and likes from the open web"}
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-[auto_1fr] gap-0 border border-[var(--line)]">
+            <div class="panel border-0 p-5 md:border-r border-[var(--line)] min-w-[180px]">
+                <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-3">▸ reactions</div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[var(--amber)]">♡</span>
+                        <span data-wm-likes class="text-[var(--fg)]">0</span>
+                        <span class="text-[var(--fg-muted)] text-xs">likes</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[var(--green)]">↻</span>
+                        <span data-wm-reposts class="text-[var(--fg)]">0</span>
+                        <span class="text-[var(--fg-muted)] text-xs">reposts</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[var(--cyan)]">↩</span>
+                        <span data-wm-replies class="text-[var(--fg)]">0</span>
+                        <span class="text-[var(--fg-muted)] text-xs">replies</span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel border-0 border-t md:border-t-0 p-5 border-[var(--line)]">
+                <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-3">▸ replies & mentions</div>
+                <ul data-wm-list class="space-y-3 text-sm"></ul>
+            </div>
+        </div>
+    </section>
+
     <!-- Related projects -->
     {related.length > 0 && (
         <section class="mb-10">
@@ -989,6 +1030,59 @@ if (project.lessons && project.lessons.length > 0) {
             }
         });
     });
+
+    // ============ Webmentions ============
+    // Fetch mentions for the current URL from webmention.io. If at least one
+    // arrives, surface the section. Silent otherwise.
+    (async () => {
+        const section = document.getElementById("sec-webmentions");
+        if (!section) return;
+        const target = `${location.origin}${location.pathname}`;
+        try {
+            const res = await fetch(
+                `https://webmention.io/api/mentions.jf2?target=${encodeURIComponent(target)}&per-page=50`,
+                { mode: "cors" }
+            );
+            if (!res.ok) return;
+            const data = await res.json();
+            const children: any[] = data?.children ?? [];
+            if (children.length === 0) return;
+
+            const likes = children.filter((c) => c["wm-property"] === "like-of");
+            const reposts = children.filter((c) => c["wm-property"] === "repost-of");
+            const replies = children.filter((c) =>
+                ["in-reply-to", "mention-of"].includes(c["wm-property"])
+            );
+
+            (section.querySelector("[data-wm-likes]") as HTMLElement).textContent = String(likes.length);
+            (section.querySelector("[data-wm-reposts]") as HTMLElement).textContent = String(reposts.length);
+            (section.querySelector("[data-wm-replies]") as HTMLElement).textContent = String(replies.length);
+
+            const list = section.querySelector("[data-wm-list]") as HTMLElement;
+            list.innerHTML = "";
+            replies.slice(0, 10).forEach((m) => {
+                const li = document.createElement("li");
+                const name = m.author?.name ?? "anon";
+                const url = m.url ?? "#";
+                const content = (m.content?.text ?? m.summary ?? "").slice(0, 240);
+                const when = m.published ? new Date(m.published).toISOString().slice(0, 10) : "";
+                li.innerHTML = `
+                    <a href="${url}" target="_blank" rel="noopener noreferrer" class="block p-3 border border-[var(--line)] hover:border-[var(--green)] transition-colors">
+                        <div class="flex items-center justify-between mb-1 text-xs">
+                            <span class="text-[var(--green)]">▸ ${name.replace(/[<>]/g, "")}</span>
+                            <span class="text-[var(--fg-muted)] font-mono">${when}</span>
+                        </div>
+                        <div class="text-[13px] text-[var(--fg-dim)] line-clamp-3">${content.replace(/[<>]/g, "")}</div>
+                    </a>
+                `;
+                list.appendChild(li);
+            });
+
+            section.classList.remove("hidden");
+        } catch (err) {
+            // Network failure, CORS issue, or webmention.io not configured for this domain — silent.
+        }
+    })();
 
     // ============ Section permalinks ============
     // For every <section id="..."> in the page, find its first heading and add a copy-link button.
