@@ -1,0 +1,498 @@
+---
+import { Image } from "astro:assets";
+
+interface Props {
+    project: any;
+    lang: "en" | "es";
+}
+
+const { project, lang } = Astro.props;
+
+const L = {
+    en: {
+        back: "cd ..  // back to projects",
+        sections: {
+            spec: "// spec", status: "// status",
+            discovery: "discovery", design: "design",
+            architecture: "architecture", infra: "infrastructure",
+            implementation: "implementation", testing: "testing & ci",
+            screenshots: "screenshots", results: "results",
+            quickFacts: "quick facts", nextStep: "next step",
+            overview: "overview", problem: "problem",
+            audience: "audience", role: "role", timeline: "timeline",
+            team: "team", responsibilities: "responsibilities",
+            tools: "tools", system: "design system",
+            artifacts: "artifacts", figmaLink: "figma file",
+            c4Context: "c4 / context", c4Container: "c4 / container",
+            c4Component: "c4 / component",
+            services: "services", flow: "data flow",
+            frontend: "frontend", backend: "backend", data: "data",
+            ai: "ai", devops: "devops",
+            strategy: "strategy", coverage: "coverage", tests: "tests",
+            metrics: "metrics", outcomes: "outcomes",
+            openDemo: "./open-demo --live",
+            viewFigma: "./open-figma",
+            letsTalk: "./let-s-talk.sh",
+            ctaTitle: "automata deploy --your-operation",
+            ctaSub: "Let's talk about adapting this to your case.",
+            todo: "TODO",
+        },
+    },
+    es: {
+        back: "cd ..  // volver a proyectos",
+        sections: {
+            spec: "// spec", status: "// estado",
+            discovery: "descubrimiento", design: "diseño",
+            architecture: "arquitectura", infra: "infraestructura",
+            implementation: "implementacion", testing: "testing & ci",
+            screenshots: "capturas", results: "resultados",
+            quickFacts: "quick facts", nextStep: "siguiente paso",
+            overview: "descripcion", problem: "problema",
+            audience: "audiencia", role: "rol", timeline: "tiempo",
+            team: "equipo", responsibilities: "responsabilidades",
+            tools: "herramientas", system: "sistema de diseño",
+            artifacts: "artefactos", figmaLink: "archivo de figma",
+            c4Context: "c4 / contexto", c4Container: "c4 / contenedor",
+            c4Component: "c4 / componente",
+            services: "servicios", flow: "flujo de datos",
+            frontend: "frontend", backend: "backend", data: "datos",
+            ai: "ia", devops: "devops",
+            strategy: "estrategia", coverage: "cobertura", tests: "tests",
+            metrics: "metricas", outcomes: "outcomes",
+            openDemo: "./abrir-demo --live",
+            viewFigma: "./abrir-figma",
+            letsTalk: "./contactar.sh",
+            ctaTitle: "automata deploy --tu-operacion",
+            ctaSub: "Conversemos sobre como adaptamos esto a tu caso.",
+            todo: "TODO",
+        },
+    },
+}[lang];
+
+const typeLabel: Record<string, string> = {
+    producto: lang === "es" ? "PRODUCTO" : "PRODUCT",
+    product: lang === "es" ? "PRODUCTO" : "PRODUCT",
+    caso: lang === "es" ? "CASO DE USO" : "USE CASE",
+    case: lang === "es" ? "CASO DE USO" : "USE CASE",
+};
+
+const backHref = lang === "es" ? "/es#solutions" : "/#solutions";
+const contactHref = lang === "es" ? "/es#contact" : "/#contact";
+
+const has = (v: any) => Array.isArray(v) ? v.length > 0 : (v !== undefined && v !== null && v !== "");
+const hasObj = (o: any) => o && Object.values(o).some((v: any) => has(v));
+
+const stackGroups = project.stack
+    ? [
+        { key: "frontend", items: project.stack.frontend },
+        { key: "backend",  items: project.stack.backend  },
+        { key: "data",     items: project.stack.data     },
+        { key: "ai",       items: project.stack.ai       },
+        { key: "devops",   items: project.stack.devops   },
+      ].filter(g => has(g.items))
+    : [];
+
+// Static class lookup so Tailwind scanner picks up each utility
+const lgCols = (n: number) => (
+    n <= 1 ? "lg:grid-cols-1" :
+    n === 2 ? "lg:grid-cols-2" :
+    n === 3 ? "lg:grid-cols-3" :
+    n === 4 ? "lg:grid-cols-4" :
+    "lg:grid-cols-5"
+);
+const stackColsClass = lgCols(stackGroups.length || 1);
+const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.length, 4)) : "";
+---
+
+<div class="max-w-6xl mx-auto px-6 lg:px-12 py-12">
+
+    <!-- Back link -->
+    <a href={backHref} class="inline-flex items-center gap-2 text-sm text-[var(--fg-muted)] hover:text-[var(--green)] transition-colors mb-8 group">
+        <span class="text-[var(--green)]">$</span>
+        <span>{L.back}</span>
+        <span class="text-[var(--green)] opacity-0 group-hover:opacity-100 transition-opacity">←</span>
+    </a>
+
+    <!-- Header panel -->
+    <div class="panel mb-10">
+        <div class="window-chrome">
+            <div class="window-chrome-title">automata@latam: ~/{lang === "es" ? "proyectos" : "projects"}/{project.slug}</div>
+        </div>
+        <div class="p-6 md:p-10 grid lg:grid-cols-[1.3fr_1fr] gap-10 items-start">
+            <div class="space-y-5">
+                <div class="flex items-center gap-3 text-xs text-[var(--fg-muted)] flex-wrap">
+                    <span class="inline-flex items-center gap-1.5 px-2 py-1 border border-[var(--line-bright)] text-[var(--green)]">
+                        <span class="w-1 h-1 rounded-full bg-[var(--green)]"></span>
+                        {typeLabel[project.type] || project.type}
+                    </span>
+                    <span class="text-[var(--line-bright)]">·</span>
+                    <span class="font-mono">slug: {project.slug}</span>
+                    {project.year && (<><span class="text-[var(--line-bright)]">·</span><span class="font-mono">{project.year}</span></>)}
+                </div>
+
+                <h1 class="heading-mono text-[clamp(2rem,5vw,3.5rem)] text-[var(--fg)]">
+                    <span class="text-[var(--green)]">{'>'}</span> {project.title}
+                </h1>
+
+                <p class="text-[var(--fg-dim)] text-base leading-relaxed max-w-xl">
+                    <span class="text-[var(--fg-muted)]">// </span>{project.description}
+                </p>
+
+                <div class="flex flex-wrap gap-2 pt-2">
+                    {project.tech.map((tech: string) => (<span class="badge-mono">{tech}</span>))}
+                </div>
+
+                <div class="flex flex-wrap gap-3 pt-2">
+                    {project.demoUrl && (
+                        <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" class="btn-cli btn-cli--primary">
+                            <span>{L.sections.openDemo}</span>
+                        </a>
+                    )}
+                    {project.figmaUrl && (
+                        <a href={project.figmaUrl} target="_blank" rel="noopener noreferrer" class="btn-cli">
+                            <span>{L.sections.viewFigma}</span>
+                        </a>
+                    )}
+                </div>
+            </div>
+
+            <div class="border border-[var(--line)] bg-black overflow-hidden">
+                <Image
+                    src={project.image}
+                    alt={project.title}
+                    class="w-full h-auto object-cover"
+                    loading="eager"
+                    width={720}
+                    height={480}
+                    format="webp"
+                />
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick facts grid -->
+    {(project.role || project.timeline || project.team || project.demoUrl) && (
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-0 border border-[var(--line)] mb-10">
+            {project.role && (
+                <div class="p-5 border-r border-[var(--line)]">
+                    <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-2">▸ {L.sections.role}</div>
+                    <div class="text-sm text-[var(--fg)]">{project.role}</div>
+                </div>
+            )}
+            {project.timeline && (
+                <div class="p-5 border-r border-[var(--line)]">
+                    <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-2">▸ {L.sections.timeline}</div>
+                    <div class="text-sm text-[var(--fg)]">{project.timeline}</div>
+                </div>
+            )}
+            {project.team && (
+                <div class="p-5 border-r border-[var(--line)]">
+                    <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-2">▸ {L.sections.team}</div>
+                    <div class="text-sm text-[var(--fg)]">{project.team}</div>
+                </div>
+            )}
+            <div class="p-5">
+                <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-2">▸ status</div>
+                <div class="text-sm text-[var(--green)]">{project.demoUrl ? "online" : "ready"}</div>
+            </div>
+        </div>
+    )}
+
+    <!-- 01 · Discovery -->
+    {(project.fullDescription || project.problem || project.audience) && (
+        <section class="mb-12">
+            <div class="border-b border-[var(--line)] pb-4 mb-6">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 01 · {L.sections.discovery}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> cat ./{L.sections.discovery}.md
+                </h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-0 border border-[var(--line)]">
+                {project.fullDescription && (
+                    <div class="panel border-0 p-6 md:col-span-3">
+                        <div class="text-xs text-[var(--fg-muted)] mb-3">▸ {L.sections.overview}</div>
+                        <p class="text-[var(--fg-dim)] leading-relaxed">{project.fullDescription}</p>
+                    </div>
+                )}
+                {project.problem && (
+                    <div class={`panel border-0 p-6 ${project.fullDescription ? 'border-t' : ''} ${project.audience ? 'md:col-span-2 md:border-r' : 'md:col-span-3'} border-[var(--line)]`}>
+                        <div class="text-xs text-[var(--amber)] mb-3">▸ {L.sections.problem}</div>
+                        <p class="text-[var(--fg-dim)] text-sm leading-relaxed">{project.problem}</p>
+                    </div>
+                )}
+                {project.audience && (
+                    <div class={`panel border-0 p-6 border-t md:border-t-0 border-[var(--line)] ${project.problem ? '' : 'md:col-span-3'}`}>
+                        <div class="text-xs text-[var(--cyan)] mb-3">▸ {L.sections.audience}</div>
+                        <p class="text-[var(--fg-dim)] text-sm leading-relaxed">{project.audience}</p>
+                    </div>
+                )}
+            </div>
+        </section>
+    )}
+
+    <!-- 02 · Design -->
+    {(project.designTools || project.designSystem || project.figmaUrl) && (
+        <section class="mb-12">
+            <div class="border-b border-[var(--line)] pb-4 mb-6">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 02 · {L.sections.design}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> cat ./{L.sections.design}.md
+                </h2>
+            </div>
+            <div class="grid md:grid-cols-2 gap-0 border border-[var(--line)]">
+                {project.designTools && (
+                    <div class="panel border-0 p-6">
+                        <div class="text-xs text-[var(--fg-muted)] mb-3">▸ {L.sections.tools}</div>
+                        <div class="flex flex-wrap gap-2">
+                            {project.designTools.map((t: string) => (<span class="badge-mono">{t}</span>))}
+                        </div>
+                        {project.figmaUrl && (
+                            <a href={project.figmaUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-4 text-xs text-[var(--green)] link-mono">
+                                <span>▸ {L.sections.figmaLink}</span>
+                                <span>↗</span>
+                            </a>
+                        )}
+                    </div>
+                )}
+                {project.designSystem && (
+                    <div class={`panel border-0 p-6 ${project.designTools ? 'border-t md:border-t-0 md:border-l' : ''} border-[var(--line)]`}>
+                        <div class="text-xs text-[var(--fg-muted)] mb-3">▸ {L.sections.system}</div>
+                        <ul class="text-sm space-y-1.5">
+                            {project.designSystem.map((d: string) => (
+                                <li class="flex items-start gap-2 text-[var(--fg-dim)]">
+                                    <span class="text-[var(--green)] shrink-0">·</span>
+                                    <span>{d}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+            </div>
+        </section>
+    )}
+
+    <!-- 03 · Architecture (C4 diagrams) -->
+    {project.architecture && (
+        <section class="mb-12">
+            <div class="border-b border-[var(--line)] pb-4 mb-6">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 03 · {L.sections.architecture}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> cat ./{L.sections.architecture}.md
+                </h2>
+            </div>
+            <div class="space-y-6">
+                {project.architecture.context && (
+                    <div class="panel">
+                        <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Context} · c4-level-1</div></div>
+                        <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{project.architecture.context}</pre>
+                    </div>
+                )}
+                {project.architecture.container && (
+                    <div class="panel">
+                        <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Container} · c4-level-2</div></div>
+                        <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{project.architecture.container}</pre>
+                    </div>
+                )}
+                {project.architecture.component && (
+                    <div class="panel">
+                        <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Component} · c4-level-3</div></div>
+                        <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{project.architecture.component}</pre>
+                    </div>
+                )}
+            </div>
+        </section>
+    )}
+
+    <!-- 04 · Infrastructure -->
+    {project.infrastructure && (
+        <section class="mb-12">
+            <div class="border-b border-[var(--line)] pb-4 mb-6">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 04 · {L.sections.infra}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> cat ./{L.sections.infra}.md
+                </h2>
+            </div>
+            <div class="grid lg:grid-cols-[1fr_1.4fr] gap-0 border border-[var(--line)]">
+                <div class="panel border-0 p-6">
+                    <div class="text-xs text-[var(--fg-muted)] mb-3">▸ {L.sections.services}</div>
+                    {project.infrastructure.provider && (
+                        <div class="mb-3 text-sm">
+                            <span class="text-[var(--fg-muted)]">provider: </span>
+                            <span class="text-[var(--cyan)]">{project.infrastructure.provider}</span>
+                        </div>
+                    )}
+                    {project.infrastructure.services && (
+                        <ul class="text-sm space-y-1.5">
+                            {project.infrastructure.services.map((s: string) => (
+                                <li class="flex items-start gap-2 text-[var(--fg-dim)]">
+                                    <span class="text-[var(--green)] shrink-0">▸</span>
+                                    <span>{s}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+                {project.infrastructure.diagram && (
+                    <div class="panel border-0 border-t lg:border-t-0 lg:border-l border-[var(--line)]">
+                        <div class="window-chrome"><div class="window-chrome-title">{L.sections.flow}</div></div>
+                        <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{project.infrastructure.diagram}</pre>
+                    </div>
+                )}
+            </div>
+        </section>
+    )}
+
+    <!-- 05 · Implementation -->
+    {(stackGroups.length > 0 || project.codeHighlights) && (
+        <section class="mb-12">
+            <div class="border-b border-[var(--line)] pb-4 mb-6">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 05 · {L.sections.implementation}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> cat ./{L.sections.implementation}.md
+                </h2>
+            </div>
+
+            {stackGroups.length > 0 && (
+                <div class={`grid grid-cols-1 md:grid-cols-2 ${stackColsClass} gap-0 border border-[var(--line)] mb-6`}>
+                    {stackGroups.map((g, gi) => (
+                        <div class={`panel border-0 p-5 ${gi > 0 ? 'border-t md:border-t-0 md:border-l' : ''} border-[var(--line)]`}>
+                            <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-3">▸ {L.sections[g.key]}</div>
+                            <ul class="text-sm space-y-1.5">
+                                {g.items.map((it: string) => (
+                                    <li class="flex items-start gap-2 text-[var(--fg)]">
+                                        <span class="text-[var(--green)] shrink-0">·</span>
+                                        <span>{it}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {project.codeHighlights && project.codeHighlights.map((ch: any) => (
+                <div class="panel mb-6">
+                    <div class="window-chrome"><div class="window-chrome-title">{ch.file || ch.title || "code"}{ch.lang ? `  ·  ${ch.lang}` : ""}</div></div>
+                    {ch.note && <div class="px-6 py-3 border-b border-[var(--line)] text-xs text-[var(--fg-muted)]">// {ch.note}</div>}
+                    <pre class="p-6 overflow-x-auto text-[12.5px] leading-[1.6] text-[var(--fg)] font-mono">{ch.code}</pre>
+                </div>
+            ))}
+        </section>
+    )}
+
+    <!-- 06 · Testing & CI -->
+    {project.testing && (
+        <section class="mb-12">
+            <div class="border-b border-[var(--line)] pb-4 mb-6">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 06 · {L.sections.testing}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> cat ./testing.md
+                </h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-0 border border-[var(--line)]">
+                {project.testing.strategy && (
+                    <div class="panel border-0 p-6 md:col-span-2 md:border-r border-[var(--line)]">
+                        <div class="text-xs text-[var(--fg-muted)] mb-3">▸ {L.sections.strategy}</div>
+                        <p class="text-[var(--fg-dim)] text-sm leading-relaxed whitespace-pre-line">{project.testing.strategy}</p>
+                    </div>
+                )}
+                <div class="panel border-0 p-6 border-t md:border-t-0 border-[var(--line)] space-y-4">
+                    {project.testing.coverage && (
+                        <div>
+                            <div class="text-xs text-[var(--fg-muted)] mb-2">▸ {L.sections.coverage}</div>
+                            <div class="heading-mono text-3xl text-[var(--green)]">{project.testing.coverage}</div>
+                        </div>
+                    )}
+                    {project.testing.tools && (
+                        <div>
+                            <div class="text-xs text-[var(--fg-muted)] mb-2">▸ {L.sections.tools}</div>
+                            <div class="flex flex-wrap gap-1.5">
+                                {project.testing.tools.map((t: string) => (<span class="badge-mono">{t}</span>))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </section>
+    )}
+
+    <!-- 07 · Screenshots -->
+    {project.screenshots && project.screenshots.length > 0 && (
+        <section class="mb-12">
+            <div class="border-b border-[var(--line)] pb-4 mb-6">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 07 · {L.sections.screenshots}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> ls ./{L.sections.screenshots}
+                </h2>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-0 border border-[var(--line)]">
+                {project.screenshots.map((shot: any, i: number) => (
+                    <a href={shot.src} target="_blank" rel="noopener noreferrer" class={`group overflow-hidden bg-black ${i > 0 ? 'border-t md:border-t-0 md:border-l border-[var(--line)]' : ''} ${i === 2 ? 'lg:border-l' : ''}`}>
+                        <Image
+                            src={shot}
+                            alt={`${project.title} ${L.sections.screenshots} ${i + 1}`}
+                            class="w-full h-auto object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                            loading="lazy"
+                            width={500}
+                            height={320}
+                            format="webp"
+                        />
+                    </a>
+                ))}
+            </div>
+        </section>
+    )}
+
+    <!-- 08 · Results -->
+    {(project.metrics || project.results || project.challenges) && (
+        <section class="mb-12">
+            <div class="border-b border-[var(--line)] pb-4 mb-6">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 08 · {L.sections.results}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> cat ./{L.sections.results}.md
+                </h2>
+            </div>
+            {project.metrics && (
+                <div class={`grid grid-cols-2 ${metricsColsClass} gap-0 border border-[var(--line)] mb-6`}>
+                    {project.metrics.map((m: any, i: number) => (
+                        <div class={`p-6 ${i > 0 ? 'border-l border-[var(--line)]' : ''} ${i >= 2 ? 'border-t lg:border-t-0' : ''}`}>
+                            <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-2">{String(i + 1).padStart(2, '0')} /</div>
+                            <div class="heading-mono text-3xl text-[var(--green)] mb-2">{m.value}</div>
+                            <div class="text-xs text-[var(--fg-dim)]">{m.label}</div>
+                        </div>
+                    ))}
+                </div>
+            )}
+            {(project.results || project.challenges) && (
+                <div class="grid md:grid-cols-2 gap-0 border border-[var(--line)]">
+                    {project.challenges && (
+                        <div class="panel border-0 p-6">
+                            <div class="text-xs text-[var(--amber)] mb-3">▸ challenges</div>
+                            <p class="text-[var(--fg-dim)] text-sm leading-relaxed">{project.challenges}</p>
+                        </div>
+                    )}
+                    {project.results && (
+                        <div class={`panel border-0 p-6 ${project.challenges ? 'border-t md:border-t-0 md:border-l' : ''} border-[var(--line)]`}>
+                            <div class="text-xs text-[var(--green)] mb-3">▸ {L.sections.outcomes}</div>
+                            <p class="text-[var(--fg-dim)] text-sm leading-relaxed">{project.results}</p>
+                        </div>
+                    )}
+                </div>
+            )}
+        </section>
+    )}
+
+    <!-- CTA -->
+    <section class="panel-accent p-8 md:p-10 text-center">
+        <div class="text-xs text-[var(--fg-muted)] mb-3">// {L.sections.nextStep}</div>
+        <h3 class="heading-mono text-2xl mb-3">
+            <span class="text-[var(--green)]">$</span> {L.sections.ctaTitle}
+        </h3>
+        <p class="text-[var(--fg-dim)] mb-6 text-sm">
+            <span class="text-[var(--fg-muted)]">// </span>{L.sections.ctaSub}
+        </p>
+        <a href={contactHref} class="btn-cli btn-cli--primary">
+            <span>{L.sections.letsTalk}</span>
+        </a>
+    </section>
+</div>

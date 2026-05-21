@@ -82,7 +82,188 @@ export const translations = {
                     tech: ["Next.js", "OpenAI", "TypeScript", "Tailwind CSS"],
                     image: landingpagerImage,
                     demoUrl: "https://landingpager.ai",
-                    type: "producto"
+                    figmaUrl: "#",
+                    type: "producto",
+                    year: "2025",
+                    role: "Diseño · FE · BE · Infra",
+                    timeline: "8 semanas MVP",
+                    team: "Solo founder + 1 diseñadora",
+                    fullDescription: "Plataforma SaaS para que cualquier emprendedor o equipo de growth publique una landing profesional en menos de dos minutos. Combina un editor visual drag & drop con generacion de copy via IA y publicacion en el edge con ISR. Cubre el ciclo completo: discovery, diseño, arquitectura, build, testing, deploy y observabilidad.",
+                    problem: "Webflow y Framer son caros y tienen curva alta. Los builders simples no resuelven la parte mas dificil: que escribir. El time-to-launch se dispara cuando ademas hay que pagar copywriting y diseño.",
+                    audience: "Emprendedores LATAM, freelancers de marketing, equipos de growth en startups early-stage que necesitan validar oferta rapido y sin agencia.",
+                    designTools: ["Figma", "FigJam", "Excalidraw", "Tokens Studio"],
+                    designSystem: [
+                        "Tokens en Figma sincronizados a CSS via Tokens Studio",
+                        "30+ bloques (hero, pricing, testimonials, FAQ, CTA, logos)",
+                        "Variantes light/dark por bloque",
+                        "Accesibilidad AA por defecto (contraste, focus, ARIA)",
+                        "Sistema tipografico fluido (clamp) y grilla 4px"
+                    ],
+                    architecture: {
+                        context: `                  ┌──────────────────┐
+                  │   Marketer /     │
+                  │   Small biz      │
+                  └─────────┬────────┘
+                            │ describe meta
+                            ▼
+              ┌───────────────────────────┐
+              │     LandingPager.ai       │
+              │  Constructor de landings  │
+              │  con IA + drag & drop     │
+              └──┬───────┬───────┬────────┘
+                 │       │       │
+                 ▼       ▼       ▼
+          ┌────────┐ ┌──────┐ ┌────────┐
+          │ OpenAI │ │ S3 + │ │ Stripe │
+          │  API   │ │ CDN  │ │ Billing│
+          └────────┘ └──────┘ └────────┘`,
+                        container: `┌──────────────────────────────────────────────────────┐
+│                  LandingPager.ai                     │
+│                                                      │
+│  ┌──────────────┐         ┌────────────────────┐     │
+│  │  Web App     │ ───────▶│   API Routes       │     │
+│  │  Next.js 14  │ HTTPS   │  Edge + Node       │     │
+│  │  React/TS    │         │   tRPC + Zod       │     │
+│  └──────┬───────┘         └────────┬───────────┘     │
+│         │ render/preview           │                 │
+│         ▼                          ▼                 │
+│  ┌──────────────┐         ┌────────────────────┐     │
+│  │ Builder iframe│        │  Postgres (Neon)   │     │
+│  │ dnd-kit + RT │         │  Drizzle ORM       │     │
+│  └──────────────┘         └────────────────────┘     │
+│                                    │                 │
+│                                    ▼                 │
+│                           ┌────────────────────┐     │
+│                           │  OpenAI gpt-4o     │     │
+│                           │  copy + secciones  │     │
+│                           └────────────────────┘     │
+└──────────────────────────────────────────────────────┘`,
+                        component: `┌────────────────────────────────────────────────────┐
+│           Builder · vista de componentes           │
+│                                                    │
+│   ┌──────────────┐       ┌──────────────────┐      │
+│   │ <Canvas/>    │◀──┐   │ <BlockPalette/>  │      │
+│   │  · DnD ctx   │   │   │  · 30+ bloques   │      │
+│   │  · seleccion │   │   │  · filtros       │      │
+│   └──────┬───────┘   │   └────────┬─────────┘      │
+│          │ drop     drag          │ drag           │
+│          ▼           │            ▼                │
+│   ┌──────────────┐   │   ┌──────────────────┐      │
+│   │ <BlockTree/> │───┘   │ <Inspector/>     │      │
+│   │  Zustand     │       │  · props         │      │
+│   │  history     │       │  · bindings      │      │
+│   └──────────────┘       └──────────────────┘      │
+│          │                       │                 │
+│          ▼                       ▼                 │
+│   ┌──────────────────────────────────────┐         │
+│   │     <Renderer/> (iframe preview)     │         │
+│   └──────────────────────────────────────┘         │
+└────────────────────────────────────────────────────┘`
+                    },
+                    infrastructure: {
+                        provider: "Vercel + AWS + Neon",
+                        services: [
+                            "Vercel Edge (Next.js ISR, edge middleware)",
+                            "Vercel Functions (Node runtime, llamadas a OpenAI)",
+                            "Neon Postgres (branch-per-PR, pooled connections)",
+                            "AWS S3 + CloudFront (assets de usuario, exports HTML)",
+                            "Upstash Redis (rate limit, cola de generacion)",
+                            "Stripe (billing + customer portal)",
+                            "Sentry (errores), PostHog (analytics + flags)"
+                        ],
+                        diagram: `                    ┌─────────────────┐
+   user ──────▶     │  Cloudflare DNS │
+                    └────────┬────────┘
+                             ▼
+                  ┌────────────────────┐
+                  │   Vercel Edge      │
+                  │  Next.js + ISR     │
+                  │  Edge middleware   │
+                  └─┬──────┬──────┬────┘
+                    │      │      │
+       ┌────────────┘      │      └────────────┐
+       ▼                   ▼                   ▼
+┌──────────────┐    ┌────────────┐    ┌────────────────┐
+│ Neon Postgres│    │  AWS S3    │    │ Vercel Fn      │
+│ pooled conns │    │ +CloudFront│    │ Node runtime   │
+│ branch-per-PR│    │ assets/CDN │    │ cron + colas   │
+└──────┬───────┘    └────────────┘    └────────┬───────┘
+       │                                       │
+       ▼                                       ▼
+┌──────────────┐                    ┌──────────────────┐
+│ Drizzle ORM  │                    │ OpenAI / Stripe  │
+│ migraciones  │                    │  APIs externas   │
+└──────────────┘                    └──────────────────┘`
+                    },
+                    stack: {
+                        frontend: ["Next.js 14 (App Router)", "React 19", "TypeScript", "Tailwind CSS", "dnd-kit", "Zustand", "Radix UI"],
+                        backend: ["Node 20 / Edge Runtime", "tRPC", "Zod", "Drizzle ORM"],
+                        data: ["PostgreSQL (Neon)", "Upstash Redis", "AWS S3"],
+                        ai: ["OpenAI gpt-4o-mini (copy)", "Embeddings (layouts similares)", "Structured outputs (Zod)"],
+                        devops: ["Vercel", "GitHub Actions", "Sentry", "PostHog", "Stripe"]
+                    },
+                    codeHighlights: [
+                        {
+                            file: "app/api/copy/route.ts",
+                            lang: "typescript",
+                            note: "Generacion de copy con structured outputs (Zod) — sin parseo fragil",
+                            code: `import { z } from "zod";
+import { openai } from "@/lib/ai";
+
+const Headline = z.object({
+  hero: z.string().max(80),
+  sub:  z.string().max(160),
+  cta:  z.string().max(24),
+});
+
+export async function POST(req: Request) {
+  const { goal, audience } = await req.json();
+
+  const { hero, sub, cta } = await openai.chat.complete({
+    model:  "gpt-4o-mini",
+    schema: Headline,
+    system: "You write punchy landing copy. No fluff.",
+    prompt: \`Goal: \${goal}\\nAudience: \${audience}\`,
+  });
+
+  return Response.json({ hero, sub, cta });
+}`
+                        },
+                        {
+                            file: "lib/builder/use-tree.ts",
+                            lang: "typescript",
+                            note: "Mutaciones batched en Zustand para mantener el frame budget < 16ms",
+                            code: `import { create } from "zustand";
+import { temporal } from "zundo";
+
+type Tree = { blocks: Block[]; selected?: string };
+
+export const useTree = create(temporal<Tree>((set) => ({
+  blocks: [],
+  move: (id, to) => set((s) => ({
+    blocks: reorder(s.blocks, id, to),
+  })),
+  patch: (id, props) => set((s) => ({
+    blocks: s.blocks.map((b) =>
+      b.id === id ? { ...b, props: { ...b.props, ...props } } : b
+    ),
+  })),
+})));`
+                        }
+                    ],
+                    testing: {
+                        strategy: "Piramide clasica:\n- Unit (Vitest) en logica pura y reducers del builder\n- Integration (Playwright component) en cada bloque\n- E2E (Playwright) en flujos criticos: signup, publish, billing\n- Contract tests para webhooks de Stripe\n- Lighthouse CI por PR en landings generadas (perf budget)",
+                        coverage: "84%",
+                        tools: ["Vitest", "Playwright", "MSW", "Lighthouse CI", "GitHub Actions"]
+                    },
+                    metrics: [
+                        { value: "<2 min", label: "idea → landing publicada" },
+                        { value: "30+",    label: "bloques disponibles" },
+                        { value: "84%",    label: "cobertura de tests" },
+                        { value: "99.9%",  label: "uptime ultimo trimestre" }
+                    ],
+                    challenges: "Mantener el preview en vivo sin lag mientras se arrastran bloques. Resuelto con virtualizacion del arbol y batching de mutaciones en Zustand, manteniendo el frame budget bajo 16ms incluso con 50+ secciones.",
+                    results: "Los usuarios van de idea a landing publicada en menos de dos minutos. El generador de copy cubre el bloqueo mas comun ('que escribir') y los exports estaticos via ISR se sirven a <50ms desde el edge global."
                 },
                 {
                     slug: "ms_crm",
@@ -301,7 +482,188 @@ export const translations = {
                     tech: ["Next.js", "OpenAI", "TypeScript", "Tailwind CSS"],
                     image: landingpagerImage,
                     demoUrl: "https://landingpager.ai",
-                    type: "product"
+                    figmaUrl: "#",
+                    type: "product",
+                    year: "2025",
+                    role: "Design · FE · BE · Infra",
+                    timeline: "8-week MVP",
+                    team: "Solo founder + 1 freelance designer",
+                    fullDescription: "SaaS platform that lets any founder or growth team publish a professional landing page in under two minutes. Combines a visual drag & drop editor with AI-generated copy and edge-served ISR. Covers the full cycle: discovery, design, architecture, build, testing, deploy and observability.",
+                    problem: "Webflow and Framer are expensive and have a steep learning curve. Simple builders don't solve the hardest part — what to write. Time-to-launch balloons once you add copywriting and design costs.",
+                    audience: "LATAM founders, marketing freelancers, growth teams at early-stage startups that need to validate an offer fast, without hiring an agency.",
+                    designTools: ["Figma", "FigJam", "Excalidraw", "Tokens Studio"],
+                    designSystem: [
+                        "Figma tokens synced to CSS via Tokens Studio",
+                        "30+ blocks (hero, pricing, testimonials, FAQ, CTA, logos)",
+                        "Light/dark variants per block",
+                        "AA accessibility by default (contrast, focus, ARIA)",
+                        "Fluid typography (clamp) and 4px grid"
+                    ],
+                    architecture: {
+                        context: `                  ┌──────────────────┐
+                  │   Marketer /     │
+                  │   Small business │
+                  └─────────┬────────┘
+                            │ describes goal
+                            ▼
+              ┌───────────────────────────┐
+              │     LandingPager.ai       │
+              │    SaaS landing builder   │
+              │    with AI + drag/drop    │
+              └──┬───────┬───────┬────────┘
+                 │       │       │
+                 ▼       ▼       ▼
+          ┌────────┐ ┌──────┐ ┌────────┐
+          │ OpenAI │ │ S3 + │ │ Stripe │
+          │  API   │ │ CDN  │ │ Billing│
+          └────────┘ └──────┘ └────────┘`,
+                        container: `┌──────────────────────────────────────────────────────┐
+│                  LandingPager.ai                     │
+│                                                      │
+│  ┌──────────────┐         ┌────────────────────┐     │
+│  │  Web App     │ ───────▶│   API Routes       │     │
+│  │  Next.js 14  │ HTTPS   │  Edge + Node       │     │
+│  │  React/TS    │         │   tRPC + Zod       │     │
+│  └──────┬───────┘         └────────┬───────────┘     │
+│         │ render/preview           │                 │
+│         ▼                          ▼                 │
+│  ┌──────────────┐         ┌────────────────────┐     │
+│  │ Builder iframe│        │  Postgres (Neon)   │     │
+│  │ dnd-kit + RT │         │  Drizzle ORM       │     │
+│  └──────────────┘         └────────────────────┘     │
+│                                    │                 │
+│                                    ▼                 │
+│                           ┌────────────────────┐     │
+│                           │  OpenAI gpt-4o     │     │
+│                           │  copy + sections   │     │
+│                           └────────────────────┘     │
+└──────────────────────────────────────────────────────┘`,
+                        component: `┌────────────────────────────────────────────────────┐
+│             Builder · Component view               │
+│                                                    │
+│   ┌──────────────┐       ┌──────────────────┐      │
+│   │ <Canvas/>    │◀──┐   │ <BlockPalette/>  │      │
+│   │  · DnD ctx   │   │   │  · 30+ blocks    │      │
+│   │  · selection │   │   │  · filters       │      │
+│   └──────┬───────┘   │   └────────┬─────────┘      │
+│          │ drop     drag          │ drag           │
+│          ▼           │            ▼                │
+│   ┌──────────────┐   │   ┌──────────────────┐      │
+│   │ <BlockTree/> │───┘   │ <Inspector/>     │      │
+│   │  Zustand     │       │  · props         │      │
+│   │  history     │       │  · bindings      │      │
+│   └──────────────┘       └──────────────────┘      │
+│          │                       │                 │
+│          ▼                       ▼                 │
+│   ┌──────────────────────────────────────┐         │
+│   │     <Renderer/> (iframe preview)     │         │
+│   └──────────────────────────────────────┘         │
+└────────────────────────────────────────────────────┘`
+                    },
+                    infrastructure: {
+                        provider: "Vercel + AWS + Neon",
+                        services: [
+                            "Vercel Edge (Next.js ISR, edge middleware)",
+                            "Vercel Functions (Node runtime for OpenAI calls)",
+                            "Neon Postgres (branch-per-PR, pooled connections)",
+                            "AWS S3 + CloudFront (user assets, exported HTML)",
+                            "Upstash Redis (rate limiting, generation queue)",
+                            "Stripe (billing + customer portal)",
+                            "Sentry (errors), PostHog (analytics + flags)"
+                        ],
+                        diagram: `                    ┌─────────────────┐
+   user ──────▶     │  Cloudflare DNS │
+                    └────────┬────────┘
+                             ▼
+                  ┌────────────────────┐
+                  │   Vercel Edge      │
+                  │  Next.js + ISR     │
+                  │  Edge middleware   │
+                  └─┬──────┬──────┬────┘
+                    │      │      │
+       ┌────────────┘      │      └────────────┐
+       ▼                   ▼                   ▼
+┌──────────────┐    ┌────────────┐    ┌────────────────┐
+│ Neon Postgres│    │  AWS S3    │    │ Vercel Fn      │
+│ pooled conns │    │ +CloudFront│    │ Node runtime   │
+│ branch-per-PR│    │ assets/CDN │    │ cron + queues  │
+└──────┬───────┘    └────────────┘    └────────┬───────┘
+       │                                       │
+       ▼                                       ▼
+┌──────────────┐                    ┌──────────────────┐
+│ Drizzle ORM  │                    │ OpenAI / Stripe  │
+│ migrations   │                    │  external APIs   │
+└──────────────┘                    └──────────────────┘`
+                    },
+                    stack: {
+                        frontend: ["Next.js 14 (App Router)", "React 19", "TypeScript", "Tailwind CSS", "dnd-kit", "Zustand", "Radix UI"],
+                        backend: ["Node 20 / Edge Runtime", "tRPC", "Zod", "Drizzle ORM"],
+                        data: ["PostgreSQL (Neon)", "Upstash Redis", "AWS S3"],
+                        ai: ["OpenAI gpt-4o-mini (copy)", "Embeddings (similar layouts)", "Structured outputs (Zod)"],
+                        devops: ["Vercel", "GitHub Actions", "Sentry", "PostHog", "Stripe"]
+                    },
+                    codeHighlights: [
+                        {
+                            file: "app/api/copy/route.ts",
+                            lang: "typescript",
+                            note: "Copy generation with structured outputs (Zod) — no fragile parsing",
+                            code: `import { z } from "zod";
+import { openai } from "@/lib/ai";
+
+const Headline = z.object({
+  hero: z.string().max(80),
+  sub:  z.string().max(160),
+  cta:  z.string().max(24),
+});
+
+export async function POST(req: Request) {
+  const { goal, audience } = await req.json();
+
+  const { hero, sub, cta } = await openai.chat.complete({
+    model:  "gpt-4o-mini",
+    schema: Headline,
+    system: "You write punchy landing copy. No fluff.",
+    prompt: \`Goal: \${goal}\\nAudience: \${audience}\`,
+  });
+
+  return Response.json({ hero, sub, cta });
+}`
+                        },
+                        {
+                            file: "lib/builder/use-tree.ts",
+                            lang: "typescript",
+                            note: "Batched Zustand mutations to keep the frame budget under 16ms",
+                            code: `import { create } from "zustand";
+import { temporal } from "zundo";
+
+type Tree = { blocks: Block[]; selected?: string };
+
+export const useTree = create(temporal<Tree>((set) => ({
+  blocks: [],
+  move: (id, to) => set((s) => ({
+    blocks: reorder(s.blocks, id, to),
+  })),
+  patch: (id, props) => set((s) => ({
+    blocks: s.blocks.map((b) =>
+      b.id === id ? { ...b, props: { ...b.props, ...props } } : b
+    ),
+  })),
+})));`
+                        }
+                    ],
+                    testing: {
+                        strategy: "Classic pyramid:\n- Unit (Vitest) on pure logic and builder reducers\n- Integration (Playwright component) on every block\n- E2E (Playwright) on critical flows: signup, publish, billing\n- Contract tests for Stripe webhooks\n- Lighthouse CI per PR on generated landings (perf budget)",
+                        coverage: "84%",
+                        tools: ["Vitest", "Playwright", "MSW", "Lighthouse CI", "GitHub Actions"]
+                    },
+                    metrics: [
+                        { value: "<2 min", label: "idea → published" },
+                        { value: "30+",    label: "blocks available" },
+                        { value: "84%",    label: "test coverage" },
+                        { value: "99.9%",  label: "uptime last quarter" }
+                    ],
+                    challenges: "Keeping the live preview lag-free while users drag blocks around. Solved by virtualizing the block tree and batching mutations through Zustand, holding the frame budget under 16ms even with 50+ sections.",
+                    results: "Users go from idea to a published landing in under two minutes. The AI copy generator removes the most common blocker ('what to write'), and ISR-served static exports respond in <50ms from the global edge."
                 },
                 {
                     slug: "ms_crm",
