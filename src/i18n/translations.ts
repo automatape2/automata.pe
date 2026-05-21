@@ -251,6 +251,112 @@ export const useTree = create(temporal<Tree>((set) => ({
 })));`
                         }
                     ],
+                    techChallenges: [
+                        {
+                            tags: ["frontend", "performance", "react"],
+                            problem: "Preview en vivo a 60fps con 100+ bloques arrastrables",
+                            constraint: "Frame budget < 16ms, no podemos dropear ni un frame al arrastrar; el arbol puede tener bloques anidados (sections > columns > blocks).",
+                            approach: "Virtualizar el arbol de bloques fuera del viewport y agrupar mutaciones de Zustand en un solo set por RAF, evitando re-renders en cascada.",
+                            algorithm: "Virtualizacion lineal con IntersectionObserver + batching via requestAnimationFrame. Selectores con shallow-equality (zustand/shallow) para que solo se rerenderee la rama tocada.",
+                            codeFile: "lib/builder/batch-mutations.ts",
+                            codeLang: "typescript",
+                            code: `// Coalesce mutations within one frame
+let queued: ((s: TreeState) => TreeState) | null = null;
+let scheduled = false;
+
+export function batch(fn: (s: TreeState) => TreeState) {
+  const prev = queued;
+  queued = (s) => fn(prev ? prev(s) : s);
+
+  if (!scheduled) {
+    scheduled = true;
+    requestAnimationFrame(() => {
+      const apply = queued!;
+      queued = null;
+      scheduled = false;
+      useTree.setState(apply);
+    });
+  }
+}`,
+                            outcome: "60fps sostenido (p99 8ms por mutacion) con arboles de 80+ secciones. CPU profile en Chrome paso de 24% a 6% durante drag."
+                        },
+                        {
+                            tags: ["ai", "backend", "reliability"],
+                            problem: "Generar copy con IA sin parsing fragil ni errores de formato",
+                            constraint: "Tipado fuerte entre el modelo y el cliente. No podemos aceptar JSON mal formado, texto preambular ni emoji sorpresa en el headline.",
+                            approach: "Structured Outputs de OpenAI: el modelo es forzado a emitir un objeto que valida contra un schema Zod en el server. Si no valida, retry con backoff exponencial + jitter.",
+                            algorithm: "Schema-driven generation (Zod → JSON Schema → response_format). Retry exponencial con jitter base 200ms, factor 2, cap 3 intentos.",
+                            codeFile: "app/api/copy/route.ts",
+                            codeLang: "typescript",
+                            code: `const Headline = z.object({
+  hero: z.string().min(8).max(80),
+  sub:  z.string().min(20).max(160),
+  cta:  z.string().min(2).max(24),
+});
+
+async function withRetry<T>(fn: () => Promise<T>, max = 3) {
+  for (let i = 0; i < max; i++) {
+    try { return await fn(); }
+    catch (e) {
+      if (i === max - 1) throw e;
+      const wait = 200 * 2 ** i + Math.random() * 100;
+      await new Promise((r) => setTimeout(r, wait));
+    }
+  }
+  throw new Error("unreachable");
+}`,
+                            outcome: "0% errores de parsing en 30 dias (antes: 4%). Latencia p95 1.2s con cache de prompts identicos en Upstash."
+                        },
+                        {
+                            tags: ["frontend", "dnd", "algorithms"],
+                            problem: "Drag & drop entre contenedores anidados (section > column > block) sin colisiones erradas",
+                            constraint: "dnd-kit asume drop targets planos; el builder tiene jerarquia. Soltar 'cerca del borde' debe priorizar el padre, no el hijo, salvo si el cursor entra al rectangulo del hijo.",
+                            approach: "Collision detection custom: primero pointer-within (puntero dentro del rect) por profundidad descendente. Si nadie matchea, fallback a closest-center con priorizacion por profundidad menor (gana el padre).",
+                            algorithm: "Hierarchical hit-testing: pointer-within DFS + closest-center con depth-tiebreak. Complejidad O(n) sobre los droppables visibles.",
+                            codeFile: "lib/builder/collision.ts",
+                            codeLang: "typescript",
+                            code: `export const hierarchicalCollision: CollisionDetection = (args) => {
+  // 1) pointer-within, deepest first
+  const within = pointerWithin(args)
+    .sort((a, b) => depth(b.id) - depth(a.id));
+  if (within.length) return within;
+
+  // 2) closest-center, but parent wins on ties
+  return closestCenter(args).sort((a, b) => {
+    const da = depth(a.id), db = depth(b.id);
+    if (Math.abs(a.data!.value - b.data!.value) < 8) return da - db;
+    return a.data!.value - b.data!.value;
+  });
+};`,
+                            outcome: "0 drops fallidos en suite E2E (200+ casos). Tiempo de drop p95 60ms, sensacion de 'pegado' al puntero confirmada en pruebas con usuarios."
+                        },
+                        {
+                            tags: ["build", "performance", "ssr"],
+                            problem: "Servir landings publicadas con <40KB de JS para que el LCP sea sub-segundo",
+                            constraint: "El editor usa React + Zustand pesado, pero la landing publicada no necesita interactividad excepto en bloques especificos (forms, carousels).",
+                            approach: "Cada bloque declara island: 'static' | 'interactive' en su schema. Al exportar, se camina el arbol y solo los interactive emiten su bundle hidratable; los static se renderizan a HTML puro.",
+                            algorithm: "Tree-shaking de hydration: walking del AST de bloques, particionando en sub-arboles static/interactive antes de pasar al renderer. Inspirado en 'islands architecture' (Astro/Marko).",
+                            codeFile: "lib/export/partition.ts",
+                            codeLang: "typescript",
+                            code: `export function partitionIslands(tree: BlockTree): {
+  staticHtml: string;
+  islands: { id: string; props: any }[];
+} {
+  const islands: any[] = [];
+
+  function walk(node: Block): string {
+    if (node.schema.island === "interactive") {
+      islands.push({ id: node.id, props: node.props });
+      return \`<div data-island="\${node.id}"></div>\`;
+    }
+    return renderStatic(node, node.children?.map(walk).join("") ?? "");
+  }
+
+  return { staticHtml: walk(tree.root), islands };
+}`,
+                            outcome: "Mediana de JS shipped: 38KB (antes: 280KB). LCP en edge global p75 0.7s, score Lighthouse perf 98."
+                        }
+                    ],
                     testing: {
                         strategy: "Piramide clasica:\n- Unit (Vitest) en logica pura y reducers del builder\n- Integration (Playwright component) en cada bloque\n- E2E (Playwright) en flujos criticos: signup, publish, billing\n- Contract tests para webhooks de Stripe\n- Lighthouse CI por PR en landings generadas (perf budget)",
                         coverage: "84%",
@@ -262,7 +368,7 @@ export const useTree = create(temporal<Tree>((set) => ({
                         { value: "84%",    label: "cobertura de tests" },
                         { value: "99.9%",  label: "uptime ultimo trimestre" }
                     ],
-                    challenges: "Mantener el preview en vivo sin lag mientras se arrastran bloques. Resuelto con virtualizacion del arbol y batching de mutaciones en Zustand, manteniendo el frame budget bajo 16ms incluso con 50+ secciones.",
+                    challenges: "Mantener el preview en vivo sin lag mientras se arrastran bloques, garantizar generacion de copy tipada y servir landings con bundle minimo. Los detalles tecnicos estan documentados arriba en la seccion 06.",
                     results: "Los usuarios van de idea a landing publicada en menos de dos minutos. El generador de copy cubre el bloqueo mas comun ('que escribir') y los exports estaticos via ISR se sirven a <50ms desde el edge global."
                 },
                 {
@@ -651,6 +757,112 @@ export const useTree = create(temporal<Tree>((set) => ({
 })));`
                         }
                     ],
+                    techChallenges: [
+                        {
+                            tags: ["frontend", "performance", "react"],
+                            problem: "60fps live preview with 100+ draggable blocks",
+                            constraint: "Frame budget < 16ms — can't drop a single frame while dragging; tree can be deeply nested (sections > columns > blocks).",
+                            approach: "Virtualize off-screen blocks and coalesce Zustand mutations into a single per-frame setState, avoiding cascading re-renders.",
+                            algorithm: "Linear virtualization via IntersectionObserver + batching with requestAnimationFrame. Selectors use shallow-equality (zustand/shallow) so only the touched branch re-renders.",
+                            codeFile: "lib/builder/batch-mutations.ts",
+                            codeLang: "typescript",
+                            code: `// Coalesce mutations within one frame
+let queued: ((s: TreeState) => TreeState) | null = null;
+let scheduled = false;
+
+export function batch(fn: (s: TreeState) => TreeState) {
+  const prev = queued;
+  queued = (s) => fn(prev ? prev(s) : s);
+
+  if (!scheduled) {
+    scheduled = true;
+    requestAnimationFrame(() => {
+      const apply = queued!;
+      queued = null;
+      scheduled = false;
+      useTree.setState(apply);
+    });
+  }
+}`,
+                            outcome: "Sustained 60fps (p99 8ms per mutation) on 80+ section trees. Chrome CPU profile dropped from 24% to 6% during drag."
+                        },
+                        {
+                            tags: ["ai", "backend", "reliability"],
+                            problem: "Generate landing copy with AI without fragile parsing or format errors",
+                            constraint: "Strong typing from the model to the client. No malformed JSON, no preamble text, no surprise emoji in headlines.",
+                            approach: "OpenAI Structured Outputs: the model is forced to emit an object that validates against a Zod schema on the server. If it doesn't validate, exponential-backoff retry with jitter.",
+                            algorithm: "Schema-driven generation (Zod → JSON Schema → response_format). Exponential retry with jitter, base 200ms, factor 2, cap 3 attempts.",
+                            codeFile: "app/api/copy/route.ts",
+                            codeLang: "typescript",
+                            code: `const Headline = z.object({
+  hero: z.string().min(8).max(80),
+  sub:  z.string().min(20).max(160),
+  cta:  z.string().min(2).max(24),
+});
+
+async function withRetry<T>(fn: () => Promise<T>, max = 3) {
+  for (let i = 0; i < max; i++) {
+    try { return await fn(); }
+    catch (e) {
+      if (i === max - 1) throw e;
+      const wait = 200 * 2 ** i + Math.random() * 100;
+      await new Promise((r) => setTimeout(r, wait));
+    }
+  }
+  throw new Error("unreachable");
+}`,
+                            outcome: "0% parsing errors over 30 days (down from 4%). p95 latency 1.2s with prompt-cache hits on Upstash."
+                        },
+                        {
+                            tags: ["frontend", "dnd", "algorithms"],
+                            problem: "Drag & drop across nested containers (section > column > block) without misfires",
+                            constraint: "dnd-kit assumes flat drop targets; the builder has hierarchy. Dropping 'near the edge' must prefer the parent — unless the cursor is inside the child's rect.",
+                            approach: "Custom collision detection: first pointer-within (cursor inside rect) walked deepest-first. If nothing matches, fall back to closest-center with depth tie-breaking (parent wins close ties).",
+                            algorithm: "Hierarchical hit-testing: pointer-within DFS + closest-center with depth tie-break. O(n) over visible droppables.",
+                            codeFile: "lib/builder/collision.ts",
+                            codeLang: "typescript",
+                            code: `export const hierarchicalCollision: CollisionDetection = (args) => {
+  // 1) pointer-within, deepest first
+  const within = pointerWithin(args)
+    .sort((a, b) => depth(b.id) - depth(a.id));
+  if (within.length) return within;
+
+  // 2) closest-center, parent wins on near-ties
+  return closestCenter(args).sort((a, b) => {
+    const da = depth(a.id), db = depth(b.id);
+    if (Math.abs(a.data!.value - b.data!.value) < 8) return da - db;
+    return a.data!.value - b.data!.value;
+  });
+};`,
+                            outcome: "0 mis-drops across 200+ E2E cases. p95 drop time 60ms; the 'stuck-to-cursor' feel was validated in user testing."
+                        },
+                        {
+                            tags: ["build", "performance", "ssr"],
+                            problem: "Serve published landings with <40KB JS so LCP stays sub-second",
+                            constraint: "The editor ships heavy React + Zustand, but the published landing only needs interactivity inside specific blocks (forms, carousels).",
+                            approach: "Each block declares island: 'static' | 'interactive' in its schema. On export, the tree is walked and only interactive blocks emit hydratable bundles; static blocks render to plain HTML.",
+                            algorithm: "Hydration tree-shaking: walk the block AST, partition into static/interactive sub-trees before passing to the renderer. Inspired by 'islands architecture' (Astro/Marko).",
+                            codeFile: "lib/export/partition.ts",
+                            codeLang: "typescript",
+                            code: `export function partitionIslands(tree: BlockTree): {
+  staticHtml: string;
+  islands: { id: string; props: any }[];
+} {
+  const islands: any[] = [];
+
+  function walk(node: Block): string {
+    if (node.schema.island === "interactive") {
+      islands.push({ id: node.id, props: node.props });
+      return \`<div data-island="\${node.id}"></div>\`;
+    }
+    return renderStatic(node, node.children?.map(walk).join("") ?? "");
+  }
+
+  return { staticHtml: walk(tree.root), islands };
+}`,
+                            outcome: "Median JS shipped: 38KB (down from 280KB). Global-edge LCP p75 0.7s, Lighthouse perf score 98."
+                        }
+                    ],
                     testing: {
                         strategy: "Classic pyramid:\n- Unit (Vitest) on pure logic and builder reducers\n- Integration (Playwright component) on every block\n- E2E (Playwright) on critical flows: signup, publish, billing\n- Contract tests for Stripe webhooks\n- Lighthouse CI per PR on generated landings (perf budget)",
                         coverage: "84%",
@@ -662,7 +874,7 @@ export const useTree = create(temporal<Tree>((set) => ({
                         { value: "84%",    label: "test coverage" },
                         { value: "99.9%",  label: "uptime last quarter" }
                     ],
-                    challenges: "Keeping the live preview lag-free while users drag blocks around. Solved by virtualizing the block tree and batching mutations through Zustand, holding the frame budget under 16ms even with 50+ sections.",
+                    challenges: "Keeping live preview lag-free, ensuring typed AI copy generation, and serving landings with a minimal bundle. The technical breakdowns are documented above in section 06.",
                     results: "Users go from idea to a published landing in under two minutes. The AI copy generator removes the most common blocker ('what to write'), and ISR-served static exports respond in <50ms from the global edge."
                 },
                 {

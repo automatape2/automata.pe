@@ -15,7 +15,9 @@ const L = {
             spec: "// spec", status: "// status",
             discovery: "discovery", design: "design",
             architecture: "architecture", infra: "infrastructure",
-            implementation: "implementation", testing: "testing & ci",
+            implementation: "implementation",
+            techChallenges: "technical challenges",
+            testing: "testing & ci",
             screenshots: "screenshots", results: "results",
             quickFacts: "quick facts", nextStep: "next step",
             overview: "overview", problem: "problem",
@@ -30,6 +32,9 @@ const L = {
             ai: "ai", devops: "devops",
             strategy: "strategy", coverage: "coverage", tests: "tests",
             metrics: "metrics", outcomes: "outcomes",
+            tcProblem: "problem", tcConstraint: "constraint",
+            tcApproach: "approach", tcAlgorithm: "algorithm / technique",
+            tcOutcome: "outcome", tcChallenge: "challenge",
             openDemo: "./open-demo --live",
             viewFigma: "./open-figma",
             letsTalk: "./let-s-talk.sh",
@@ -44,7 +49,9 @@ const L = {
             spec: "// spec", status: "// estado",
             discovery: "descubrimiento", design: "diseño",
             architecture: "arquitectura", infra: "infraestructura",
-            implementation: "implementacion", testing: "testing & ci",
+            implementation: "implementacion",
+            techChallenges: "desafios tecnicos",
+            testing: "testing & ci",
             screenshots: "capturas", results: "resultados",
             quickFacts: "quick facts", nextStep: "siguiente paso",
             overview: "descripcion", problem: "problema",
@@ -59,6 +66,9 @@ const L = {
             ai: "ia", devops: "devops",
             strategy: "estrategia", coverage: "cobertura", tests: "tests",
             metrics: "metricas", outcomes: "outcomes",
+            tcProblem: "problema", tcConstraint: "restriccion",
+            tcApproach: "enfoque", tcAlgorithm: "algoritmo / tecnica",
+            tcOutcome: "outcome", tcChallenge: "desafio",
             openDemo: "./abrir-demo --live",
             viewFigma: "./abrir-figma",
             letsTalk: "./contactar.sh",
@@ -380,11 +390,82 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
         </section>
     )}
 
-    <!-- 06 · Testing & CI -->
+    <!-- 06 · Technical Challenges -->
+    {project.techChallenges && project.techChallenges.length > 0 && (
+        <section class="mb-12">
+            <div class="border-b border-[var(--line)] pb-4 mb-6">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 06 · {L.sections.techChallenges}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> cat ./challenges/*.md
+                </h2>
+                <p class="mt-2 text-sm text-[var(--fg-dim)]">
+                    <span class="text-[var(--fg-muted)]">// </span>{project.techChallenges.length} {lang === "es" ? "problemas tecnicos resueltos" : "technical problems solved"}
+                </p>
+            </div>
+            <div class="space-y-5">
+                {project.techChallenges.map((ch: any, i: number) => (
+                    <article class="panel">
+                        <div class="window-chrome">
+                            <div class="window-chrome-title">
+                                {`challenge-${String(i + 1).padStart(2, '0')}.md`}{ch.tags && ch.tags.length > 0 ? `  ·  ${ch.tags.join(' · ')}` : ''}
+                            </div>
+                        </div>
+                        <div class="p-6 md:p-8 space-y-5">
+                            <div>
+                                <div class="text-[10px] text-[var(--amber)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcProblem}</div>
+                                <h3 class="text-lg font-semibold text-[var(--fg)] leading-tight">{ch.problem}</h3>
+                                {ch.constraint && (
+                                    <p class="mt-3 text-sm text-[var(--fg-dim)]">
+                                        <span class="text-[var(--fg-muted)]">{L.sections.tcConstraint}: </span>{ch.constraint}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-6 border-t border-[var(--line)] pt-5">
+                                {ch.approach && (
+                                    <div>
+                                        <div class="text-[10px] text-[var(--cyan)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcApproach}</div>
+                                        <p class="text-sm text-[var(--fg)] leading-relaxed">{ch.approach}</p>
+                                    </div>
+                                )}
+                                {ch.algorithm && (
+                                    <div>
+                                        <div class="text-[10px] text-[var(--cyan)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcAlgorithm}</div>
+                                        <p class="text-sm text-[var(--cyan-bright)] leading-relaxed">{ch.algorithm}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {ch.code && (
+                                <div class="border border-[var(--line)] bg-black">
+                                    {ch.codeLang && (
+                                        <div class="px-4 py-2 border-b border-[var(--line)] text-[11px] text-[var(--fg-muted)] flex justify-between">
+                                            <span>{ch.codeFile || `snippet-${i + 1}`}</span>
+                                            <span>{ch.codeLang}</span>
+                                        </div>
+                                    )}
+                                    <pre class="p-4 overflow-x-auto text-[12.5px] leading-[1.6] text-[var(--fg)] font-mono">{ch.code}</pre>
+                                </div>
+                            )}
+
+                            {ch.outcome && (
+                                <div class="border-t border-[var(--line)] pt-4">
+                                    <div class="text-[10px] text-[var(--green)] uppercase tracking-[0.15em] mb-2">▸ {L.sections.tcOutcome}</div>
+                                    <p class="text-sm text-[var(--green)] leading-relaxed">{ch.outcome}</p>
+                                </div>
+                            )}
+                        </div>
+                    </article>
+                ))}
+            </div>
+        </section>
+    )}
+
+    <!-- 07 · Testing & CI -->
     {project.testing && (
         <section class="mb-12">
             <div class="border-b border-[var(--line)] pb-4 mb-6">
-                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 06 · {L.sections.testing}</div>
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 07 · {L.sections.testing}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> cat ./testing.md
                 </h2>
@@ -420,7 +501,7 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
     {project.screenshots && project.screenshots.length > 0 && (
         <section class="mb-12">
             <div class="border-b border-[var(--line)] pb-4 mb-6">
-                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 07 · {L.sections.screenshots}</div>
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 08 · {L.sections.screenshots}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> ls ./{L.sections.screenshots}
                 </h2>
@@ -447,7 +528,7 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
     {(project.metrics || project.results || project.challenges) && (
         <section class="mb-12">
             <div class="border-b border-[var(--line)] pb-4 mb-6">
-                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 08 · {L.sections.results}</div>
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 09 · {L.sections.results}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> cat ./{L.sections.results}.md
                 </h2>
