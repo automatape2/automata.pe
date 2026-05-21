@@ -57,6 +57,7 @@ const projectsBase = lang === "es" ? "/es/projects" : "/projects";
 const langItems = (translations[lang] as any).solutions.items as any[];
 const cmdkCommands = [
     { label: lang === "es" ? "Inicio" : "Home", href: homeHref, tag: "page" },
+    { label: lang === "es" ? "Todos los proyectos" : "All projects", href: projectsBase, tag: "page" },
     { label: t.nav.solutions, href: `${homeHref}#solutions`, tag: "section" },
     { label: t.nav.services, href: `${homeHref}#services`, tag: "section" },
     { label: t.nav.tech, href: `${homeHref}#tech`, tag: "section" },

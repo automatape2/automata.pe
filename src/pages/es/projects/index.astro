@@ -1,0 +1,31 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import ProjectsGrid from "../../../components/ProjectsGrid.astro";
+import { translations } from "../../../i18n/translations";
+
+const items = translations.es.solutions.items;
+const title = `${translations.es.solutions.sectionTitle} | Automata`;
+const description = translations.es.solutions.subtitle;
+---
+
+<Layout title={title} description={description}>
+    <div class="max-w-6xl mx-auto px-6 lg:px-12 py-12">
+        <a href="/es" class="inline-flex items-center gap-2 text-sm text-[var(--fg-muted)] hover:text-[var(--green)] transition-colors mb-8 group">
+            <span class="text-[var(--green)]">$</span>
+            <span>cd ..  // volver al inicio</span>
+            <span class="text-[var(--green)] opacity-0 group-hover:opacity-100 transition-opacity">←</span>
+        </a>
+
+        <header class="border-b border-[var(--line)] pb-5 mb-8">
+            <div class="text-xs text-[var(--fg-muted)] mb-2">// {translations.es.solutions.items.length} entries</div>
+            <h1 class="heading-mono text-[clamp(2rem,5vw,3rem)]">
+                <span class="text-[var(--green)]">$</span> ls ./proyectos
+            </h1>
+            <p class="mt-3 text-sm md:text-[15px] text-[var(--fg-dim)] max-w-2xl">
+                <span class="text-[var(--fg-muted)]">// </span>{translations.es.solutions.subtitle}
+            </p>
+        </header>
+
+        <ProjectsGrid items={items} lang="es" />
+    </div>
+</Layout>
