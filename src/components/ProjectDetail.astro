@@ -580,14 +580,21 @@ if (project.metrics || project.results || project.challenges) {
                             </div>
 
                             {ch.code && (
-                                <div class="code-block border border-[var(--line)] bg-black">
-                                    {ch.codeLang && (
-                                        <div class="px-4 py-2 border-b border-[var(--line)] text-[11px] text-[var(--fg-muted)] flex justify-between">
-                                            <span>{ch.codeFile || `snippet-${i + 1}`}</span>
-                                            <span>{ch.codeLang}</span>
-                                        </div>
-                                    )}
+                                <div class="code-block border border-[var(--line)] bg-black" data-code-block>
+                                    <div class="px-4 py-2 border-b border-[var(--line)] text-[11px] text-[var(--fg-muted)] flex items-center justify-between gap-3">
+                                        <span class="truncate">{ch.codeFile || `snippet-${i + 1}`}</span>
+                                        <span class="flex items-center gap-3 shrink-0">
+                                            {ch.codeLang && <span>{ch.codeLang}</span>}
+                                            <button
+                                                type="button"
+                                                data-code-copy
+                                                class="px-2 py-0.5 border border-[var(--line)] text-[var(--fg-muted)] hover:border-[var(--green)] hover:text-[var(--green)] transition-colors"
+                                                aria-label="Copy code to clipboard"
+                                            >[ copy ]</button>
+                                        </span>
+                                    </div>
                                     <div class="shiki-wrap" set:html={ch.codeHtml || `<pre>${ch.code}</pre>`}></div>
+                                    <template data-code-source>{ch.code}</template>
                                 </div>
                             )}
 
@@ -769,3 +776,25 @@ if (project.metrics || project.results || project.challenges) {
         <TableOfContents items={tocItems} title={lang === "es" ? "// secciones" : "// sections"} />
     </div>
 </div>
+
+<script>
+    // Copy code-block source to clipboard
+    document.querySelectorAll<HTMLButtonElement>("[data-code-copy]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const block = btn.closest<HTMLElement>("[data-code-block]");
+            const source = block?.querySelector<HTMLTemplateElement>("[data-code-source]")?.content?.textContent ?? "";
+            try {
+                await navigator.clipboard.writeText(source);
+                btn.textContent = "[ copied ]";
+                btn.classList.add("text-[var(--green)]", "border-[var(--green)]");
+                setTimeout(() => {
+                    btn.textContent = "[ copy ]";
+                    btn.classList.remove("text-[var(--green)]", "border-[var(--green)]");
+                }, 1500);
+            } catch {
+                btn.textContent = "[ failed ]";
+                setTimeout(() => { btn.textContent = "[ copy ]"; }, 1500);
+            }
+        });
+    });
+</script>
