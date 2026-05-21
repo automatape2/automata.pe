@@ -17,6 +17,29 @@ export async function getStaticPaths() {
 
 const { project, prev, next } = Astro.props;
 const ogImage = `/og/${project.slug}.svg`;
+
+const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: project.title,
+    description: project.description,
+    url: new URL(`/es/projects/${project.slug}`, Astro.site || Astro.url).toString(),
+    inLanguage: "es-PE",
+    image: new URL(ogImage, Astro.site || Astro.url).toString(),
+    keywords: [...(project.tech || []), project.type].filter(Boolean).join(", "),
+    author: {
+        "@type": "Organization",
+        name: "Automata",
+        url: (Astro.site || Astro.url).toString(),
+    },
+    publisher: {
+        "@type": "Organization",
+        name: "Automata",
+        logo: { "@type": "ImageObject", url: new URL("/favicon.svg", Astro.site || Astro.url).toString() },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": new URL(`/es/projects/${project.slug}`, Astro.site || Astro.url).toString() },
+    ...(project.year ? { datePublished: `${project.year}-01-01` } : {}),
+};
 ---
 
 <Layout
@@ -24,6 +47,7 @@ const ogImage = `/og/${project.slug}.svg`;
     description={project.description}
     ogImage={ogImage}
     ogType="article"
+    structuredData={articleLd}
 >
     <ProjectDetail project={project} lang="es" prev={prev} next={next} />
 </Layout>

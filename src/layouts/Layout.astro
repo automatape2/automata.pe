@@ -18,6 +18,8 @@ interface Props {
     ogImage?: string;
     /** "website" for landing, "article" for case studies. Defaults to "website". */
     ogType?: "website" | "article";
+    /** Optional JSON-LD structured data (any schema.org type). Replaces the default Organization payload. */
+    structuredData?: Record<string, any>;
 }
 
 const {
@@ -25,6 +27,7 @@ const {
     description: pageDescription,
     ogImage = "/favicon.svg",
     ogType = "website",
+    structuredData,
 } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const t = getTranslations(lang);
@@ -54,6 +57,35 @@ const canonical = new URL(Astro.url.pathname, Astro.site || Astro.url).toString(
 const absoluteOgImage = ogImage.startsWith("http")
     ? ogImage
     : new URL(ogImage, Astro.site || Astro.url).toString();
+
+const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: personalInfo.brandName,
+    url: (Astro.site || Astro.url).toString(),
+    logo: new URL("/favicon.svg", Astro.site || Astro.url).toString(),
+    description: defaultDescription,
+    sameAs: [
+        personalInfo.socialLinks.github,
+        personalInfo.socialLinks.linkedin,
+        personalInfo.socialLinks.twitter,
+    ].filter(Boolean),
+};
+
+// Default JSON-LD: for landing → Organization; for articles → WebPage if caller didn't supply one.
+const ldPayload = structuredData ?? (
+    ogType === "article"
+        ? {
+              "@context": "https://schema.org",
+              "@type": "WebPage",
+              name: title,
+              description,
+              url: canonical,
+              inLanguage: lang === "es" ? "es-PE" : "en-US",
+              isPartOf: { "@type": "WebSite", name: personalInfo.brandName, url: (Astro.site || Astro.url).toString() },
+          }
+        : orgSchema
+);
 ---
 
 <!doctype html>
@@ -67,6 +99,9 @@ const absoluteOgImage = ogImage.startsWith("http")
         <link rel="alternate" type="application/rss+xml" title="Automata Projects" href="/rss.xml" />
         <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
         <meta name="generator" content={Astro.generator} />
+
+        <!-- JSON-LD structured data -->
+        <script type="application/ld+json" is:inline set:html={JSON.stringify(ldPayload)}></script>
 
         <!-- Open Graph -->
         <meta property="og:type" content={ogType} />
