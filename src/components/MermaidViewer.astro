@@ -42,8 +42,14 @@ const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
 
     <!-- View pane (rendered SVG) -->
     <div class="mv-pane" data-pane="view">
-        <div class="mv-svg p-4 overflow-auto bg-[var(--bg)] flex items-center justify-center min-h-[120px] max-h-[420px]">
-            <pre class="mv-source-raw whitespace-pre font-mono text-[12px] text-[var(--fg-dim)]">{source}</pre>
+        <div class="mv-svg p-4 overflow-auto bg-[var(--bg)] flex items-center justify-center min-h-[120px] max-h-[420px] relative">
+            <pre class="mv-source-raw whitespace-pre font-mono text-[12px] text-[var(--fg-dim)] hidden">{source}</pre>
+            <!-- Skeleton placeholders while Mermaid loads -->
+            <div class="mv-skeleton" aria-hidden="true">
+                <div class="mv-sk-row mv-sk-row-a"></div>
+                <div class="mv-sk-row mv-sk-row-b"></div>
+                <div class="mv-sk-row mv-sk-row-c"></div>
+            </div>
         </div>
         {fallback && (
             <details class="border-t border-[var(--line)]">
@@ -68,6 +74,36 @@ const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
 </div>
 
 <style is:global>
+    /* ============ Mermaid skeleton (while loading) ============ */
+    .mv-skeleton {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: min(560px, 90%);
+        padding: 8px;
+    }
+    .mv-sk-row {
+        height: 56px;
+        background: linear-gradient(
+            90deg,
+            rgba(31, 41, 55, 0.45) 0%,
+            rgba(74, 222, 128, 0.10) 50%,
+            rgba(31, 41, 55, 0.45) 100%
+        );
+        background-size: 200% 100%;
+        animation: mv-sk-pulse 1.2s ease-in-out infinite;
+        border: 1px solid var(--line);
+    }
+    .mv-sk-row-a { width: 60%; align-self: center; }
+    .mv-sk-row-b { width: 90%; }
+    .mv-sk-row-c { width: 75%; align-self: flex-end; }
+    @keyframes mv-sk-pulse {
+        0%, 100% { background-position: 0% 0%; }
+        50% { background-position: -200% 0%; }
+    }
+    /* Hide skeleton once an <svg> sibling has been rendered into the container */
+    .mv-svg:has(svg) .mv-skeleton { display: none; }
+
     /* ============ Editable Mermaid source textarea ============ */
     .mv-source-editor {
         min-height: 240px;

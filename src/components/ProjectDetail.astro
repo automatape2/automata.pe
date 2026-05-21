@@ -358,7 +358,7 @@ if (project.lessons && project.lessons.length > 0) {
 
     <!-- 01 · Discovery -->
     {(project.fullDescription || project.problem || project.audience) && (
-        <section id="sec-discovery" class="mb-10 scroll-mt-20">
+        <section id="sec-discovery" class="mb-10 scroll-mt-20" data-animate="fade-up" data-duration="0.6">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 01 · {L.sections.discovery}</div>
                 <h2 class="heading-mono text-2xl">
@@ -390,7 +390,7 @@ if (project.lessons && project.lessons.length > 0) {
 
     <!-- 02 · Design -->
     {(project.designTools || project.designSystem || project.figmaUrl) && (
-        <section id="sec-design" class="mb-10 scroll-mt-20">
+        <section id="sec-design" class="mb-10 scroll-mt-20" data-animate="fade-up" data-duration="0.6">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 02 · {L.sections.design}</div>
                 <h2 class="heading-mono text-2xl">
@@ -440,7 +440,7 @@ if (project.lessons && project.lessons.length > 0) {
         if (cmp) items.push({ key: "component", label: L.sections.c4Component, sublabel: "c4-level-3" });
         if (items.length === 0) return null;
         return (
-            <section id="sec-architecture" class="mb-10 scroll-mt-20">
+            <section id="sec-architecture" class="mb-10 scroll-mt-20" data-animate="fade-up" data-duration="0.6">
                 <div class="border-b border-[var(--line)] pb-3 mb-5">
                     <div class="text-xs text-[var(--fg-muted)] mb-1">// section 03 · {L.sections.architecture}</div>
                     <h2 class="heading-mono text-2xl">
@@ -492,7 +492,7 @@ if (project.lessons && project.lessons.length > 0) {
 
     <!-- 04 · Infrastructure -->
     {project.infrastructure && (
-        <section id="sec-infrastructure" class="mb-10 scroll-mt-20">
+        <section id="sec-infrastructure" class="mb-10 scroll-mt-20" data-animate="fade-up" data-duration="0.6">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 04 · {L.sections.infra}</div>
                 <h2 class="heading-mono text-2xl">
@@ -538,7 +538,7 @@ if (project.lessons && project.lessons.length > 0) {
 
     <!-- 05 · Implementation -->
     {(stackGroups.length > 0 || project.codeHighlights) && (
-        <section id="sec-implementation" class="mb-10 scroll-mt-20">
+        <section id="sec-implementation" class="mb-10 scroll-mt-20" data-animate="fade-up" data-duration="0.6">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 05 · {L.sections.implementation}</div>
                 <h2 class="heading-mono text-2xl">
@@ -578,7 +578,7 @@ if (project.lessons && project.lessons.length > 0) {
 
     <!-- 06 · Technical Challenges (carousel) -->
     {project.techChallenges && project.techChallenges.length > 0 && (
-        <section id="sec-challenges" class="mb-10 scroll-mt-20">
+        <section id="sec-challenges" class="mb-10 scroll-mt-20" data-animate="fade-up" data-duration="0.6">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 06 · {L.sections.techChallenges}</div>
                 <h2 class="heading-mono text-2xl">
@@ -657,7 +657,7 @@ if (project.lessons && project.lessons.length > 0) {
 
     <!-- 07 · Testing & CI -->
     {project.testing && (
-        <section id="sec-testing" class="mb-10 scroll-mt-20">
+        <section id="sec-testing" class="mb-10 scroll-mt-20" data-animate="fade-up" data-duration="0.6">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 07 · {L.sections.testing}</div>
                 <h2 class="heading-mono text-2xl">
@@ -693,7 +693,7 @@ if (project.lessons && project.lessons.length > 0) {
 
     <!-- 07 · Screenshots -->
     {project.screenshots && project.screenshots.length > 0 && (
-        <section id="sec-screenshots" class="mb-10 scroll-mt-20">
+        <section id="sec-screenshots" class="mb-10 scroll-mt-20" data-animate="fade-up" data-duration="0.6">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 08 · {L.sections.screenshots}</div>
                 <h2 class="heading-mono text-2xl">
@@ -726,7 +726,7 @@ if (project.lessons && project.lessons.length > 0) {
 
     <!-- 08 · Results -->
     {(project.metrics || project.results || project.challenges) && (
-        <section id="sec-results" class="mb-10 scroll-mt-20">
+        <section id="sec-results" class="mb-10 scroll-mt-20" data-animate="fade-up" data-duration="0.6">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 09 · {L.sections.results}</div>
                 <h2 class="heading-mono text-2xl">
@@ -765,7 +765,7 @@ if (project.lessons && project.lessons.length > 0) {
 
     <!-- 10 · Lessons learned -->
     {project.lessons && project.lessons.length > 0 && (
-        <section id="sec-lessons" class="mb-10 scroll-mt-20">
+        <section id="sec-lessons" class="mb-10 scroll-mt-20" data-animate="fade-up" data-duration="0.6">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 10 · {L.sections.lessons}</div>
                 <h2 class="heading-mono text-2xl">
