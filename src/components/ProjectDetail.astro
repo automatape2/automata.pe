@@ -139,6 +139,9 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 // Build TOC items from what the project actually has
 const tocItems: { id: string; label: string; sublabel?: string }[] = [];
 tocItems.push({ id: "overview", label: lang === "es" ? "overview" : "overview" });
+if (project.fullDescription || project.problem || project.audience) {
+    tocItems.push({ id: "sec-discovery", label: L.sections.discovery, sublabel: "section 01" });
+}
 if (project.designTools || project.designSystem || project.figmaUrl) {
     tocItems.push({ id: "sec-design", label: L.sections.design, sublabel: "section 02" });
 }
@@ -269,9 +272,9 @@ if (project.metrics || project.results || project.challenges) {
         </div>
     )}
 
-    <!-- 01 · Discovery — hidden for now (toggle the `false &&` below to bring it back) -->
-    {false && (project.fullDescription || project.problem || project.audience) && (
-        <section class="mb-10">
+    <!-- 01 · Discovery -->
+    {(project.fullDescription || project.problem || project.audience) && (
+        <section id="sec-discovery" class="mb-10 scroll-mt-20">
             <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 01 · {L.sections.discovery}</div>
                 <h2 class="heading-mono text-2xl">
