@@ -34,6 +34,10 @@ const lang = getLangFromUrl(Astro.url);
 const t = getTranslations(lang);
 const homeHref = lang === "es" ? "/" : "/en";
 
+// Privacy-friendly analytics (Plausible). Set PUBLIC_PLAUSIBLE_DOMAIN in .env
+// to your registered domain (e.g. "automata.pe"). Leave empty to disable.
+const PLAUSIBLE_DOMAIN = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN || "";
+
 // Compute alternate-language URL for the current path so we can emit hreflang tags.
 // /            ↔ /es        (root defaults to en)
 // /en          ↔ /es
@@ -129,6 +133,16 @@ const ldPayload = structuredData ?? (
 
         <!-- JSON-LD structured data -->
         <script type="application/ld+json" is:inline set:html={JSON.stringify(ldPayload)}></script>
+
+        <!-- Plausible analytics (no cookies, GDPR-friendly). Renders only when PUBLIC_PLAUSIBLE_DOMAIN is set. -->
+        {PLAUSIBLE_DOMAIN && (
+            <script
+                is:inline
+                defer
+                data-domain={PLAUSIBLE_DOMAIN}
+                src="https://plausible.io/js/script.outbound-links.js"
+            ></script>
+        )}
 
         <!-- Open Graph -->
         <meta property="og:type" content={ogType} />
