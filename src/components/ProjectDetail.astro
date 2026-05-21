@@ -275,6 +275,19 @@ if (project.lessons && project.lessons.length > 0) {
                     {project.tech.map((tech: string) => (<span class="badge-mono">{tech}</span>))}
                 </div>
 
+                {project.githubUrl && (
+                    <div
+                        class="flex items-center gap-4 pt-1 text-xs font-mono text-[var(--fg-muted)]"
+                        data-gh-stats
+                        data-gh-url={project.githubUrl}
+                        aria-live="polite"
+                    >
+                        <span class="gh-stat opacity-50">★ <span data-gh-stars>—</span></span>
+                        <span class="gh-stat opacity-50"><span data-gh-forks>—</span> forks</span>
+                        <span class="gh-stat opacity-50">last commit <span data-gh-pushed>—</span></span>
+                    </div>
+                )}
+
                 <div class="flex flex-wrap gap-3 pt-2">
                     {project.demoUrl && (
                         <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" class="btn-cli btn-cli--primary">
@@ -832,6 +845,46 @@ if (project.lessons && project.lessons.length > 0) {
 </div>
 
 <script>
+    // ============ GitHub live stats ============
+    function timeAgo(iso: string): string {
+        const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+        const intervals: Array<[number, string]> = [
+            [86400 * 365, "y"],
+            [86400 * 30, "mo"],
+            [86400 * 7, "w"],
+            [86400, "d"],
+            [3600, "h"],
+            [60, "m"],
+        ];
+        for (const [secs, label] of intervals) {
+            const v = Math.floor(seconds / secs);
+            if (v >= 1) return `${v}${label} ago`;
+        }
+        return "just now";
+    }
+
+    document.querySelectorAll<HTMLElement>("[data-gh-stats]").forEach(async (panel) => {
+        const url = panel.getAttribute("data-gh-url");
+        if (!url) return;
+        const m = url.match(/github\.com\/([^/]+)\/([^/?#]+)/i);
+        if (!m) return;
+        const [, owner, repo] = m;
+        try {
+            const res = await fetch(`https://api.github.com/repos/${owner}/${repo.replace(/\.git$/, "")}`);
+            if (!res.ok) throw new Error(String(res.status));
+            const data = await res.json();
+            const stars = panel.querySelector("[data-gh-stars]");
+            const forks = panel.querySelector("[data-gh-forks]");
+            const pushed = panel.querySelector("[data-gh-pushed]");
+            if (stars) stars.textContent = String(data.stargazers_count ?? 0);
+            if (forks) forks.textContent = String(data.forks_count ?? 0);
+            if (pushed && data.pushed_at) pushed.textContent = timeAgo(data.pushed_at);
+            panel.querySelectorAll<HTMLElement>(".gh-stat").forEach((s) => s.classList.remove("opacity-50"));
+        } catch {
+            // repo private / 404 / rate-limited — just leave the dashes and dim style
+        }
+    });
+
     // Copy code-block source to clipboard
     document.querySelectorAll<HTMLButtonElement>("[data-code-copy]").forEach((btn) => {
         btn.addEventListener("click", async () => {
