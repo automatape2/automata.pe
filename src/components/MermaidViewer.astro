@@ -53,13 +53,29 @@ const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
         )}
     </div>
 
-    <!-- Source pane (code editor / read-only) -->
+    <!-- Source pane (editable code editor) -->
     <div class="mv-pane hidden" data-pane="source">
-        <pre class="p-6 overflow-x-auto text-[12.5px] leading-[1.6] text-[var(--fg)] font-mono whitespace-pre">{source}</pre>
+        <textarea
+            class="mv-source-editor block w-full p-6 bg-transparent border-0 outline-none resize-y font-mono text-[12.5px] leading-[1.6] text-[var(--fg)] whitespace-pre"
+            spellcheck="false"
+            aria-label="Edit Mermaid source"
+        >{source}</textarea>
+        <div class="mv-edit-footer hidden border-t border-[var(--line)] px-4 py-2 text-[11px] text-[var(--fg-muted)] flex items-center justify-between">
+            <span><span class="text-[var(--amber)]">●</span> unsaved edits — view tab will re-render</span>
+            <button type="button" class="mv-edit-reset text-[var(--fg-muted)] hover:text-[var(--green)] transition-colors">[ reset ]</button>
+        </div>
     </div>
 </div>
 
 <style is:global>
+    /* ============ Editable Mermaid source textarea ============ */
+    .mv-source-editor {
+        min-height: 240px;
+        caret-color: var(--green);
+        tab-size: 4;
+    }
+    .mv-source-editor:focus { outline: none; box-shadow: inset 2px 0 0 var(--green); }
+
     /* ============ Mermaid size cap — diagrams render at natural size; constrain proportionally ============ */
     .mv-svg svg {
         max-width: min(100%, 720px) !important;
@@ -206,13 +222,13 @@ const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
         return mermaidPromise;
     }
 
-    async function renderViewer(viewer: HTMLElement) {
+    async function renderViewer(viewer: HTMLElement, codeOverride?: string) {
         const sourceEl = viewer.querySelector(".mv-source-raw") as HTMLElement | null;
         const svgContainer = viewer.querySelector(".mv-svg") as HTMLElement | null;
         const status = viewer.querySelector(".mv-status") as HTMLElement | null;
-        if (!sourceEl || !svgContainer) return;
+        if (!svgContainer) return;
 
-        const code = sourceEl.textContent || "";
+        const code = codeOverride ?? sourceEl?.textContent ?? "";
         try {
             const mermaid = await loadMermaid();
             const id = `mermaid-${Math.random().toString(36).slice(2, 10)}`;
@@ -220,20 +236,16 @@ const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
             svgContainer.innerHTML = svg;
             if (status) {
                 status.textContent = "rendered";
-                status.classList.remove("text-[var(--fg-muted)]");
+                status.classList.remove("text-[var(--fg-muted)]", "text-[var(--amber)]");
                 status.classList.add("text-[var(--green)]");
             }
         } catch (err) {
             console.error("[MermaidViewer] render failed:", err);
-            // Keep the source visible as fallback
             if (status) {
-                status.textContent = "render error — showing source";
-                status.classList.remove("text-[var(--fg-muted)]");
+                status.textContent = "render error";
+                status.classList.remove("text-[var(--fg-muted)]", "text-[var(--green)]");
                 status.classList.add("text-[var(--amber)]");
             }
-            // Swap to source tab automatically
-            const sourceTab = viewer.querySelector('[data-tab="source"]') as HTMLElement | null;
-            sourceTab?.click();
         }
     }
 
@@ -275,7 +287,29 @@ const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
             }
         });
 
-        // Render once visible (or eagerly — viewers are usually above the fold of the section)
+        // Editable source: debounce edits, re-render view, expose reset
+        const editor = viewer.querySelector<HTMLTextAreaElement>(".mv-source-editor");
+        const editFooter = viewer.querySelector<HTMLElement>(".mv-edit-footer");
+        const resetBtn = viewer.querySelector<HTMLButtonElement>(".mv-edit-reset");
+        const originalSrc = editor?.value ?? "";
+        let timer: number | null = null;
+
+        editor?.addEventListener("input", () => {
+            if (editFooter) editFooter.classList.remove("hidden");
+            if (timer) window.clearTimeout(timer);
+            timer = window.setTimeout(() => {
+                renderViewer(viewer, editor.value);
+            }, 400);
+        });
+
+        resetBtn?.addEventListener("click", () => {
+            if (!editor) return;
+            editor.value = originalSrc;
+            editFooter?.classList.add("hidden");
+            renderViewer(viewer, originalSrc);
+        });
+
+        // Initial render
         renderViewer(viewer);
     }
 
