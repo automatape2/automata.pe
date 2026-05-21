@@ -1,0 +1,70 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getLangFromUrl } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const homeHref = lang === "es" ? "/" : "/en";
+const requested = Astro.url.pathname || "/";
+
+const L = lang === "es"
+    ? {
+          title: "404 | Automata",
+          stamp: "EXIT CODE 404",
+          message: "no se encontro ningun archivo en esta ruta.",
+          tip: "intenta abrir el palette con Cmd/Ctrl + K para buscar un proyecto o seccion.",
+          home: "./volver-al-inicio.sh",
+          projects: "ls ./proyectos",
+      }
+    : {
+          title: "404 | Automata",
+          stamp: "EXIT CODE 404",
+          message: "no file found at this path.",
+          tip: "try opening the palette with Cmd/Ctrl + K to search projects or sections.",
+          home: "./back-home.sh",
+          projects: "ls ./projects",
+      };
+---
+
+<Layout title={L.title} ogType="website">
+    <div class="max-w-3xl mx-auto px-6 py-24 lg:py-32">
+        <div class="text-xs text-[var(--fg-muted)] mb-3">
+            <span class="inline-flex items-center gap-2">
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--red)]"></span>
+                {L.stamp}
+            </span>
+        </div>
+
+        <h1 class="heading-mono text-[clamp(2.5rem,8vw,5rem)] mb-6">
+            <span class="text-[var(--red)]">4</span><span class="text-[var(--green)]">0</span><span class="text-[var(--red)]">4</span>
+        </h1>
+
+        <div class="panel mb-8">
+            <div class="window-chrome">
+                <div class="window-chrome-title">automata@latam: ~{requested}</div>
+            </div>
+            <div class="p-5 md:p-7 font-mono text-[13px] leading-[1.7] space-y-1">
+                <div><span class="text-[var(--green)]">$</span> <span class="text-[var(--fg)]">cd {requested}</span></div>
+                <div class="text-[var(--red)]">cd: {requested}: no such file or directory</div>
+                <div class="pt-2"><span class="text-[var(--green)]">$</span> <span class="text-[var(--fg)]">git log {requested}</span></div>
+                <div class="text-[var(--fg-muted)]">fatal: ambiguous argument '{requested}': unknown revision or path not in the working tree.</div>
+                <div class="pt-2"><span class="text-[var(--green)]">$</span> <span class="text-[var(--fg)]">echo $?</span></div>
+                <div class="text-[var(--amber)]">404</div>
+                <div class="pt-3 text-[var(--fg-dim)]">
+                    <span class="text-[var(--fg-muted)]">// </span>{L.message}
+                </div>
+                <div class="text-[var(--fg-dim)]">
+                    <span class="text-[var(--fg-muted)]">// </span>{L.tip}
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            <a href={homeHref} class="btn-cli btn-cli--primary">
+                <span>{L.home}</span>
+            </a>
+            <a href={`${homeHref}#solutions`} class="btn-cli">
+                <span>{L.projects}</span>
+            </a>
+        </div>
+    </div>
+</Layout>
