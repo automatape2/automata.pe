@@ -133,11 +133,11 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
     </a>
 
     <!-- Header panel -->
-    <div class="panel mb-10">
+    <div class="panel mb-8">
         <div class="window-chrome">
             <div class="window-chrome-title">automata@latam: ~/{lang === "es" ? "proyectos" : "projects"}/{project.slug}</div>
         </div>
-        <div class="p-6 md:p-10 grid lg:grid-cols-[1.3fr_1fr] gap-10 items-start">
+        <div class="p-5 md:p-7 grid lg:grid-cols-[1.3fr_1fr] gap-6 lg:gap-10 items-start">
             <div class="space-y-5">
                 <div class="flex items-center gap-3 text-xs text-[var(--fg-muted)] flex-wrap">
                     <span class="inline-flex items-center gap-1.5 px-2 py-1 border border-[var(--line-bright)] text-[var(--green)]">
@@ -191,7 +191,7 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- Quick facts grid -->
     {(project.role || project.timeline || project.team || project.demoUrl) && (
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-0 border border-[var(--line)] mb-10">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-0 border border-[var(--line)] mb-8">
             {project.role && (
                 <div class="p-5 border-r border-[var(--line)]">
                     <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-2">▸ {L.sections.role}</div>
@@ -219,8 +219,8 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 01 · Discovery — hidden for now (toggle the `false &&` below to bring it back) -->
     {false && (project.fullDescription || project.problem || project.audience) && (
-        <section class="mb-12">
-            <div class="border-b border-[var(--line)] pb-4 mb-6">
+        <section class="mb-10">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 01 · {L.sections.discovery}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> cat ./{L.sections.discovery}.md
@@ -251,8 +251,8 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 02 · Design -->
     {(project.designTools || project.designSystem || project.figmaUrl) && (
-        <section class="mb-12">
-            <div class="border-b border-[var(--line)] pb-4 mb-6">
+        <section class="mb-10">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 02 · {L.sections.design}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> cat ./{L.sections.design}.md
@@ -292,8 +292,8 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 03 · Architecture (C4 diagrams: Mermaid view + source editor) -->
     {project.architecture && (
-        <section class="mb-12">
-            <div class="border-b border-[var(--line)] pb-4 mb-6">
+        <section class="mb-10">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 03 · {L.sections.architecture}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> cat ./{L.sections.architecture}.md
@@ -351,8 +351,8 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 04 · Infrastructure -->
     {project.infrastructure && (
-        <section class="mb-12">
-            <div class="border-b border-[var(--line)] pb-4 mb-6">
+        <section class="mb-10">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 04 · {L.sections.infra}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> cat ./{L.sections.infra}.md
@@ -397,8 +397,8 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 05 · Implementation -->
     {(stackGroups.length > 0 || project.codeHighlights) && (
-        <section class="mb-12">
-            <div class="border-b border-[var(--line)] pb-4 mb-6">
+        <section class="mb-10">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 05 · {L.sections.implementation}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> cat ./{L.sections.implementation}.md
@@ -423,7 +423,9 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
                 </div>
             )}
 
-            {project.codeHighlights && project.codeHighlights.map((ch: any) => (
+            {/* Code highlights hidden for now — the algorithm-level snippets live in section 06 (technical challenges).
+                Flip the `false &&` to bring them back as a high-level stack showcase. */}
+            {false && project.codeHighlights && project.codeHighlights.map((ch: any) => (
                 <div class="panel mb-6">
                     <div class="window-chrome"><div class="window-chrome-title">{ch.file || ch.title || "code"}{ch.lang ? `  ·  ${ch.lang}` : ""}</div></div>
                     {ch.note && <div class="px-6 py-3 border-b border-[var(--line)] text-xs text-[var(--fg-muted)]">// {ch.note}</div>}
@@ -435,8 +437,8 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 06 · Technical Challenges -->
     {project.techChallenges && project.techChallenges.length > 0 && (
-        <section class="mb-12">
-            <div class="border-b border-[var(--line)] pb-4 mb-6">
+        <section class="mb-10">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 06 · {L.sections.techChallenges}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> cat ./challenges/*.md
@@ -506,8 +508,8 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 07 · Testing & CI -->
     {project.testing && (
-        <section class="mb-12">
-            <div class="border-b border-[var(--line)] pb-4 mb-6">
+        <section class="mb-10">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 07 · {L.sections.testing}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> cat ./testing.md
@@ -542,8 +544,8 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 07 · Screenshots -->
     {project.screenshots && project.screenshots.length > 0 && (
-        <section class="mb-12">
-            <div class="border-b border-[var(--line)] pb-4 mb-6">
+        <section class="mb-10">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 08 · {L.sections.screenshots}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> ls ./{L.sections.screenshots}
@@ -569,8 +571,8 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
 
     <!-- 08 · Results -->
     {(project.metrics || project.results || project.challenges) && (
-        <section class="mb-12">
-            <div class="border-b border-[var(--line)] pb-4 mb-6">
+        <section class="mb-10">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
                 <div class="text-xs text-[var(--fg-muted)] mb-1">// section 09 · {L.sections.results}</div>
                 <h2 class="heading-mono text-2xl">
                     <span class="text-[var(--green)]">$</span> cat ./{L.sections.results}.md
