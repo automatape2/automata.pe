@@ -4,8 +4,10 @@ import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import ScrollToTop from "../components/ScrollToTop.astro";
 import Footer from "../components/Footer.astro";
 import VisitTracker from "../components/VisitTracker.astro";
+import CommandPalette from "../components/CommandPalette.astro";
 import { getLangFromUrl, getTranslations } from "../i18n/utils";
 import { personalInfo } from "../config/personal";
+import { translations } from "../i18n/translations";
 
 interface Props {
     title: string;
@@ -26,6 +28,22 @@ const {
 const lang = getLangFromUrl(Astro.url);
 const t = getTranslations(lang);
 const homeHref = lang === "es" ? "/" : "/en";
+
+const projectsBase = lang === "es" ? "/es/projects" : "/projects";
+const langItems = (translations[lang] as any).solutions.items as any[];
+const cmdkCommands = [
+    { label: lang === "es" ? "Inicio" : "Home", href: homeHref, tag: "page" },
+    { label: t.nav.solutions, href: `${homeHref}#solutions`, tag: "section" },
+    { label: t.nav.services, href: `${homeHref}#services`, tag: "section" },
+    { label: t.nav.tech, href: `${homeHref}#tech`, tag: "section" },
+    { label: t.nav.contact, href: `${homeHref}#contact`, tag: "section" },
+    ...langItems.map((p: any) => ({
+        label: p.title,
+        sublabel: p.slug,
+        href: `${projectsBase}/${p.slug}`,
+        tag: "project",
+    })),
+];
 
 const defaultDescription = lang === "es"
     ? "Automata — Tecnologia que opera contigo. Consultoria, software, cloud, IoT y automatizacion para empresas que necesitan continuidad operativa."
@@ -142,6 +160,16 @@ const absoluteOgImage = ogImage.startsWith("http")
                             </a>
                         </li>
                     </ul>
+                    <button
+                        type="button"
+                        id="cmdk-trigger"
+                        class="hidden md:inline-flex items-center gap-1.5 px-2 py-1 text-[11px] text-[var(--fg-muted)] border border-[var(--line)] hover:border-[var(--green)] hover:text-[var(--green)] transition-colors mr-2 font-mono"
+                        aria-label="Open command palette"
+                        onclick="document.dispatchEvent(new KeyboardEvent('keydown', {key:'k', metaKey: navigator.platform.toLowerCase().includes('mac'), ctrlKey: !navigator.platform.toLowerCase().includes('mac')}))"
+                    >
+                        <span>⌘</span>
+                        <span>K</span>
+                    </button>
                     <div class="w-px h-5 bg-[var(--line)] mx-3 hidden md:block"></div>
                     <LanguageSwitcher />
                 </div>
@@ -154,6 +182,7 @@ const absoluteOgImage = ogImage.startsWith("http")
 
         <Footer />
         <ScrollToTop />
+        <CommandPalette commands={cmdkCommands} />
         <VisitTracker />
 
         <script src="/sw-register.js" defer></script>

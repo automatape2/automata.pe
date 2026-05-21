@@ -1,0 +1,280 @@
+---
+// CommandPalette — Cmd+K (or Ctrl+K) opens a modal with fuzzy-search over a list of items.
+// Items are passed serialized as JSON to keep the script self-contained per page.
+
+interface Command {
+    label: string;
+    sublabel?: string;
+    href: string;
+    tag?: string;
+}
+
+interface Props {
+    commands: Command[];
+}
+
+const { commands } = Astro.props;
+const commandsJson = JSON.stringify(commands);
+---
+
+<div id="cmdk-overlay" class="cmdk-overlay" data-open="false" aria-hidden="true">
+    <div class="cmdk-panel" role="dialog" aria-modal="true" aria-label="Command palette">
+        <div class="cmdk-header">
+            <span class="cmdk-prompt">$</span>
+            <input
+                id="cmdk-input"
+                type="text"
+                placeholder="search projects, sections…"
+                autocomplete="off"
+                spellcheck="false"
+                aria-label="Search"
+            />
+            <kbd class="cmdk-esc">esc</kbd>
+        </div>
+        <ul id="cmdk-list" class="cmdk-list" role="listbox">
+            <!-- filled by JS -->
+        </ul>
+        <div class="cmdk-footer">
+            <span><kbd>↑↓</kbd> navigate</span>
+            <span><kbd>↵</kbd> open</span>
+            <span><kbd>esc</kbd> close</span>
+            <span class="cmdk-spacer"></span>
+            <span id="cmdk-count">0 results</span>
+        </div>
+    </div>
+</div>
+
+<style is:global>
+    .cmdk-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 12vh;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    .cmdk-overlay[data-open="true"] { display: flex; }
+
+    .cmdk-panel {
+        width: min(560px, calc(100vw - 2rem));
+        max-height: 70vh;
+        background: var(--panel);
+        border: 1px solid var(--line-bright);
+        display: flex;
+        flex-direction: column;
+        animation: cmdk-in 120ms ease-out;
+    }
+    @keyframes cmdk-in {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .cmdk-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+    }
+    .cmdk-prompt { color: var(--green); font-weight: 700; }
+    #cmdk-input {
+        flex: 1;
+        background: transparent;
+        border: 0;
+        outline: none;
+        color: var(--fg);
+        font: inherit;
+        font-size: 14px;
+    }
+    #cmdk-input::placeholder { color: var(--fg-muted); }
+    .cmdk-esc {
+        font-size: 10px;
+        padding: 2px 6px;
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        color: var(--fg-muted);
+    }
+
+    .cmdk-list {
+        list-style: none;
+        margin: 0;
+        padding: 4px 0;
+        overflow-y: auto;
+        flex: 1;
+    }
+    .cmdk-list li { padding: 0; }
+    .cmdk-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 16px;
+        cursor: pointer;
+        color: var(--fg-dim);
+        text-decoration: none;
+        border-left: 2px solid transparent;
+    }
+    .cmdk-item:hover,
+    .cmdk-item[data-selected="true"] {
+        background: rgba(74, 222, 128, 0.06);
+        border-left-color: var(--green);
+        color: var(--fg);
+    }
+    .cmdk-item[data-selected="true"] .cmdk-arrow { opacity: 1; }
+    .cmdk-tag {
+        font-size: 10px;
+        padding: 1px 6px;
+        border: 1px solid var(--line-bright);
+        color: var(--fg-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+    .cmdk-label { flex: 1; font-size: 13px; }
+    .cmdk-sub { font-size: 11px; color: var(--fg-muted); }
+    .cmdk-arrow {
+        opacity: 0;
+        color: var(--green);
+        transition: opacity 120ms;
+    }
+    .cmdk-empty {
+        padding: 16px;
+        text-align: center;
+        color: var(--fg-muted);
+        font-size: 13px;
+    }
+
+    .cmdk-footer {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 10px 16px;
+        border-top: 1px solid var(--line);
+        font-size: 10px;
+        color: var(--fg-muted);
+    }
+    .cmdk-footer kbd {
+        display: inline-block;
+        padding: 1px 5px;
+        font-size: 10px;
+        color: var(--fg-dim);
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        margin-right: 4px;
+    }
+    .cmdk-spacer { flex: 1; }
+</style>
+
+<script define:vars={{ commandsJson }}>
+    const commands = JSON.parse(commandsJson);
+
+    const overlay = document.getElementById("cmdk-overlay");
+    const input = document.getElementById("cmdk-input");
+    const list = document.getElementById("cmdk-list");
+    const count = document.getElementById("cmdk-count");
+    if (!overlay || !input || !list || !count) {
+        console.warn("[CommandPalette] missing DOM nodes");
+    } else {
+        let selected = 0;
+        let filtered = commands.slice();
+
+        // Cheap fuzzy: every query char must appear in label/sublabel/tag in order
+        function fuzzy(query, item) {
+            if (!query) return true;
+            const haystack = `${item.label} ${item.sublabel ?? ""} ${item.tag ?? ""}`.toLowerCase();
+            const q = query.toLowerCase();
+            let hi = 0;
+            for (let qi = 0; qi < q.length; qi++) {
+                hi = haystack.indexOf(q[qi], hi);
+                if (hi === -1) return false;
+                hi++;
+            }
+            return true;
+        }
+
+        function render() {
+            list.innerHTML = "";
+            if (filtered.length === 0) {
+                const li = document.createElement("li");
+                li.innerHTML = `<div class="cmdk-empty">// no matches</div>`;
+                list.appendChild(li);
+                count.textContent = "0 results";
+                return;
+            }
+            filtered.forEach((cmd, i) => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <a class="cmdk-item" data-selected="${i === selected}" href="${cmd.href}">
+                        ${cmd.tag ? `<span class="cmdk-tag">${cmd.tag}</span>` : ""}
+                        <span class="cmdk-label">${cmd.label}</span>
+                        ${cmd.sublabel ? `<span class="cmdk-sub">${cmd.sublabel}</span>` : ""}
+                        <span class="cmdk-arrow">↵</span>
+                    </a>
+                `;
+                list.appendChild(li);
+            });
+            count.textContent = `${filtered.length} result${filtered.length === 1 ? "" : "s"}`;
+        }
+
+        function open() {
+            overlay.setAttribute("data-open", "true");
+            overlay.setAttribute("aria-hidden", "false");
+            input.value = "";
+            filtered = commands.slice();
+            selected = 0;
+            render();
+            setTimeout(() => input.focus(), 10);
+            document.body.style.overflow = "hidden";
+        }
+
+        function close() {
+            overlay.setAttribute("data-open", "false");
+            overlay.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+        }
+
+        function move(delta) {
+            if (filtered.length === 0) return;
+            selected = (selected + delta + filtered.length) % filtered.length;
+            render();
+            const sel = list.querySelector('[data-selected="true"]');
+            sel?.scrollIntoView({ block: "nearest" });
+        }
+
+        function activate() {
+            const item = filtered[selected];
+            if (item) window.location.href = item.href;
+        }
+
+        // Global hotkey
+        document.addEventListener("keydown", (e) => {
+            const isOpen = overlay.getAttribute("data-open") === "true";
+            const isMac = navigator.platform.toLowerCase().includes("mac");
+            const mod = isMac ? e.metaKey : e.ctrlKey;
+            if (mod && e.key.toLowerCase() === "k") {
+                e.preventDefault();
+                isOpen ? close() : open();
+                return;
+            }
+            if (!isOpen) return;
+            if (e.key === "Escape") { e.preventDefault(); close(); }
+            else if (e.key === "ArrowDown") { e.preventDefault(); move(1); }
+            else if (e.key === "ArrowUp") { e.preventDefault(); move(-1); }
+            else if (e.key === "Enter") { e.preventDefault(); activate(); }
+        });
+
+        // Input updates filter
+        input.addEventListener("input", () => {
+            filtered = commands.filter((c) => fuzzy(input.value, c));
+            selected = 0;
+            render();
+        });
+
+        // Click outside the panel closes
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) close();
+        });
+    }
+</script>
