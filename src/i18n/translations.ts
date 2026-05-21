@@ -481,6 +481,260 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                     ]
                 },
                 {
+                    slug: "automata-portfolio",
+                    title: "Automata Portfolio",
+                    description: "Este mismo sitio: portfolio + case studies con estetica terminal, diagramas C4 Mermaid en vivo, Cmd+K, syntax highlighting server-side y deploy estatico.",
+                    tech: ["Astro", "TypeScript", "Tailwind CSS", "Mermaid", "Shiki", "GSAP"],
+                    image: landingpagerImage,
+                    demoUrl: "https://automata.pe",
+                    githubUrl: "https://github.com/automatape2/automata.pe",
+                    type: "producto",
+                    year: "2026",
+                    role: "Diseño · FE · Infra · Contenido",
+                    timeline: "1 semana (sprints con Claude Code)",
+                    team: "Solo founder + LLM pair",
+                    fullDescription: "Portfolio que funciona como case-study template reutilizable. Cada proyecto rendea su propia pagina con discovery, design, arquitectura C4, infra, implementacion, technical challenges, testing y resultados — todo desde un solo objeto en translations.ts. La estetica terminal (mono everywhere, $/▸/// prompts, paleta verde/cyan/negro) atraviesa cada componente para que el medio sea el mensaje: 'soy un ingeniero que envia codigo'.",
+                    problem: "Webflow y Notion-as-portfolio se ven igual que los de todos. Linktree no muestra profundidad tecnica. Necesitaba un sitio que fuera evidencia de craft en vez de catalogo de skills, y que escalara sin pagar por bloque cada proyecto nuevo.",
+                    audience: "Clientes potenciales (CTOs y founders LATAM) que evaluan si confiar sus proyectos a Automata, mas recruiters tecnicos que necesitan ver depth real en menos de 5 minutos.",
+                    designTools: ["Figma (mockups iniciales)", "VS Code (design-in-code)", "Excalidraw (C4 sketches)"],
+                    designSystem: [
+                        "JetBrains Mono en todo el sitio, font-feature-settings activos",
+                        "Paleta: #000 / #0D1117 panel / #4ADE80 green / #06B6D4 cyan / #FBBF24 amber",
+                        "Markers ▸ ○ $ // como puntuacion del lenguaje visual",
+                        "Window-chrome (dots ● ● ●) en cada panel relevante",
+                        "Border-color como hover state principal (sin shadows ni gradients)"
+                    ],
+                    architecture: {
+                        context: {
+                            mermaid: `flowchart TD
+    user((("Visitor / Recruiter<br/><i>evalua depth tecnica</i>")))
+    sys["<b>automata.pe</b><br/><i>Astro SSG</i><br/>portfolio + case studies"]
+    github["<b>GitHub API</b><br/><i>stars, forks, last commit</i>"]
+    formspree["<b>Formspree</b><br/><i>contact form backend</i>"]
+    cal["<b>Cal.com</b><br/><i>book intro call</i>"]
+    plausible["<b>Plausible</b><br/><i>analytics</i>"]
+
+    user -->|browse / Cmd+K| sys
+    sys -->|fetch stats client-side| github
+    sys -->|POST contact form| formspree
+    sys -->|deep link| cal
+    sys -->|page views| plausible
+
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef system fill:#0D1117,stroke:#06B6D4,color:#E5E7EB,stroke-width:1.5px
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class user person
+    class sys system
+    class github,formspree,cal,plausible ext`,
+                            ascii: ""
+                        },
+                        container: {
+                            mermaid: `flowchart TD
+    visitor((("Visitor")))
+
+    subgraph site ["automata.pe (build output)"]
+        direction LR
+        landing["<b>/ (Landing)</b><br/><i>Hero, Services, Solutions, Tech, Contact</i>"]
+        index["<b>/projects</b><br/><i>type + tech filters</i>"]
+        detail["<b>/projects/[slug]</b><br/><i>10 sections case study</i>"]
+        og["<b>/og/[slug].svg</b><br/><i>dynamic OG image</i>"]
+        feeds["<b>/sitemap.xml<br/>/rss.xml<br/>/robots.txt</b>"]
+    end
+
+    cdn["<b>CDN / Edge</b><br/><i>Cloudflare / Vercel</i>"]
+    ghapi["<b>GitHub API</b>"]
+    formspree["<b>Formspree</b>"]
+
+    visitor --> cdn
+    cdn --> landing
+    cdn --> index
+    cdn --> detail
+    detail --> ghapi
+    detail --> formspree
+
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef container fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class visitor person
+    class landing,index,detail,og,feeds container
+    class cdn,ghapi,formspree ext
+
+    style site fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
+                            ascii: ""
+                        },
+                        component: {
+                            mermaid: `flowchart TD
+    subgraph projectDetail ["ProjectDetail.astro &middot; vista de componentes"]
+        direction LR
+        layout["<b>Layout</b><br/><i>OG, JSON-LD, hreflang</i>"]
+        toc["<b>TableOfContents</b><br/><i>sticky + mobile drawer</i>"]
+        master["<b>MasterDetail</b><br/><i>C4 sidebar picker</i>"]
+        mermaid["<b>MermaidViewer</b><br/><i>view / source / share</i>"]
+        carousel["<b>Carousel</b><br/><i>challenges slides</i>"]
+        cmdk["<b>CommandPalette</b><br/><i>Cmd+K fuzzy nav</i>"]
+        lightbox["<b>Lightbox</b><br/><i>screenshots</i>"]
+    end
+
+    layout --> toc
+    layout --> master
+    master --> mermaid
+    layout --> carousel
+    layout --> cmdk
+    layout --> lightbox
+
+    classDef component fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+
+    class layout,toc,master,mermaid,carousel,cmdk,lightbox component
+
+    style projectDetail fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
+                            ascii: ""
+                        }
+                    },
+                    infrastructure: {
+                        provider: "Astro SSG + Edge CDN",
+                        services: [
+                            "Build: Astro 5 con sharp para imagenes",
+                            "Static export: HTML + assets, sin Node runtime",
+                            "Hosting: Vercel / Cloudflare Pages (cualquiera static)",
+                            "DNS: Cloudflare con cache agresiva en /og/*, /sitemap.xml",
+                            "Analytics: Plausible (sin cookies, GDPR)",
+                            "Forms: Formspree (free tier soporta el volumen actual)",
+                            "Embeds: mermaid lazy-load via esm.sh, shiki precompilado en build"
+                        ],
+                        diagram: {
+                            mermaid: `flowchart TD
+    dev[Developer]
+    repo[GitHub repo]
+    ci["GitHub Actions<br/>(future: lighthouse-ci)"]
+    build["Astro build<br/>npm run build"]
+    edge["Cloudflare / Vercel<br/>edge cache"]
+    user[Visitor]
+
+    dev -->|git push| repo
+    repo -->|webhook| ci
+    ci --> build
+    build -->|deploy| edge
+    user --> edge
+
+    classDef edge fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+
+    class dev,user ext
+    class build,edge edge
+    class ci,repo ext`,
+                            ascii: ""
+                        }
+                    },
+                    stack: {
+                        frontend: ["Astro 5 (SSG, content collections-ready)", "TypeScript", "Tailwind CSS 4", "GSAP + ScrollTrigger", "Lenis (smooth scroll)"],
+                        backend: ["—", "(static, sin runtime)"],
+                        data: ["translations.ts (in-memory)", "GitHub API (live fetch)", "Formspree (form submissions)"],
+                        ai: ["Shiki (theming server-side)", "Mermaid (live diagram rendering)", "Claude Code (pair programming en cada sesion)"],
+                        devops: ["Vercel / Cloudflare Pages", "Plausible analytics", "Sitemap + RSS autogenerados"]
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["astro", "compiler", "patterns"],
+                            problem: "Astro rechaza <slot name={dynamic} /> dentro de un .map(): compiler error",
+                            constraint: "MasterDetail necesita renderear paneles distintos por item, pero Astro exige nombres de slot literales en parse-time.",
+                            approach: "Inverti la responsabilidad: en lugar de slot-por-item, MasterDetail expone un solo default slot y los callers marcan sus paneles con data-md-key. El script en MasterDetail toggles visibility basandose en ese atributo.",
+                            algorithm: "Inversion de control: render-prop-via-data-attribute en vez de named-slots. La logica de show/hide vive en el componente generico, el contenido en el caller.",
+                            codeFile: "src/components/MasterDetail.astro",
+                            codeLang: "astro",
+                            code: `<!-- Genérico: no sabe ni le importa qué contenido va en cada pane -->
+<div class="md-grid" data-masterdetail>
+  <nav>{items.map((it, i) => (
+    <button data-md-pick={it.key} data-active={i === 0}>{it.label}</button>
+  ))}</nav>
+  <div><slot /></div> <!-- caller pone los <div data-md-key="..."> -->
+</div>
+
+<!-- Caller: explícito y type-safe -->
+<MasterDetail items={levels}>
+  <div data-md-key="context"><MermaidViewer ... /></div>
+  <div data-md-key="container" class="hidden"><MermaidViewer ... /></div>
+</MasterDetail>`,
+                            outcome: "Componente reusable, compile-time errors desaparecen, sintaxis del caller mas explicita (ve donde va cada pane)."
+                        },
+                        {
+                            tags: ["frontend", "scroll", "css"],
+                            problem: "Carousel con scroll-snap se pelea con Lenis smooth-scroll y vuelve siempre a slide 0",
+                            constraint: "Queriamos scroll horizontal nativo, snap perfecto y compatibilidad con Lenis global. Las tres no se llevan.",
+                            approach: "Abandonar scroll-snap + scrollLeft, pasar a transform: translateX(-N * 100%) sobre el track. El contenedor exterior tiene overflow:hidden, no scroll. Las flechas y dots solo cambian el indice y la transform.",
+                            algorithm: "Carousel transform-based con state externo: el navegador no sabe que hay scroll, solo ve una traduccion. No conflictua con ningun scroll-jacker porque no hay scroll real.",
+                            codeFile: "src/components/Carousel.astro",
+                            codeLang: "typescript",
+                            code: `const update = (i: number) => {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    track.style.transform = \`translateX(-\${current * 100}%)\`;
+    counter.textContent = String(current + 1).padStart(2, "0");
+    dots.forEach((d, di) => d.setAttribute("data-active", String(di === current)));
+    if (prev) prev.disabled = current === 0;
+    if (next) next.disabled = current === slides.length - 1;
+};`,
+                            outcome: "0 conflictos con Lenis. Transicion 300ms con cubic-bezier ease-out se siente nativa, prev/next + arrow keys + dots todos consistentes."
+                        },
+                        {
+                            tags: ["css", "grid", "shiki"],
+                            problem: "Grid con un panel sticky y otro con code highlights explota el viewport horizontal",
+                            constraint: "Layout master-detail con sidebar 200px + contenido 1fr. Los <pre> de Shiki con lineas largas hacen overflow y rompen el grid.",
+                            approach: "El default min-width:auto en grid items les permite crecer al tamaño de su contenido — no a 1fr puro. Cambiar a minmax(0, 1fr) en el grid-template-columns + min-w-0 en el item lo soluciona.",
+                            algorithm: "CSS grid 101: min-width:auto vs minmax(0, 1fr). Un detalle que rompe la mayoria de layouts con code blocks adentro.",
+                            codeFile: "src/components/ProjectDetail.astro",
+                            codeLang: "html",
+                            code: `<!-- ANTES: explota -->
+<div class="lg:grid lg:grid-cols-[200px_1fr]">
+  <aside>...</aside>
+  <div>...code blocks here, overflow grid...</div>
+</div>
+
+<!-- DESPUÉS: min-w-0 + minmax(0, 1fr) -->
+<div class="lg:grid lg:grid-cols-[200px_minmax(0,1fr)]">
+  <aside>...</aside>
+  <div class="min-w-0">...code blocks contained...</div>
+</div>`,
+                            outcome: "Code blocks scrollean internamente (overflow-x: auto), el grid mantiene su ancho. Aplique a Mermaid SVGs tambien — el max-width caso similar."
+                        },
+                        {
+                            tags: ["mermaid", "theming", "ssr"],
+                            problem: "Diagramas C4 de Mermaid llegaban con colores azul/gris hardcoded, sin matchear la paleta terminal",
+                            constraint: "themeCSS y CSS clases no agarraban porque C4 paint shapes con atributos SVG inline (fill='#08427B' directo). Pero queriamos C4 con la paleta del sitio.",
+                            approach: "Migrar de sintaxis C4Context/Container/Component a flowchart TD + classDef. classDef da control total sobre fill, stroke, color por cada nodo, mientras que C4 oculta esa capa.",
+                            algorithm: "Sacrificar la sintaxis 'oficial' por control. El output visual es el mismo (boundary dasheado, person como circulo, etc) pero ahora los estilos son data, no convencion.",
+                            outcome: "Los 3 niveles C4 + el flowchart de infra ahora son visualmente identicos al resto del sitio. Bonus: editables, y el source tab del MermaidViewer muestra exactamente lo que se renderea."
+                        }
+                    ],
+                    testing: {
+                        strategy: "Aun sin tests automaticos (foco fue construir rapido con feedback en vivo via dev server). Plan:\n- Playwright smoke test: cmd+k → seleccionar proyecto → carousel funciona → lightbox abre\n- Lighthouse CI por PR con perf budget > 95\n- TypeScript strict mode para tipar projects[]",
+                        coverage: "—",
+                        tools: ["Playwright (planned)", "Lighthouse CI (planned)", "tsc --noEmit"]
+                    },
+                    metrics: [
+                        { value: "~50 commits", label: "1 semana de sprints" },
+                        { value: "12+", label: "componentes reusables" },
+                        { value: "<2s", label: "TTI en mobile 4G" },
+                        { value: "0 KB", label: "JS en pages sin interactividad" }
+                    ],
+                    challenges: "Dynamic slot names + grid min-width + Mermaid theming + Lenis vs scroll-snap. Los breakdowns estan en section 06.",
+                    results: "Sitio que funciona como pitch + portfolio + sandbox. Cada componente (MasterDetail, Carousel, MermaidViewer, CommandPalette, Lightbox) es reusable en otros proyectos. El template translations.ts → ProjectDetail rendea un case-study completo con solo poblar fields.",
+                    lessons: [
+                        {
+                            title: "Empezar por la estetica condiciona TODA la API del codigo",
+                            body: "El primer commit fue 'paleta + JetBrains Mono'. Esa decision se propago a nombres de variables CSS (--green, --line), a nombres de botones (btn-cli), al diseño de los hovers (border-color en vez de shadow), incluso al naming de las secciones (// section 03). Lo que parecia branding termino siendo la arquitectura."
+                        },
+                        {
+                            title: "Server-side highlights > client-side libraries",
+                            body: "Shiki en frontmatter genera HTML estatico, cero JS al cliente. Mermaid no se puede precompilar (es interactivo) asi que lazy-load via esm.sh. Reglas: si no necesita interactividad en runtime → server-side; si si → CDN lazy."
+                        },
+                        {
+                            title: "Pair-programming con LLM cambia el ratio explorar/construir",
+                            body: "Sesiones de Claude Code permiten probar 4 layouts (stacked → carousel → tabs → master-detail) en lo que tomaria probar uno solo a mano. La consecuencia inesperada: requerir commits granulares como disciplina, porque sino se vuelve imposible auditar que termino aprobando."
+                        }
+                    ]
+                },
+                {
                     slug: "ms_crm",
                     title: "MS CRM",
                     description: "Sistema CRM con automatizacion de seguimiento, segmentos dinamicos y timeline de interacciones para fuerza de ventas.",
@@ -1092,6 +1346,260 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                         {
                             title: "Islands > full hydration as the default",
                             body: "Switching blocks to 'static by default, interactive opt-in' cut shipped JS by 7×. Next time I'd encode that contract in the design system before writing the first block, not after."
+                        }
+                    ]
+                },
+                {
+                    slug: "automata-portfolio",
+                    title: "Automata Portfolio",
+                    description: "This very site: portfolio + case studies with a terminal aesthetic, live C4 Mermaid diagrams, Cmd+K, server-side syntax highlighting and a static deploy.",
+                    tech: ["Astro", "TypeScript", "Tailwind CSS", "Mermaid", "Shiki", "GSAP"],
+                    image: landingpagerImage,
+                    demoUrl: "https://automata.pe",
+                    githubUrl: "https://github.com/automatape2/automata.pe",
+                    type: "product",
+                    year: "2026",
+                    role: "Design · FE · Infra · Content",
+                    timeline: "1 week (Claude Code sprints)",
+                    team: "Solo founder + LLM pair",
+                    fullDescription: "A portfolio that doubles as a reusable case-study template. Each project renders its own page with discovery, design, C4 architecture, infrastructure, implementation, technical challenges, testing and results — all from a single object in translations.ts. The terminal aesthetic (mono everywhere, $/▸/// prompts, green/cyan/black palette) carries through every component so the medium reinforces the message: 'I'm an engineer who ships code.'",
+                    problem: "Webflow and Notion-as-portfolio look the same as everyone else's. Linktree doesn't convey technical depth. I wanted a site that was evidence of craft rather than a skill checklist, and that would scale without paying per block for each new project.",
+                    audience: "Potential clients (LATAM CTOs and founders) evaluating whether to trust Automata with their projects, plus technical recruiters who need to see real depth in under 5 minutes.",
+                    designTools: ["Figma (initial mockups)", "VS Code (design-in-code)", "Excalidraw (C4 sketches)"],
+                    designSystem: [
+                        "JetBrains Mono everywhere, font-feature-settings active",
+                        "Palette: #000 / #0D1117 panel / #4ADE80 green / #06B6D4 cyan / #FBBF24 amber",
+                        "Markers ▸ ○ $ // as punctuation of the visual language",
+                        "Window-chrome (dots ● ● ●) on every relevant panel",
+                        "Border-color as primary hover state (no shadows, no gradients)"
+                    ],
+                    architecture: {
+                        context: {
+                            mermaid: `flowchart TD
+    user((("Visitor / Recruiter<br/><i>evaluating technical depth</i>")))
+    sys["<b>automata.pe</b><br/><i>Astro SSG</i><br/>portfolio + case studies"]
+    github["<b>GitHub API</b><br/><i>stars, forks, last commit</i>"]
+    formspree["<b>Formspree</b><br/><i>contact form backend</i>"]
+    cal["<b>Cal.com</b><br/><i>book intro call</i>"]
+    plausible["<b>Plausible</b><br/><i>analytics</i>"]
+
+    user -->|browse / Cmd+K| sys
+    sys -->|fetch stats client-side| github
+    sys -->|POST contact form| formspree
+    sys -->|deep link| cal
+    sys -->|page views| plausible
+
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef system fill:#0D1117,stroke:#06B6D4,color:#E5E7EB,stroke-width:1.5px
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class user person
+    class sys system
+    class github,formspree,cal,plausible ext`,
+                            ascii: ""
+                        },
+                        container: {
+                            mermaid: `flowchart TD
+    visitor((("Visitor")))
+
+    subgraph site ["automata.pe (build output)"]
+        direction LR
+        landing["<b>/ (Landing)</b><br/><i>Hero, Services, Solutions, Tech, Contact</i>"]
+        index["<b>/projects</b><br/><i>type + tech filters</i>"]
+        detail["<b>/projects/[slug]</b><br/><i>10-section case study</i>"]
+        og["<b>/og/[slug].svg</b><br/><i>dynamic OG image</i>"]
+        feeds["<b>/sitemap.xml<br/>/rss.xml<br/>/robots.txt</b>"]
+    end
+
+    cdn["<b>CDN / Edge</b><br/><i>Cloudflare / Vercel</i>"]
+    ghapi["<b>GitHub API</b>"]
+    formspree["<b>Formspree</b>"]
+
+    visitor --> cdn
+    cdn --> landing
+    cdn --> index
+    cdn --> detail
+    detail --> ghapi
+    detail --> formspree
+
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef container fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class visitor person
+    class landing,index,detail,og,feeds container
+    class cdn,ghapi,formspree ext
+
+    style site fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
+                            ascii: ""
+                        },
+                        component: {
+                            mermaid: `flowchart TD
+    subgraph projectDetail ["ProjectDetail.astro &middot; component view"]
+        direction LR
+        layout["<b>Layout</b><br/><i>OG, JSON-LD, hreflang</i>"]
+        toc["<b>TableOfContents</b><br/><i>sticky + mobile drawer</i>"]
+        master["<b>MasterDetail</b><br/><i>C4 sidebar picker</i>"]
+        mermaid["<b>MermaidViewer</b><br/><i>view / source / share</i>"]
+        carousel["<b>Carousel</b><br/><i>challenge slides</i>"]
+        cmdk["<b>CommandPalette</b><br/><i>Cmd+K fuzzy nav</i>"]
+        lightbox["<b>Lightbox</b><br/><i>screenshots</i>"]
+    end
+
+    layout --> toc
+    layout --> master
+    master --> mermaid
+    layout --> carousel
+    layout --> cmdk
+    layout --> lightbox
+
+    classDef component fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+
+    class layout,toc,master,mermaid,carousel,cmdk,lightbox component
+
+    style projectDetail fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
+                            ascii: ""
+                        }
+                    },
+                    infrastructure: {
+                        provider: "Astro SSG + Edge CDN",
+                        services: [
+                            "Build: Astro 5 with sharp for image transforms",
+                            "Static export: HTML + assets, no Node runtime",
+                            "Hosting: Vercel / Cloudflare Pages (any static host)",
+                            "DNS: Cloudflare with aggressive cache on /og/*, /sitemap.xml",
+                            "Analytics: Plausible (cookieless, GDPR)",
+                            "Forms: Formspree (free tier handles current volume)",
+                            "Embeds: mermaid lazy-loaded via esm.sh, shiki precompiled at build"
+                        ],
+                        diagram: {
+                            mermaid: `flowchart TD
+    dev[Developer]
+    repo[GitHub repo]
+    ci["GitHub Actions<br/>(future: lighthouse-ci)"]
+    build["Astro build<br/>npm run build"]
+    edge["Cloudflare / Vercel<br/>edge cache"]
+    user[Visitor]
+
+    dev -->|git push| repo
+    repo -->|webhook| ci
+    ci --> build
+    build -->|deploy| edge
+    user --> edge
+
+    classDef edge fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+
+    class dev,user ext
+    class build,edge edge
+    class ci,repo ext`,
+                            ascii: ""
+                        }
+                    },
+                    stack: {
+                        frontend: ["Astro 5 (SSG, content collections-ready)", "TypeScript", "Tailwind CSS 4", "GSAP + ScrollTrigger", "Lenis (smooth scroll)"],
+                        backend: ["—", "(static, no runtime)"],
+                        data: ["translations.ts (in-memory)", "GitHub API (live fetch)", "Formspree (form submissions)"],
+                        ai: ["Shiki (server-side theming)", "Mermaid (live diagram rendering)", "Claude Code (pair-programming each session)"],
+                        devops: ["Vercel / Cloudflare Pages", "Plausible analytics", "Auto-generated sitemap + RSS"]
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["astro", "compiler", "patterns"],
+                            problem: "Astro rejects <slot name={dynamic} /> inside a .map(): compiler error",
+                            constraint: "MasterDetail needs to render different panes per item, but Astro requires literal slot names at parse-time.",
+                            approach: "I inverted the responsibility: instead of slot-per-item, MasterDetail exposes a single default slot and callers tag their panes with data-md-key. The MasterDetail script toggles visibility based on that attribute.",
+                            algorithm: "Inversion of control: render-prop-via-data-attribute instead of named-slots. The show/hide logic lives in the generic component, the content in the caller.",
+                            codeFile: "src/components/MasterDetail.astro",
+                            codeLang: "astro",
+                            code: `<!-- Generic: doesn't know what content each pane holds -->
+<div class="md-grid" data-masterdetail>
+  <nav>{items.map((it, i) => (
+    <button data-md-pick={it.key} data-active={i === 0}>{it.label}</button>
+  ))}</nav>
+  <div><slot /></div> <!-- caller drops <div data-md-key="..."> -->
+</div>
+
+<!-- Caller: explicit and type-safe -->
+<MasterDetail items={levels}>
+  <div data-md-key="context"><MermaidViewer ... /></div>
+  <div data-md-key="container" class="hidden"><MermaidViewer ... /></div>
+</MasterDetail>`,
+                            outcome: "Reusable component, compile-time errors gone, caller syntax stays explicit (you can see where each pane lives)."
+                        },
+                        {
+                            tags: ["frontend", "scroll", "css"],
+                            problem: "Carousel with scroll-snap fights Lenis smooth-scroll and snaps back to slide 0",
+                            constraint: "We wanted native horizontal scroll, perfect snapping and compatibility with the global Lenis instance. The three don't play well together.",
+                            approach: "Drop scroll-snap + scrollLeft entirely, switch to transform: translateX(-N * 100%) on the track. The outer wrapper has overflow:hidden, no scroll. Arrows and dots just change the index and the transform.",
+                            algorithm: "Transform-based carousel with external state: the browser never sees a scroll, only a translation. Nothing conflicts because there's no real scroll.",
+                            codeFile: "src/components/Carousel.astro",
+                            codeLang: "typescript",
+                            code: `const update = (i: number) => {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    track.style.transform = \`translateX(-\${current * 100}%)\`;
+    counter.textContent = String(current + 1).padStart(2, "0");
+    dots.forEach((d, di) => d.setAttribute("data-active", String(di === current)));
+    if (prev) prev.disabled = current === 0;
+    if (next) next.disabled = current === slides.length - 1;
+};`,
+                            outcome: "0 conflicts with Lenis. 300ms cubic-bezier ease-out transition feels native; prev/next + arrow keys + dots all stay in sync."
+                        },
+                        {
+                            tags: ["css", "grid", "shiki"],
+                            problem: "Grid with a sticky pane next to code highlights blows the viewport horizontally",
+                            constraint: "Master-detail layout: 200px sidebar + 1fr content. Shiki <pre> blocks with long lines overflow and force the grid wider than the viewport.",
+                            approach: "Default min-width:auto on grid items lets them grow to their content size — not honor 1fr cleanly. Switch to minmax(0, 1fr) on grid-template-columns + min-w-0 on the item and it behaves.",
+                            algorithm: "CSS grid 101: min-width:auto vs minmax(0, 1fr). A detail that breaks most layouts containing code blocks.",
+                            codeFile: "src/components/ProjectDetail.astro",
+                            codeLang: "html",
+                            code: `<!-- BEFORE: blows up -->
+<div class="lg:grid lg:grid-cols-[200px_1fr]">
+  <aside>...</aside>
+  <div>...code blocks here overflow the grid...</div>
+</div>
+
+<!-- AFTER: min-w-0 + minmax(0, 1fr) -->
+<div class="lg:grid lg:grid-cols-[200px_minmax(0,1fr)]">
+  <aside>...</aside>
+  <div class="min-w-0">...code blocks now contained...</div>
+</div>`,
+                            outcome: "Code blocks scroll internally (overflow-x: auto), the grid keeps its width. Same pattern applied to Mermaid SVGs — max-width capped, content contained."
+                        },
+                        {
+                            tags: ["mermaid", "theming", "ssr"],
+                            problem: "Mermaid C4 diagrams shipped with hard-coded blue/gray colors, ignoring the terminal palette",
+                            constraint: "themeCSS and CSS classes didn't take because C4 paints shapes with inline SVG attributes (fill='#08427B' directly). But we wanted C4 to look like the rest of the site.",
+                            approach: "Migrated the syntax from C4Context/Container/Component to flowchart TD + classDef. classDef gives total control over fill, stroke, color per node, where C4 hides that layer behind convention.",
+                            algorithm: "Trade the 'official' syntax for control. Visual output stays the same (dashed boundary, person as circle, etc) but styles are data now, not convention.",
+                            outcome: "The three C4 levels + the infra flowchart now match the rest of the site visually. Bonus: they're editable, and the MermaidViewer source tab shows exactly what's rendered."
+                        }
+                    ],
+                    testing: {
+                        strategy: "No automated tests yet (focus was speed with live dev-server feedback). Plan:\n- Playwright smoke test: Cmd+K → pick project → carousel works → lightbox opens\n- Lighthouse CI per PR with perf budget > 95\n- TypeScript strict mode to type projects[]",
+                        coverage: "—",
+                        tools: ["Playwright (planned)", "Lighthouse CI (planned)", "tsc --noEmit"]
+                    },
+                    metrics: [
+                        { value: "~50 commits", label: "1 week of sprints" },
+                        { value: "12+", label: "reusable components" },
+                        { value: "<2s", label: "TTI on 4G mobile" },
+                        { value: "0 KB", label: "JS on non-interactive pages" }
+                    ],
+                    challenges: "Dynamic slot names + grid min-width + Mermaid theming + Lenis vs scroll-snap. The breakdowns are in section 06.",
+                    results: "A site that works as pitch + portfolio + sandbox. Every component (MasterDetail, Carousel, MermaidViewer, CommandPalette, Lightbox) is reusable in other projects. The translations.ts → ProjectDetail template renders a full case study just by filling fields.",
+                    lessons: [
+                        {
+                            title: "Starting with the aesthetic conditions the ENTIRE code API",
+                            body: "The first commit was 'palette + JetBrains Mono'. That decision propagated to CSS variable names (--green, --line), button names (btn-cli), hover design (border-color instead of shadow), even section naming (// section 03). What looked like branding turned out to be the architecture."
+                        },
+                        {
+                            title: "Server-side highlights > client-side libraries",
+                            body: "Shiki in the frontmatter outputs static HTML, zero client JS. Mermaid can't be precompiled (it's interactive), so lazy-load via esm.sh. Rule: if it doesn't need runtime interactivity → server-side; if it does → lazy CDN."
+                        },
+                        {
+                            title: "LLM pair-programming changes the explore/build ratio",
+                            body: "Claude Code sessions let me try 4 layouts (stacked → carousel → tabs → master-detail) in the time it would take to try one by hand. The unexpected consequence: I had to enforce granular commits as discipline, otherwise auditing what I had approved became impossible."
                         }
                     ]
                 },
