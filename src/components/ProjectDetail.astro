@@ -233,6 +233,10 @@ if (project.lessons && project.lessons.length > 0) {
 
 <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12 lg:grid lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-10">
 
+    <div class="lg:order-1">
+        <TableOfContents items={tocItems} title={lang === "es" ? "// secciones" : "// sections"} />
+    </div>
+
     <div class="lg:order-2 min-w-0">
 
     <!-- Back link -->
@@ -839,9 +843,6 @@ if (project.lessons && project.lessons.length > 0) {
 
     </div><!-- /lg:order-2 content column -->
 
-    <div class="hidden lg:block lg:order-1">
-        <TableOfContents items={tocItems} title={lang === "es" ? "// secciones" : "// sections"} />
-    </div>
 </div>
 
 <script>

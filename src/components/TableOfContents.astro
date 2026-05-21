@@ -1,8 +1,6 @@
 ---
-// TableOfContents — sticky left sidebar with scroll-spy.
+// TableOfContents — sticky sidebar on lg+, collapsible drawer on mobile.
 // Caller passes a list of { id, label, sublabel? } matching real section ids in the page.
-// On lg+ viewports the TOC sticks to the top while scrolling. IntersectionObserver
-// highlights the section currently in view.
 
 interface Item {
     id: string;
@@ -18,7 +16,36 @@ interface Props {
 const { items, title = "// contents" } = Astro.props;
 ---
 
-<aside class="toc" data-toc>
+<!-- Mobile: collapsible <details> drawer -->
+<details class="toc-mobile lg:hidden mb-6" data-toc-mobile>
+    <summary class="toc-mobile-summary">
+        <span class="flex items-center gap-2">
+            <span class="text-[var(--green)]">▸</span>
+            <span class="text-[var(--fg-dim)]">{title.replace(/^\/\/\s*/, "")} <span class="text-[var(--fg-muted)]">({items.length})</span></span>
+        </span>
+        <span class="toc-mobile-chevron">▾</span>
+    </summary>
+    <nav class="toc-mobile-list" data-toc>
+        {items.map((it, i) => (
+            <a
+                href={`#${it.id}`}
+                data-toc-link={it.id}
+                data-active={i === 0 ? "true" : "false"}
+                class="toc-link"
+            >
+                <span class="toc-row">
+                    <span class="toc-marker"></span>
+                    <span class="toc-num">{String(i + 1).padStart(2, "0")}</span>
+                    <span class="toc-label">{it.label}</span>
+                </span>
+                {it.sublabel && <span class="toc-sub">{it.sublabel}</span>}
+            </a>
+        ))}
+    </nav>
+</details>
+
+<!-- Desktop: sticky sidebar -->
+<aside class="toc-desktop" data-toc>
     <div class="toc-title">{title}</div>
     <ul>
         {items.map((it, i) => (
@@ -27,6 +54,7 @@ const { items, title = "// contents" } = Astro.props;
                     href={`#${it.id}`}
                     data-toc-link={it.id}
                     data-active={i === 0 ? "true" : "false"}
+                    class="toc-link"
                 >
                     <span class="toc-row">
                         <span class="toc-marker"></span>
@@ -41,9 +69,39 @@ const { items, title = "// contents" } = Astro.props;
 </aside>
 
 <style>
-    .toc { display: none; }
+    /* ============ Mobile drawer ============ */
+    .toc-mobile {
+        border: 1px solid var(--line);
+        background: rgba(10, 10, 10, 0.4);
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    .toc-mobile-summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 10px 12px;
+        font-size: 12px;
+        color: var(--fg-dim);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .toc-mobile-summary::-webkit-details-marker { display: none; }
+    .toc-mobile-chevron {
+        color: var(--fg-muted);
+        transition: transform 200ms;
+    }
+    .toc-mobile[open] .toc-mobile-chevron { transform: rotate(180deg); }
+    .toc-mobile-list {
+        display: flex;
+        flex-direction: column;
+        padding: 4px;
+        border-top: 1px solid var(--line);
+    }
+
+    /* ============ Desktop sticky sidebar ============ */
+    .toc-desktop { display: none; }
     @media (min-width: 1024px) {
-        .toc {
+        .toc-desktop {
             display: block;
             position: sticky;
             top: 5.5rem;
@@ -59,9 +117,11 @@ const { items, title = "// contents" } = Astro.props;
         margin-bottom: 12px;
         padding: 0 8px;
     }
-    .toc ul { list-style: none; padding: 0; margin: 0; }
-    .toc li + li { margin-top: 2px; }
-    .toc a {
+    .toc-desktop ul { list-style: none; padding: 0; margin: 0; }
+    .toc-desktop li + li { margin-top: 2px; }
+
+    /* ============ Shared link styling ============ */
+    .toc-link {
         display: flex;
         flex-direction: column;
         gap: 2px;
@@ -72,25 +132,26 @@ const { items, title = "// contents" } = Astro.props;
         border-left: 2px solid transparent;
         transition: color 120ms, border-color 120ms, background-color 120ms;
     }
-    .toc .toc-row { display: flex; align-items: center; gap: 8px; }
-    .toc .toc-marker { display: inline-block; width: 8px; color: var(--fg-muted); }
-    .toc .toc-marker::before { content: "○"; font-size: 10px; }
-    .toc .toc-num { color: var(--fg-muted); font-variant-numeric: tabular-nums; }
-    .toc .toc-label { color: var(--fg-dim); }
-    .toc .toc-sub { font-size: 10px; color: var(--fg-muted); padding-left: 30px; }
-    .toc a:hover { color: var(--green); background: rgba(74, 222, 128, 0.03); }
-    .toc a:hover .toc-label { color: var(--green); }
+    .toc-row { display: flex; align-items: center; gap: 8px; }
+    .toc-marker { display: inline-block; width: 8px; color: var(--fg-muted); }
+    .toc-marker::before { content: "\25CB"; font-size: 10px; }
+    .toc-num { color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+    .toc-label { color: var(--fg-dim); }
+    .toc-sub { font-size: 10px; color: var(--fg-muted); padding-left: 30px; }
+    .toc-link:hover { color: var(--green); background: rgba(74, 222, 128, 0.03); }
+    .toc-link:hover .toc-label { color: var(--green); }
 
-    .toc a[data-active="true"] {
+    .toc-link[data-active="true"] {
         border-left-color: var(--green);
         background: rgba(74, 222, 128, 0.05);
     }
-    .toc a[data-active="true"] .toc-marker { color: var(--green); }
-    .toc a[data-active="true"] .toc-marker::before { content: "▸"; }
-    .toc a[data-active="true"] .toc-label { color: var(--fg); font-weight: 600; }
+    .toc-link[data-active="true"] .toc-marker { color: var(--green); }
+    .toc-link[data-active="true"] .toc-marker::before { content: "\25B8"; }
+    .toc-link[data-active="true"] .toc-label { color: var(--fg); font-weight: 600; }
 </style>
 
 <script>
+    // Wire BOTH mobile drawer and desktop sidebar links to the same scroll-spy
     document.querySelectorAll<HTMLElement>("[data-toc]").forEach((toc) => {
         const links = toc.querySelectorAll<HTMLAnchorElement>("[data-toc-link]");
         if (links.length === 0) return;
@@ -99,15 +160,16 @@ const { items, title = "// contents" } = Astro.props;
         links.forEach((link) => {
             const id = link.getAttribute("data-toc-link") || "";
             const el = document.getElementById(id);
-            if (el) sectionEls.push({ id, el });
+            if (el && !sectionEls.find((s) => s.id === id)) sectionEls.push({ id, el });
         });
         if (sectionEls.length === 0) return;
 
         const setActive = (id: string) => {
-            links.forEach((l) => l.setAttribute("data-active", String(l.getAttribute("data-toc-link") === id)));
+            document.querySelectorAll<HTMLAnchorElement>(`[data-toc-link]`).forEach((l) => {
+                l.setAttribute("data-active", String(l.getAttribute("data-toc-link") === id));
+            });
         };
 
-        // Track which sections are in view; the topmost visible section wins.
         const visible = new Set<string>();
         const io = new IntersectionObserver(
             (entries) => {
@@ -118,7 +180,6 @@ const { items, title = "// contents" } = Astro.props;
                     else visible.delete(id);
                 });
                 if (visible.size === 0) return;
-                // Pick the first section (in document order) that's currently visible
                 for (const s of sectionEls) {
                     if (visible.has(s.id)) {
                         setActive(s.id);
@@ -129,5 +190,13 @@ const { items, title = "// contents" } = Astro.props;
             { rootMargin: "-20% 0px -60% 0px", threshold: 0 }
         );
         sectionEls.forEach((s) => io.observe(s.el));
+    });
+
+    // Close mobile drawer after a click (so it doesn't stay open while you scroll)
+    document.querySelectorAll<HTMLElement>("[data-toc-mobile] a").forEach((a) => {
+        a.addEventListener("click", () => {
+            const drawer = a.closest<HTMLDetailsElement>("[data-toc-mobile]");
+            if (drawer) drawer.open = false;
+        });
     });
 </script>
