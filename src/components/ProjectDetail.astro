@@ -41,6 +41,24 @@ const automataShikiTheme: any = {
     ],
 };
 
+// Word count + reading time across all human-readable project text (code excluded).
+function collectWords(value: any, out: string[]): void {
+    if (value == null) return;
+    if (typeof value === "string") out.push(value);
+    else if (Array.isArray(value)) value.forEach((v) => collectWords(v, out));
+    else if (typeof value === "object") {
+        for (const [k, v] of Object.entries(value)) {
+            // skip raw code, mermaid sources and ascii art — they aren't "reading" text
+            if (["code", "mermaid", "ascii", "image", "screenshots"].includes(k)) continue;
+            collectWords(v, out);
+        }
+    }
+}
+const _wordBuf: string[] = [];
+collectWords(project, _wordBuf);
+const wordCount = _wordBuf.join(" ").trim().split(/\s+/).filter(Boolean).length;
+const readingMinutes = Math.max(1, Math.round(wordCount / 220));
+
 // Pre-highlight all code snippets in techChallenges (server-side, zero client cost)
 const challenges = await Promise.all(
     ((project.techChallenges || []) as any[]).map(async (ch) => ({
@@ -234,6 +252,10 @@ if (project.metrics || project.results || project.challenges) {
                     <span class="text-[var(--line-bright)]">·</span>
                     <span class="font-mono">slug: {project.slug}</span>
                     {project.year && (<><span class="text-[var(--line-bright)]">·</span><span class="font-mono">{project.year}</span></>)}
+                    <span class="text-[var(--line-bright)]">·</span>
+                    <span class="font-mono">{readingMinutes} min read</span>
+                    <span class="text-[var(--line-bright)]">·</span>
+                    <span class="font-mono">{wordCount.toLocaleString()} words</span>
                 </div>
 
                 <h1 class="heading-mono text-[clamp(2rem,5vw,3.5rem)] text-[var(--fg)]">
