@@ -630,6 +630,16 @@ if (project.lessons && project.lessons.length > 0) {
                                         <span class="truncate">{ch.codeFile || `snippet-${i + 1}`}</span>
                                         <span class="flex items-center gap-3 shrink-0">
                                             {ch.codeLang && <span>{ch.codeLang}</span>}
+                                            {ch.codeSandbox && (
+                                                <button
+                                                    type="button"
+                                                    data-code-sandbox
+                                                    data-sandbox-template={ch.codeSandbox}
+                                                    data-sandbox-file={ch.codeFile || `snippet-${i + 1}.${ch.codeLang === "typescript" ? "ts" : "js"}`}
+                                                    class="px-2 py-0.5 border border-[var(--line)] text-[var(--fg-muted)] hover:border-[var(--green)] hover:text-[var(--green)] transition-colors"
+                                                    aria-label="Open in StackBlitz"
+                                                >[ ▸ stackblitz ]</button>
+                                            )}
                                             <button
                                                 type="button"
                                                 data-code-copy
@@ -925,6 +935,39 @@ if (project.lessons && project.lessons.length > 0) {
         } catch {
             // repo private / 404 / rate-limited — just leave the dashes and dim style
         }
+    });
+
+    // Open snippet in StackBlitz (POST API)
+    document.querySelectorAll<HTMLButtonElement>("[data-code-sandbox]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const block = btn.closest<HTMLElement>("[data-code-block]");
+            const source = block?.querySelector<HTMLTemplateElement>("[data-code-source]")?.content?.textContent ?? "";
+            const template = btn.getAttribute("data-sandbox-template") || "typescript";
+            const filename = btn.getAttribute("data-sandbox-file") || "snippet.ts";
+
+            const form = document.createElement("form");
+            form.action = "https://stackblitz.com/run";
+            form.method = "POST";
+            form.target = "_blank";
+            form.style.display = "none";
+
+            const addField = (name: string, value: string) => {
+                const i = document.createElement("input");
+                i.type = "hidden";
+                i.name = name;
+                i.value = value;
+                form.appendChild(i);
+            };
+
+            addField("project[template]", template);
+            addField("project[title]", `Snippet · ${filename}`);
+            addField("project[description]", "Opened from automata.pe");
+            addField(`project[files][${filename}]`, source);
+
+            document.body.appendChild(form);
+            form.submit();
+            form.remove();
+        });
     });
 
     // Copy code-block source to clipboard

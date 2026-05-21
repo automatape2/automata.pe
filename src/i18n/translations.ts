@@ -666,6 +666,7 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                             algorithm: "Carousel transform-based con state externo: el navegador no sabe que hay scroll, solo ve una traduccion. No conflictua con ningun scroll-jacker porque no hay scroll real.",
                             codeFile: "src/components/Carousel.astro",
                             codeLang: "typescript",
+                            codeSandbox: "typescript",
                             code: `const update = (i: number) => {
     current = Math.max(0, Math.min(slides.length - 1, i));
     track.style.transform = \`translateX(-\${current * 100}%)\`;
@@ -1535,6 +1536,7 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                             algorithm: "Transform-based carousel with external state: the browser never sees a scroll, only a translation. Nothing conflicts because there's no real scroll.",
                             codeFile: "src/components/Carousel.astro",
                             codeLang: "typescript",
+                            codeSandbox: "typescript",
                             code: `const update = (i: number) => {
     current = Math.max(0, Math.min(slides.length - 1, i));
     track.style.transform = \`translateX(-\${current * 100}%)\`;
