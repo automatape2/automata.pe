@@ -1,7 +1,4 @@
 ---
-import { Image } from "astro:assets";
-import robotImage from "../assets/robot.png";
-
 interface Props {
     t: {
         greeting: string;
@@ -19,158 +16,83 @@ interface Props {
 }
 
 const { t } = Astro.props;
+const stamp = new Date().toISOString().slice(0, 10);
 ---
 
-<section class="min-h-[90vh] flex items-center py-20" data-parallax>
-    <div class="grid md:grid-cols-2 gap-12 items-center w-full">
-        <!-- Left side: Text content -->
-        <div class="space-y-6">
-            <span
-                data-animate="fade-up"
-                class="inline-block text-cyan-400 font-medium tracking-wider text-sm tag-modern"
-            >
-                {t.greeting}
-            </span>
-            <h1
-                data-animate="fade-up"
-                data-delay="0.1"
-                class="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight"
-            >
-                {t.title}<span class="gradient-text">{t.titleHighlight}</span
-                >{t.titleEnd}
-            </h1>
-            <p
-                data-animate="fade-up"
-                data-delay="0.2"
-                class="text-base md:text-lg text-slate-400 max-w-xl leading-relaxed"
-            >
+<section class="min-h-[90vh] flex items-center py-16 md:py-24">
+    <div class="w-full grid lg:grid-cols-[1.4fr_1fr] gap-10 lg:gap-16 items-center">
+
+        <!-- Left: terminal prompt -->
+        <div class="space-y-8">
+            <div class="flex items-center gap-3 text-xs text-[var(--fg-muted)] tracking-wider">
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--green)] animate-pulse"></span>
+                <span>SYSTEM ONLINE</span>
+                <span class="text-[var(--line-bright)]">·</span>
+                <span>{stamp}</span>
+                <span class="text-[var(--line-bright)]">·</span>
+                <span>{t.greeting}</span>
+            </div>
+
+            <div data-animate="fade-up">
+                <div class="text-sm text-[var(--green)] mb-4 font-medium">
+                    <span class="text-[var(--green)]">$</span> automata --init
+                </div>
+                <h1 class="heading-mono text-[clamp(2.5rem,6.5vw,5.5rem)] text-[var(--fg)]">
+                    <span class="block text-[var(--fg-muted)]">{'>'} {t.title.trim()}</span>
+                    <span class="block text-[var(--green)] glow-green-soft cursor-blink">{t.titleHighlight}{t.titleEnd ? ` ${t.titleEnd}` : ''}</span>
+                </h1>
+            </div>
+
+            <p data-animate="fade-up" data-delay="0.1" class="text-comment text-base md:text-[15px] text-[var(--fg-dim)] max-w-2xl leading-relaxed">
                 {t.description}
             </p>
-            <div
-                data-animate="fade-up"
-                data-delay="0.3"
-                class="flex flex-wrap gap-4 pt-4"
-            >
-                <a href="#solutions" class="btn-modern btn-primary magnetic">
-                    <span>{t.cta1}</span>
+
+            <div data-animate="fade-up" data-delay="0.2" class="flex flex-wrap gap-3 pt-2">
+                <a href="#solutions" class="btn-cli btn-cli--primary">
+                    <span>./{t.cta1.toLowerCase().replace(/\s+/g, '-')}.sh</span>
                 </a>
-                <a href="#contact" class="btn-modern btn-outline magnetic">
-                    <span>{t.cta2}</span>
+                <a href="#contact" class="btn-cli">
+                    <span>cat ./{t.cta2.toLowerCase().replace(/\s+/g, '-')}.md</span>
                 </a>
             </div>
 
-            <!-- Social Media Links -->
-            <div
-                data-animate="fade-up"
-                data-delay="0.4"
-                class="flex gap-4 pt-6"
-            >
-                <a
-                    href={t.socialLinks.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="magnetic w-12 h-12 flex items-center justify-center rounded-full glass hover:glow-cyan transition-all group"
-                    aria-label="GitHub"
-                >
-                    <svg
-                        class="w-6 h-6 text-slate-400 group-hover:text-cyan-400 transition-colors"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
-                        ></path>
-                    </svg>
-                </a>
-
-                <a
-                    href={t.socialLinks.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="magnetic w-12 h-12 flex items-center justify-center rounded-full glass hover:glow-purple transition-all group"
-                    aria-label="LinkedIn"
-                >
-                    <svg
-                        class="w-6 h-6 text-slate-400 group-hover:text-purple-400 transition-colors"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-                        ></path>
-                    </svg>
-                </a>
+            <!-- Social Links - terminal style -->
+            <div data-animate="fade-up" data-delay="0.3" class="flex items-center gap-5 pt-4">
+                <span class="text-xs text-[var(--fg-muted)]">// connect:</span>
+                <a href={t.socialLinks.github} target="_blank" rel="noopener noreferrer" class="link-mono text-sm" aria-label="GitHub">github</a>
+                <a href={t.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" class="link-mono text-sm" aria-label="LinkedIn">linkedin</a>
             </div>
         </div>
 
-        <!-- Right side: Robot image -->
-        <div
-            data-animate="scale"
-            data-delay="0.2"
-            class="relative flex justify-center items-center"
-        >
-            <!-- Animated glow rings -->
-            <div
-                class="absolute w-[400px] h-[400px] rounded-full border border-cyan-500/20 animate-[spin_20s_linear_infinite]"
-            >
+        <!-- Right: terminal window with ASCII -->
+        <div data-animate="fade-left" data-delay="0.15" class="panel relative">
+            <div class="window-chrome">
+                <div class="window-chrome-title">automata@latam: ~/operations</div>
             </div>
-            <div
-                class="absolute w-[350px] h-[350px] rounded-full border border-purple-500/20 animate-[spin_15s_linear_infinite_reverse]"
-            >
-            </div>
-
-            <!-- Animated glow effect -->
-            <div
-                class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-full blur-[100px] animate-pulse"
-            >
-            </div>
-
-            <!-- Robot image container -->
-            <div
-                class="relative z-10 transform hover:scale-105 transition-transform duration-500"
-            >
-                <Image
-                    src={robotImage}
-                    alt="Happy automation robot"
-                    class="w-full max-w-md h-auto drop-shadow-[0_0_80px_rgba(6,182,212,0.4)]"
-                    loading="eager"
-                    fetchpriority="high"
-                    width={500}
-                    height={500}
-                    format="webp"
-                />
+            <div class="p-6 md:p-7 font-mono text-[13px] leading-[1.7] space-y-2">
+                <div><span class="text-[var(--green)]">$</span> <span class="text-[var(--fg)]">automata status</span></div>
+                <div class="text-[var(--fg-muted)]">[OK]  building automations for LATAM operations</div>
+                <div class="text-[var(--fg-muted)]">[OK]  loading consultancy modules ............. <span class="text-[var(--green)]">ready</span></div>
+                <div class="text-[var(--fg-muted)]">[OK]  software factory ........................ <span class="text-[var(--green)]">ready</span></div>
+                <div class="text-[var(--fg-muted)]">[OK]  cloud + IoT infrastructure .............. <span class="text-[var(--green)]">ready</span></div>
+                <div class="text-[var(--fg-muted)]">[OK]  AI workflows + automation ............... <span class="text-[var(--green)]">ready</span></div>
+                <div class="text-[var(--fg-muted)]">[OK]  IT staffing ............................. <span class="text-[var(--green)]">ready</span></div>
+                <div class="pt-3">
+                    <span class="text-[var(--green)]">$</span> <span class="text-[var(--fg)]">automata deploy</span> <span class="text-[var(--amber)]">--your-operation</span>
+                </div>
+                <div class="text-[var(--fg-dim)]">→ continuity: <span class="text-[var(--green)]">guaranteed</span></div>
+                <div class="text-[var(--fg-dim)]">→ stack: <span class="text-[var(--cyan)]">node · laravel · python · react</span></div>
+                <div class="text-[var(--fg-dim)]">→ region: <span class="text-[var(--cyan)]">latam · global</span></div>
+                <div class="pt-2 flex items-center">
+                    <span class="text-[var(--green)]">$</span><span class="ml-2 cursor-blink"></span>
+                </div>
             </div>
 
-            <!-- Floating tech icons -->
-            <div
-                class="absolute top-10 right-10 w-14 h-14 glass rounded-2xl flex items-center justify-center animate-float"
-                title="n8n"
-            >
-                <svg class="w-8 h-8 text-orange-500" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-            </div>
-            <div
-                class="absolute bottom-20 left-10 w-14 h-14 glass rounded-2xl flex items-center justify-center animate-float-slow"
-                title="AI"
-            >
-                <svg class="w-8 h-8 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/>
-                    <path d="M6 10v4a6 6 0 0 0 12 0v-4"/>
-                    <line x1="12" y1="18" x2="12" y2="22"/>
-                    <line x1="8" y1="22" x2="16" y2="22"/>
-                </svg>
-            </div>
-            <div
-                class="absolute top-1/2 -right-5 w-14 h-14 glass rounded-2xl flex items-center justify-center animate-float"
-                style="animation-delay: 1s;"
-                title="API"
-            >
-                <svg class="w-8 h-8 text-cyan-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>
-                    <path d="M7 10v4M17 10v4M10 7h4M10 17h4"/>
-                </svg>
-            </div>
+            <!-- corner ticks -->
+            <div class="absolute -top-1.5 -left-1.5 w-3 h-3 border-t border-l border-[var(--green)]"></div>
+            <div class="absolute -top-1.5 -right-1.5 w-3 h-3 border-t border-r border-[var(--green)]"></div>
+            <div class="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b border-l border-[var(--green)]"></div>
+            <div class="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b border-r border-[var(--green)]"></div>
         </div>
     </div>
 </section>

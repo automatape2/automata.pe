@@ -14,6 +14,7 @@ interface Props {
 const { title } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const t = getTranslations(lang);
+const homeHref = lang === "es" ? "/" : "/en";
 ---
 
 <!doctype html>
@@ -22,7 +23,7 @@ const t = getTranslations(lang);
         <meta charset="UTF-8" />
         <meta
             name="description"
-            content="Automata - Automatizacion inteligente con IA. Workflows n8n, integraciones GPT/Claude, ETL y RPA para tu negocio."
+            content="Automata — Tecnologia que opera contigo. Consultoria, software, cloud, IoT y automatizacion para empresas que necesitan continuidad operativa."
         />
         <meta name="viewport" content="width=device-width" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -32,37 +33,23 @@ const t = getTranslations(lang);
         <link rel="manifest" href="/manifest.json" />
 
         <!-- Theme Color for mobile browsers -->
-        <meta name="theme-color" content="#06b6d4" />
+        <meta name="theme-color" content="#000000" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-            name="apple-mobile-web-app-status-bar-style"
-            content="black-translucent"
-        />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
         <!-- Preconnect to improve performance -->
-        <link
-            rel="preconnect"
-            href="https://fonts.googleapis.com"
-            crossorigin
-        />
-
-        <!-- DNS Prefetch for external resources -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
 
-        <!-- Critical CSS - Inline for instant render (prevents 250ms blocking) -->
+        <!-- Critical CSS - Inline for instant render -->
         <style is:inline>
-            /* Prevent white flash and enable instant paint */
-            html {
-                scroll-behavior: smooth;
-            }
+            html { scroll-behavior: smooth; }
             body {
                 margin: 0;
-                background: #020617;
-                color: #e2e8f0;
-                font-family:
-                    system-ui,
-                    -apple-system,
-                    sans-serif;
+                background: #000;
+                color: #E5E7EB;
+                font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             }
             header {
                 position: fixed;
@@ -70,75 +57,55 @@ const t = getTranslations(lang);
                 width: 100%;
                 z-index: 50;
             }
-            main {
-                padding-top: 5rem;
-            }
-            /* Hide elements before GSAP loads */
-            [data-animate] {
-                opacity: 0;
-            }
+            main { padding-top: 4rem; }
+            [data-animate] { opacity: 0; }
         </style>
 
         <title>{title}</title>
     </head>
-    <body
-        class="bg-slate-950 text-slate-200 font-sans antialiased"
-    >
-        <!-- Modern Gradient Background -->
-        <div class="fixed inset-0 -z-10 overflow-hidden bg-slate-950">
-            <!-- Subtle grid pattern -->
-            <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
+    <body class="bg-terminal">
+        <!-- Grid backdrop -->
+        <div class="fixed inset-0 -z-10 bg-grid pointer-events-none"></div>
 
-            <!-- Gradient orbs - subtle and elegant -->
-            <div class="absolute -top-[300px] -left-[300px] w-[600px] h-[600px] rounded-full bg-cyan-500/10 blur-[150px]"></div>
-            <div class="absolute top-1/2 -right-[200px] w-[500px] h-[500px] rounded-full bg-purple-500/10 blur-[150px]"></div>
-            <div class="absolute -bottom-[200px] left-1/4 w-[400px] h-[400px] rounded-full bg-blue-500/10 blur-[150px]"></div>
-
-            <!-- Radial gradient overlay -->
-            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,transparent_0%,#020617_70%)]"></div>
-        </div>
-
-        <header class="glass-strong fixed top-0 z-50 w-full">
-            <nav
-                class="container mx-auto px-6 py-4 flex justify-between items-center"
-            >
-                <a
-                    href={lang === "es" ? "/" : "/en"}
-                    class="text-2xl font-bold gradient-text magnetic"
-                >
-                    {personalInfo.brandName}
+        <!-- Header: bracketed CLI nav -->
+        <header class="border-b border-[var(--line)] bg-black/80 backdrop-blur">
+            <nav class="mx-auto max-w-7xl px-6 h-14 flex items-center justify-between">
+                <a href={homeHref} class="flex items-center gap-2 text-sm group">
+                    <span class="text-[var(--green)]">$</span>
+                    <span class="font-bold tracking-tight text-[var(--fg)] group-hover:text-[var(--green)] transition-colors">
+                        {personalInfo.brandName.toLowerCase()}
+                    </span>
+                    <span class="text-[var(--fg-muted)]">--init</span>
                 </a>
-                <div class="flex items-center gap-6">
-                    <ul class="hidden md:flex space-x-8">
+
+                <div class="flex items-center gap-1">
+                    <ul class="hidden md:flex items-center text-sm">
                         <li>
-                            <a
-                                href="#services"
-                                class="link-underline hover:text-cyan-400 transition-colors"
-                                >{t.nav.services}</a
-                            >
+                            <a href="#services" class="px-3 py-2 text-[var(--fg-dim)] hover:text-[var(--green)] transition-colors flex items-center gap-1.5">
+                                <span class="text-[var(--fg-muted)]">01</span>
+                                <span>{t.nav.services}</span>
+                            </a>
                         </li>
                         <li>
-                            <a
-                                href="#solutions"
-                                class="link-underline hover:text-cyan-400 transition-colors"
-                                >{t.nav.solutions}</a
-                            >
+                            <a href="#solutions" class="px-3 py-2 text-[var(--fg-dim)] hover:text-[var(--green)] transition-colors flex items-center gap-1.5">
+                                <span class="text-[var(--fg-muted)]">02</span>
+                                <span>{t.nav.solutions}</span>
+                            </a>
                         </li>
                         <li>
-                            <a
-                                href="#tech"
-                                class="link-underline hover:text-cyan-400 transition-colors"
-                                >{t.nav.tech}</a
-                            >
+                            <a href="#tech" class="px-3 py-2 text-[var(--fg-dim)] hover:text-[var(--green)] transition-colors flex items-center gap-1.5">
+                                <span class="text-[var(--fg-muted)]">03</span>
+                                <span>{t.nav.tech}</span>
+                            </a>
                         </li>
                         <li>
-                            <a
-                                href="#contact"
-                                class="link-underline hover:text-cyan-400 transition-colors"
-                                >{t.nav.contact}</a
-                            >
+                            <a href="#contact" class="px-3 py-2 text-[var(--fg-dim)] hover:text-[var(--green)] transition-colors flex items-center gap-1.5">
+                                <span class="text-[var(--fg-muted)]">04</span>
+                                <span>{t.nav.contact}</span>
+                            </a>
                         </li>
                     </ul>
+                    <div class="w-px h-5 bg-[var(--line)] mx-3 hidden md:block"></div>
                     <LanguageSwitcher />
                 </div>
             </nav>
@@ -148,35 +115,26 @@ const t = getTranslations(lang);
             <slot />
         </main>
 
-        <!-- Footer -->
         <Footer />
-
-        <!-- Scroll to top button -->
         <ScrollToTop />
-
-        <!-- Visit Tracker -->
         <VisitTracker />
 
-        <!-- Service Worker Registration -->
         <script src="/sw-register.js" defer></script>
 
         <!-- Lenis Smooth Scroll -->
         <script>
             import Lenis from 'lenis';
-
             const lenis = new Lenis({
-                duration: 1.2,
+                duration: 1.0,
                 easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
                 orientation: 'vertical',
                 gestureOrientation: 'vertical',
                 smoothWheel: true,
             });
-
             function raf(time: number) {
                 lenis.raf(time);
                 requestAnimationFrame(raf);
             }
-
             requestAnimationFrame(raf);
         </script>
 
@@ -187,139 +145,59 @@ const t = getTranslations(lang);
 
             gsap.registerPlugin(ScrollTrigger);
 
-            // Wait for DOM to be ready
             document.addEventListener('DOMContentLoaded', () => {
-                // Animate all elements with data-animate attribute
                 const animatedElements = document.querySelectorAll('[data-animate]');
 
                 animatedElements.forEach((element) => {
                     const animationType = element.getAttribute('data-animate');
                     const delay = element.getAttribute('data-delay') || 0;
-                    const duration = element.getAttribute('data-duration') || 0.8;
+                    const duration = element.getAttribute('data-duration') || 0.7;
 
                     let fromProps: gsap.TweenVars = { opacity: 0 };
 
                     switch (animationType) {
-                        case 'fade-up':
-                            fromProps.y = 40;
-                            break;
-                        case 'fade-down':
-                            fromProps.y = -40;
-                            break;
-                        case 'fade-left':
-                            fromProps.x = 40;
-                            break;
-                        case 'fade-right':
-                            fromProps.x = -40;
-                            break;
-                        case 'scale':
-                            fromProps.scale = 0.9;
-                            break;
-                        case 'blur':
-                            fromProps.filter = 'blur(10px)';
-                            break;
+                        case 'fade-up':    fromProps.y = 24; break;
+                        case 'fade-down':  fromProps.y = -24; break;
+                        case 'fade-left':  fromProps.x = 24; break;
+                        case 'fade-right': fromProps.x = -24; break;
+                        case 'scale':      fromProps.scale = 0.96; break;
+                        case 'blur':       fromProps.filter = 'blur(8px)'; break;
                     }
 
-                    gsap.fromTo(
-                        element,
-                        fromProps,
+                    gsap.fromTo(element, fromProps, {
+                        opacity: 1,
+                        x: 0, y: 0, scale: 1,
+                        filter: 'blur(0px)',
+                        duration: Number(duration),
+                        delay: Number(delay),
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: element,
+                            start: 'top 88%',
+                            toggleActions: 'play none none none',
+                        },
+                    });
+                });
+
+                const staggerContainers = document.querySelectorAll('[data-stagger]');
+                staggerContainers.forEach((container) => {
+                    const children = container.children;
+                    const staggerDelay = container.getAttribute('data-stagger') || 0.06;
+
+                    gsap.fromTo(children,
+                        { opacity: 0, y: 16 },
                         {
-                            opacity: 1,
-                            x: 0,
-                            y: 0,
-                            scale: 1,
-                            filter: 'blur(0px)',
-                            duration: Number(duration),
-                            delay: Number(delay),
-                            ease: 'power3.out',
+                            opacity: 1, y: 0,
+                            duration: 0.5,
+                            stagger: Number(staggerDelay),
+                            ease: 'power2.out',
                             scrollTrigger: {
-                                trigger: element,
+                                trigger: container,
                                 start: 'top 85%',
                                 toggleActions: 'play none none none',
                             },
                         }
                     );
-                });
-
-                // Stagger animations for grid items
-                const staggerContainers = document.querySelectorAll('[data-stagger]');
-
-                staggerContainers.forEach((container) => {
-                    const children = container.children;
-                    const staggerDelay = container.getAttribute('data-stagger') || 0.1;
-
-                    gsap.fromTo(
-                        children,
-                        { opacity: 0, y: 30 },
-                        {
-                            opacity: 1,
-                            y: 0,
-                            duration: 0.6,
-                            stagger: Number(staggerDelay),
-                            ease: 'power2.out',
-                            scrollTrigger: {
-                                trigger: container,
-                                start: 'top 80%',
-                                toggleActions: 'play none none none',
-                            },
-                        }
-                    );
-                });
-
-                // Parallax effect for hero section
-                const heroSection = document.querySelector('[data-parallax]');
-                if (heroSection) {
-                    gsap.to(heroSection, {
-                        y: 100,
-                        ease: 'none',
-                        scrollTrigger: {
-                            trigger: heroSection,
-                            start: 'top top',
-                            end: 'bottom top',
-                            scrub: true,
-                        },
-                    });
-                }
-
-                // Cursor glow effect
-                const cursorGlow = document.createElement('div');
-                cursorGlow.className = 'cursor-glow';
-                document.body.appendChild(cursorGlow);
-
-                document.addEventListener('mousemove', (e) => {
-                    gsap.to(cursorGlow, {
-                        x: e.clientX,
-                        y: e.clientY,
-                        duration: 0.3,
-                        ease: 'power2.out',
-                    });
-                });
-
-                // Magnetic effect for buttons
-                const magneticElements = document.querySelectorAll('.magnetic');
-
-                magneticElements.forEach((el) => {
-                    el.addEventListener('mousemove', (e) => {
-                        const rect = (el as HTMLElement).getBoundingClientRect();
-                        const x = (e as MouseEvent).clientX - rect.left - rect.width / 2;
-                        const y = (e as MouseEvent).clientY - rect.top - rect.height / 2;
-
-                        gsap.to(el, {
-                            x: x * 0.3,
-                            y: y * 0.3,
-                            duration: 0.3,
-                            ease: 'power2.out',
-                        });
-                    });
-
-                    el.addEventListener('mouseleave', () => {
-                        gsap.to(el, {
-                            x: 0,
-                            y: 0,
-                            duration: 0.5,
-                            ease: 'elastic.out(1, 0.3)',
-                        });
-                    });
                 });
             });
         </script>

@@ -1,61 +1,30 @@
 ---
-const currentPath = Astro.url.pathname;
-const isEnglish = currentPath.startsWith("/en");
+import { getLangFromUrl } from "../i18n/utils";
 
-// Toggle between languages
-const toggleUrl = isEnglish
-    ? currentPath.replace("/en", "") || "/"
-    : `/en${currentPath}`;
+const lang = getLangFromUrl(Astro.url);
+const currentPath = Astro.url.pathname;
+
+const stripped = currentPath.replace(/^\/(en|es)(?=\/|$)/, "") || "/";
+const targetLang = lang === "en" ? "es" : "en";
+const toggleUrl = stripped === "/" ? `/${targetLang}` : `/${targetLang}${stripped}`;
+
+const tooltipText = lang === "en" ? "Cambiar a Español" : "Switch to English";
 ---
 
 <div class="relative group">
-    <button
-        id="lang-switcher"
-        class="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 hover:border-cyan-400 transition-all bg-slate-900/50 backdrop-blur-sm"
-        aria-label="Change language"
+    <a
+        href={toggleUrl}
+        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono border border-[var(--line)] text-[var(--fg-dim)] hover:border-[var(--green)] hover:text-[var(--green)] transition-colors"
+        aria-label={tooltipText}
     >
-        <span
-            class="text-sm font-mono text-slate-300 group-hover:text-cyan-400 transition-colors"
-        >
-            {isEnglish ? "EN" : "ES"}
-        </span>
-        <svg
-            class="w-4 h-4 text-slate-400 group-hover:text-cyan-400 transition-colors"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
-            ></path>
-        </svg>
-    </button>
+        <span class={lang === 'en' ? 'text-[var(--green)]' : 'text-[var(--fg-muted)]'}>en</span>
+        <span class="text-[var(--line-bright)]">/</span>
+        <span class={lang === 'es' ? 'text-[var(--green)]' : 'text-[var(--fg-muted)]'}>es</span>
+    </a>
 
-    <!-- Tooltip -->
-    <div
-        class="absolute top-full mt-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-    >
-        <div
-            class="bg-slate-800 text-slate-200 px-3 py-1 rounded text-xs whitespace-nowrap"
-        >
-            {isEnglish ? "Cambiar a Español" : "Switch to English"}
+    <div class="absolute top-full mt-2 right-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <div class="bg-[var(--bg-elev)] text-[var(--fg-dim)] border border-[var(--line)] px-2.5 py-1 text-[11px] whitespace-nowrap font-mono">
+            // {tooltipText}
         </div>
     </div>
 </div>
-
-<script>
-    const button = document.getElementById("lang-switcher");
-    if (button) {
-        button.addEventListener("click", () => {
-            const currentPath = window.location.pathname;
-            const isEnglish = currentPath.startsWith("/en");
-            const newPath = isEnglish
-                ? currentPath.replace("en", "es") || "es"
-                : currentPath.replace("es", "en") || "en";
-            window.location.href = newPath;
-        });
-    }
-</script>
