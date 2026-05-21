@@ -11,9 +11,10 @@ interface Props {
     lang: "en" | "es";
     prev?: any;
     next?: any;
+    related?: any[];
 }
 
-const { project, lang, prev, next } = Astro.props;
+const { project, lang, prev, next, related = [] } = Astro.props;
 
 // Custom Shiki theme matching the terminal palette (green keywords, amber strings, cyan types)
 const automataShikiTheme: any = {
@@ -787,6 +788,46 @@ if (project.lessons && project.lessons.length > 0) {
                     </li>
                 ))}
             </ul>
+        </section>
+    )}
+
+    <!-- Related projects -->
+    {related.length > 0 && (
+        <section class="mb-10">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// {lang === "es" ? "relacionados" : "related"}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> grep -l "tech" ./projects/*
+                </h2>
+                <p class="mt-2 text-sm text-[var(--fg-dim)]">
+                    <span class="text-[var(--fg-muted)]">// </span>
+                    {lang === "es" ? "proyectos que comparten parte del stack" : "projects that share part of the stack"}
+                </p>
+            </div>
+            <div class={`grid grid-cols-1 ${related.length >= 3 ? 'md:grid-cols-3' : related.length === 2 ? 'md:grid-cols-2' : ''} gap-0 border border-[var(--line)]`}>
+                {related.map((r: any, i: number) => {
+                    const shared = (project.tech || []).filter((t: string) => (r.tech || []).includes(t));
+                    return (
+                        <a
+                            href={`${projectsBase}/${r.slug}`}
+                            class={`group panel border-0 p-5 hover:bg-[var(--bg-elev)]/40 transition-colors ${i > 0 ? 'border-t md:border-t-0 md:border-l border-[var(--line)]' : ''}`}
+                        >
+                            <div class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-2">
+                                {String(i + 1).padStart(2, '0')} / related
+                            </div>
+                            <h3 class="text-base font-semibold text-[var(--fg)] group-hover:text-[var(--green)] transition-colors leading-tight mb-2">
+                                {r.title}
+                            </h3>
+                            <p class="text-xs text-[var(--fg-dim)] line-clamp-2 mb-3">{r.description}</p>
+                            <div class="flex flex-wrap gap-1">
+                                {shared.slice(0, 3).map((t: string) => (
+                                    <span class="badge-mono">{t}</span>
+                                ))}
+                            </div>
+                        </a>
+                    );
+                })}
+            </div>
         </section>
     )}
 

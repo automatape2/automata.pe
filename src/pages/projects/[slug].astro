@@ -5,17 +5,33 @@ import ProjectDetail from "../../components/ProjectDetail.astro";
 export async function getStaticPaths() {
     const { translations } = await import("../../i18n/translations.ts");
     const items = translations.en.solutions.items;
+
+    function relatedFor(current: any): any[] {
+        const myTech = new Set<string>(current.tech || []);
+        return items
+            .filter((p: any) => p.slug !== current.slug)
+            .map((p: any) => {
+                const shared = (p.tech || []).filter((t: string) => myTech.has(t)).length;
+                return { p, shared };
+            })
+            .filter(({ shared }) => shared > 0)
+            .sort((a, b) => b.shared - a.shared)
+            .slice(0, 3)
+            .map(({ p }) => p);
+    }
+
     return items.map((project: any, i: number) => ({
         params: { slug: project.slug },
         props: {
             project,
             prev: i > 0 ? items[i - 1] : null,
             next: i < items.length - 1 ? items[i + 1] : null,
+            related: relatedFor(project),
         },
     }));
 }
 
-const { project, prev, next } = Astro.props;
+const { project, prev, next, related } = Astro.props;
 const ogImage = `/og/${project.slug}.svg`;
 
 const articleLd = {
@@ -49,5 +65,5 @@ const articleLd = {
     ogType="article"
     structuredData={articleLd}
 >
-    <ProjectDetail project={project} lang="en" prev={prev} next={next} />
+    <ProjectDetail project={project} lang="en" prev={prev} next={next} related={related} />
 </Layout>
