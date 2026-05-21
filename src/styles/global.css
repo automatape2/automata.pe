@@ -433,6 +433,31 @@ body {
 }
 
 /* ========================================
+   Cross-document view transitions
+   Browser-native (Chrome/Edge). Other browsers fall through to a
+   normal navigation. No SPA router → all our client scripts keep
+   running on each load without changes.
+   ======================================== */
+
+@view-transition {
+    navigation: auto;
+}
+
+::view-transition-old(root) {
+    animation: 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both fade-out;
+}
+::view-transition-new(root) {
+    animation: 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both fade-in;
+}
+@keyframes fade-out { to { opacity: 0; transform: translateY(-4px); } }
+@keyframes fade-in  { from { opacity: 0; transform: translateY(4px); } }
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation-duration: 0ms !important; }
+}
+
+/* ========================================
    Section permalinks
    ======================================== */
 
