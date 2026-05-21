@@ -4,15 +4,26 @@ import ProjectDetail from "../../../components/ProjectDetail.astro";
 
 export async function getStaticPaths() {
     const { translations } = await import("../../../i18n/translations.ts");
-    return translations.es.solutions.items.map((project: any) => ({
+    const items = translations.es.solutions.items;
+    return items.map((project: any, i: number) => ({
         params: { slug: project.slug },
-        props: { project },
+        props: {
+            project,
+            prev: i > 0 ? items[i - 1] : null,
+            next: i < items.length - 1 ? items[i + 1] : null,
+        },
     }));
 }
 
-const { project } = Astro.props;
+const { project, prev, next } = Astro.props;
+const ogImage = project.image?.src;
 ---
 
-<Layout title={`${project.title} | Automata`}>
-    <ProjectDetail project={project} lang="es" />
+<Layout
+    title={`${project.title} | Automata`}
+    description={project.description}
+    ogImage={ogImage}
+    ogType="article"
+>
+    <ProjectDetail project={project} lang="es" prev={prev} next={next} />
 </Layout>

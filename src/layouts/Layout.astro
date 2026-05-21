@@ -9,25 +9,62 @@ import { personalInfo } from "../config/personal";
 
 interface Props {
     title: string;
+    /** Page-specific description for SEO / social cards. Falls back to a brand default. */
+    description?: string;
+    /** Absolute or root-relative path to the social preview image (1200x630 ideal). */
+    ogImage?: string;
+    /** "website" for landing, "article" for case studies. Defaults to "website". */
+    ogType?: "website" | "article";
 }
 
-const { title } = Astro.props;
+const {
+    title,
+    description: pageDescription,
+    ogImage = "/favicon.svg",
+    ogType = "website",
+} = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const t = getTranslations(lang);
 const homeHref = lang === "es" ? "/" : "/en";
+
+const defaultDescription = lang === "es"
+    ? "Automata — Tecnologia que opera contigo. Consultoria, software, cloud, IoT y automatizacion para empresas que necesitan continuidad operativa."
+    : "Automata — Technology that operates with you. Consulting, software, cloud, IoT and automation for businesses that need operational continuity.";
+const description = pageDescription || defaultDescription;
+const canonical = new URL(Astro.url.pathname, Astro.site || Astro.url).toString();
+const absoluteOgImage = ogImage.startsWith("http")
+    ? ogImage
+    : new URL(ogImage, Astro.site || Astro.url).toString();
 ---
 
 <!doctype html>
 <html lang={lang} class="lenis lenis-smooth">
     <head>
         <meta charset="UTF-8" />
-        <meta
-            name="description"
-            content="Automata — Tecnologia que opera contigo. Consultoria, software, cloud, IoT y automatizacion para empresas que necesitan continuidad operativa."
-        />
+        <meta name="description" content={description} />
         <meta name="viewport" content="width=device-width" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="canonical" href={canonical} />
         <meta name="generator" content={Astro.generator} />
+
+        <!-- Open Graph -->
+        <meta property="og:type" content={ogType} />
+        <meta property="og:site_name" content={personalInfo.brandName} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={absoluteOgImage} />
+        <meta property="og:image:alt" content={title} />
+        <meta property="og:locale" content={lang === "es" ? "es_PE" : "en_US"} />
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={absoluteOgImage} />
+        {personalInfo.socialUsernames.twitter && (
+            <meta name="twitter:site" content={personalInfo.socialUsernames.twitter} />
+        )}
 
         <!-- PWA Manifest -->
         <link rel="manifest" href="/manifest.json" />

@@ -1,0 +1,133 @@
+---
+// TableOfContents — sticky left sidebar with scroll-spy.
+// Caller passes a list of { id, label, sublabel? } matching real section ids in the page.
+// On lg+ viewports the TOC sticks to the top while scrolling. IntersectionObserver
+// highlights the section currently in view.
+
+interface Item {
+    id: string;
+    label: string;
+    sublabel?: string;
+}
+
+interface Props {
+    items: Item[];
+    title?: string;
+}
+
+const { items, title = "// contents" } = Astro.props;
+---
+
+<aside class="toc" data-toc>
+    <div class="toc-title">{title}</div>
+    <ul>
+        {items.map((it, i) => (
+            <li>
+                <a
+                    href={`#${it.id}`}
+                    data-toc-link={it.id}
+                    data-active={i === 0 ? "true" : "false"}
+                >
+                    <span class="toc-row">
+                        <span class="toc-marker"></span>
+                        <span class="toc-num">{String(i + 1).padStart(2, "0")}</span>
+                        <span class="toc-label">{it.label}</span>
+                    </span>
+                    {it.sublabel && <span class="toc-sub">{it.sublabel}</span>}
+                </a>
+            </li>
+        ))}
+    </ul>
+</aside>
+
+<style>
+    .toc { display: none; }
+    @media (min-width: 1024px) {
+        .toc {
+            display: block;
+            position: sticky;
+            top: 5.5rem;
+            align-self: start;
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+        }
+    }
+    .toc-title {
+        font-size: 10px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        margin-bottom: 12px;
+        padding: 0 8px;
+    }
+    .toc ul { list-style: none; padding: 0; margin: 0; }
+    .toc li + li { margin-top: 2px; }
+    .toc a {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 6px 8px;
+        font-size: 12.5px;
+        color: var(--fg-dim);
+        text-decoration: none;
+        border-left: 2px solid transparent;
+        transition: color 120ms, border-color 120ms, background-color 120ms;
+    }
+    .toc .toc-row { display: flex; align-items: center; gap: 8px; }
+    .toc .toc-marker { display: inline-block; width: 8px; color: var(--fg-muted); }
+    .toc .toc-marker::before { content: "○"; font-size: 10px; }
+    .toc .toc-num { color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+    .toc .toc-label { color: var(--fg-dim); }
+    .toc .toc-sub { font-size: 10px; color: var(--fg-muted); padding-left: 30px; }
+    .toc a:hover { color: var(--green); background: rgba(74, 222, 128, 0.03); }
+    .toc a:hover .toc-label { color: var(--green); }
+
+    .toc a[data-active="true"] {
+        border-left-color: var(--green);
+        background: rgba(74, 222, 128, 0.05);
+    }
+    .toc a[data-active="true"] .toc-marker { color: var(--green); }
+    .toc a[data-active="true"] .toc-marker::before { content: "▸"; }
+    .toc a[data-active="true"] .toc-label { color: var(--fg); font-weight: 600; }
+</style>
+
+<script>
+    document.querySelectorAll<HTMLElement>("[data-toc]").forEach((toc) => {
+        const links = toc.querySelectorAll<HTMLAnchorElement>("[data-toc-link]");
+        if (links.length === 0) return;
+
+        const sectionEls: Array<{ id: string; el: HTMLElement }> = [];
+        links.forEach((link) => {
+            const id = link.getAttribute("data-toc-link") || "";
+            const el = document.getElementById(id);
+            if (el) sectionEls.push({ id, el });
+        });
+        if (sectionEls.length === 0) return;
+
+        const setActive = (id: string) => {
+            links.forEach((l) => l.setAttribute("data-active", String(l.getAttribute("data-toc-link") === id)));
+        };
+
+        // Track which sections are in view; the topmost visible section wins.
+        const visible = new Set<string>();
+        const io = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((e) => {
+                    const id = e.target.getAttribute("id");
+                    if (!id) return;
+                    if (e.isIntersecting) visible.add(id);
+                    else visible.delete(id);
+                });
+                if (visible.size === 0) return;
+                // Pick the first section (in document order) that's currently visible
+                for (const s of sectionEls) {
+                    if (visible.has(s.id)) {
+                        setActive(s.id);
+                        break;
+                    }
+                }
+            },
+            { rootMargin: "-20% 0px -60% 0px", threshold: 0 }
+        );
+        sectionEls.forEach((s) => io.observe(s.el));
+    });
+</script>
