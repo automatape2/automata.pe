@@ -464,7 +464,21 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                         { value: "99.9%",  label: "uptime ultimo trimestre" }
                     ],
                     challenges: "Mantener el preview en vivo sin lag mientras se arrastran bloques, garantizar generacion de copy tipada y servir landings con bundle minimo. Los detalles tecnicos estan documentados arriba en la seccion 06.",
-                    results: "Los usuarios van de idea a landing publicada en menos de dos minutos. El generador de copy cubre el bloqueo mas comun ('que escribir') y los exports estaticos via ISR se sirven a <50ms desde el edge global."
+                    results: "Los usuarios van de idea a landing publicada en menos de dos minutos. El generador de copy cubre el bloqueo mas comun ('que escribir') y los exports estaticos via ISR se sirven a <50ms desde el edge global.",
+                    lessons: [
+                        {
+                            title: "Apostar a Structured Outputs desde el dia uno",
+                            body: "El primer prototipo parseaba JSON 'a mano' y el 4% de las generaciones se rompian con preambulos o emojis. Migrar a response_format con Zod schemas tomo medio dia y eliminö el problema completamente. Lo haria desde el commit cero."
+                        },
+                        {
+                            title: "El builder se siente lento mucho antes que los benchmarks lo digan",
+                            body: "Lighthouse decia 'todo OK' mientras los usuarios reportaban arrastres pegajosos. Aprendi a confiar primero en el frame-profiler de Chrome y en sesiones reales. Los promedios escondian p99 de 40ms."
+                        },
+                        {
+                            title: "Islands architecture > full hydration por defecto",
+                            body: "Mover bloques a 'static por defecto, interactive opt-in' redujo 7x el JS shipped. Si lo hiciera de nuevo, definiria ese contrato en el sistema de diseño antes de escribir el primer bloque, no despues."
+                        }
+                    ]
                 },
                 {
                     slug: "ms_crm",
@@ -1065,7 +1079,21 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                         { value: "99.9%",  label: "uptime last quarter" }
                     ],
                     challenges: "Keeping live preview lag-free, ensuring typed AI copy generation, and serving landings with a minimal bundle. The technical breakdowns are documented above in section 06.",
-                    results: "Users go from idea to a published landing in under two minutes. The AI copy generator removes the most common blocker ('what to write'), and ISR-served static exports respond in <50ms from the global edge."
+                    results: "Users go from idea to a published landing in under two minutes. The AI copy generator removes the most common blocker ('what to write'), and ISR-served static exports respond in <50ms from the global edge.",
+                    lessons: [
+                        {
+                            title: "Bet on Structured Outputs from day one",
+                            body: "The first prototype parsed JSON by hand and ~4% of generations broke on preambles or surprise emoji. Migrating to response_format with Zod schemas took half a day and eliminated the failure mode entirely. Would do it from commit zero."
+                        },
+                        {
+                            title: "The builder feels slow long before benchmarks say so",
+                            body: "Lighthouse said 'all green' while users reported sticky drags. I learned to trust Chrome's frame profiler and real sessions first. Averages were hiding a p99 of 40ms."
+                        },
+                        {
+                            title: "Islands > full hydration as the default",
+                            body: "Switching blocks to 'static by default, interactive opt-in' cut shipped JS by 7×. Next time I'd encode that contract in the design system before writing the first block, not after."
+                        }
+                    ]
                 },
                 {
                     slug: "ms_crm",

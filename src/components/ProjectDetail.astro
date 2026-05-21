@@ -92,6 +92,7 @@ const L = {
             techChallenges: "technical challenges",
             testing: "testing & ci",
             screenshots: "screenshots", results: "results",
+            lessons: "lessons learned",
             quickFacts: "quick facts", nextStep: "next step",
             overview: "overview", problem: "problem",
             audience: "audience", role: "role", timeline: "timeline",
@@ -130,6 +131,7 @@ const L = {
             techChallenges: "desafios tecnicos",
             testing: "testing & ci",
             screenshots: "capturas", results: "resultados",
+            lessons: "lecciones",
             quickFacts: "quick facts", nextStep: "siguiente paso",
             overview: "descripcion", problem: "problema",
             audience: "audiencia", role: "rol", timeline: "tiempo",
@@ -223,6 +225,9 @@ if (project.screenshots && project.screenshots.length > 0) {
 }
 if (project.metrics || project.results || project.challenges) {
     tocItems.push({ id: "sec-results", label: L.sections.results, sublabel: "section 09" });
+}
+if (project.lessons && project.lessons.length > 0) {
+    tocItems.push({ id: "sec-lessons", label: L.sections.lessons, sublabel: "section 10" });
 }
 ---
 
@@ -738,6 +743,33 @@ if (project.metrics || project.results || project.challenges) {
                     )}
                 </div>
             )}
+        </section>
+    )}
+
+    <!-- 10 · Lessons learned -->
+    {project.lessons && project.lessons.length > 0 && (
+        <section id="sec-lessons" class="mb-10 scroll-mt-20">
+            <div class="border-b border-[var(--line)] pb-3 mb-5">
+                <div class="text-xs text-[var(--fg-muted)] mb-1">// section 10 · {L.sections.lessons}</div>
+                <h2 class="heading-mono text-2xl">
+                    <span class="text-[var(--green)]">$</span> cat ./lessons.md
+                </h2>
+                <p class="mt-2 text-sm text-[var(--fg-dim)]">
+                    <span class="text-[var(--fg-muted)]">// </span>
+                    {lang === "es" ? "si lo hiciera de nuevo" : "if I did it again"}
+                </p>
+            </div>
+            <ul class="grid md:grid-cols-2 gap-0 border border-[var(--line)]">
+                {project.lessons.map((lesson: any, i: number) => (
+                    <li class={`panel border-0 p-5 md:p-6 ${i % 2 === 1 ? 'md:border-l' : ''} ${i >= 2 ? 'border-t' : ''} border-[var(--line)]`}>
+                        <div class="flex items-baseline gap-3 mb-3">
+                            <span class="text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] font-mono">{String(i + 1).padStart(2, '0')} /</span>
+                            <h3 class="text-base font-semibold text-[var(--fg)] leading-tight">{lesson.title}</h3>
+                        </div>
+                        <p class="text-sm text-[var(--fg-dim)] leading-relaxed">{lesson.body}</p>
+                    </li>
+                ))}
+            </ul>
         </section>
     )}
 
