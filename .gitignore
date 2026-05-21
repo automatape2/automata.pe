@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Claude Code local config
+.claude/
+
+# Windows alternate data streams
+*Zone.Identifier
