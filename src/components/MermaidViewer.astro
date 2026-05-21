@@ -1,0 +1,193 @@
+---
+interface Props {
+    source: string;
+    label?: string;
+    fallback?: string;
+}
+
+const { source, label, fallback } = Astro.props;
+// Astro generates a stable id per slot
+const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
+---
+
+<div class="mermaid-viewer panel" data-mermaid-viewer={uid}>
+    <div class="window-chrome">
+        <div class="window-chrome-title">{label || "diagram.mmd"}</div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="flex items-center justify-between px-3 py-2 border-b border-[var(--line)] text-xs font-mono">
+        <div class="flex gap-2" role="tablist">
+            <button
+                type="button"
+                class="tab-btn px-2.5 py-1 border border-[var(--green)] text-[var(--green)] transition-colors"
+                data-tab="view"
+                aria-selected="true"
+            >▸ view</button>
+            <button
+                type="button"
+                class="tab-btn px-2.5 py-1 border border-[var(--line-bright)] text-[var(--fg-muted)] hover:text-[var(--green)] hover:border-[var(--green)] transition-colors"
+                data-tab="source"
+                aria-selected="false"
+            >▸ source</button>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="mv-status text-[var(--fg-muted)]">loading…</span>
+            <button
+                type="button"
+                class="copy-btn text-[var(--fg-muted)] hover:text-[var(--green)] transition-colors"
+            >[ copy ]</button>
+        </div>
+    </div>
+
+    <!-- View pane (rendered SVG) -->
+    <div class="mv-pane" data-pane="view">
+        <div class="mv-svg p-6 overflow-x-auto bg-[var(--bg)] flex items-center justify-center min-h-[200px]">
+            <pre class="mv-source-raw whitespace-pre font-mono text-[12px] text-[var(--fg-dim)]">{source}</pre>
+        </div>
+        {fallback && (
+            <details class="border-t border-[var(--line)]">
+                <summary class="px-4 py-2 cursor-pointer text-xs text-[var(--fg-muted)] hover:text-[var(--green)]">▸ ascii fallback</summary>
+                <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{fallback}</pre>
+            </details>
+        )}
+    </div>
+
+    <!-- Source pane (code editor / read-only) -->
+    <div class="mv-pane hidden" data-pane="source">
+        <pre class="p-6 overflow-x-auto text-[12.5px] leading-[1.6] text-[var(--fg)] font-mono whitespace-pre">{source}</pre>
+    </div>
+</div>
+
+<script>
+    // Lazy-load mermaid from CDN (ESM build). Only ships when a viewer is on the page.
+    let mermaidPromise: Promise<any> | null = null;
+
+    function loadMermaid() {
+        if (!mermaidPromise) {
+            mermaidPromise = (async () => {
+                // @ts-ignore — runtime ESM import
+                const mod = await import("https://esm.sh/mermaid@11.4.1");
+                const m = mod.default;
+                m.initialize({
+                    startOnLoad: false,
+                    theme: "base",
+                    // Sans-serif for diagrams: monospace ligatures + ss02/ss03 mangle SVG text
+                    fontFamily: "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif",
+                    securityLevel: "strict",
+                    themeVariables: {
+                        background: "#000000",
+                        primaryColor: "#0D1117",
+                        primaryTextColor: "#E5E7EB",
+                        primaryBorderColor: "#4ADE80",
+                        secondaryColor: "#111827",
+                        tertiaryColor: "#0A0A0A",
+                        lineColor: "#9CA3AF",
+                        textColor: "#E5E7EB",
+                    },
+                    c4: {
+                        // C4 has its own palette layer; keep boxes terminal-themed
+                        diagramMarginX: 32,
+                        diagramMarginY: 16,
+                        c4ShapeMargin: 40,
+                        c4ShapePadding: 16,
+                    },
+                    themeCSS: `
+                        .person, .external_person { fill: #0D1117 !important; stroke: #4ADE80 !important; }
+                        .external_person { stroke: #6B7280 !important; opacity: 0.85; }
+                        .system, .system_db, .system_queue { fill: #0D1117 !important; stroke: #06B6D4 !important; }
+                        .external_system, .external_system_db, .external_system_queue { fill: #111827 !important; stroke: #6B7280 !important; }
+                        .container, .container_db, .container_queue { fill: #0D1117 !important; stroke: #06B6D4 !important; }
+                        .external_container, .external_container_db, .external_container_queue { fill: #111827 !important; stroke: #6B7280 !important; }
+                        .component, .component_db, .component_queue { fill: #0D1117 !important; stroke: #4ADE80 !important; }
+                        .external_component { fill: #111827 !important; stroke: #6B7280 !important; }
+                        .boundary { fill: rgba(74, 222, 128, 0.03) !important; stroke: #4ADE80 !important; stroke-dasharray: 4 4 !important; }
+                        text { fill: #E5E7EB !important; font-feature-settings: normal !important; font-variant: normal !important; }
+                        .person tspan, .system tspan, .container tspan, .component tspan { fill: #E5E7EB !important; }
+                        .external_person tspan, .external_system tspan, .external_container tspan { fill: #9CA3AF !important; }
+                        .relation, .rel, .relation_label { stroke: #6B7280 !important; }
+                        .relation_label tspan { fill: #9CA3AF !important; }
+                        .legend { fill: #0A0A0A !important; stroke: #374151 !important; }
+                    `,
+                });
+                return m;
+            })();
+        }
+        return mermaidPromise;
+    }
+
+    async function renderViewer(viewer: HTMLElement) {
+        const sourceEl = viewer.querySelector(".mv-source-raw") as HTMLElement | null;
+        const svgContainer = viewer.querySelector(".mv-svg") as HTMLElement | null;
+        const status = viewer.querySelector(".mv-status") as HTMLElement | null;
+        if (!sourceEl || !svgContainer) return;
+
+        const code = sourceEl.textContent || "";
+        try {
+            const mermaid = await loadMermaid();
+            const id = `mermaid-${Math.random().toString(36).slice(2, 10)}`;
+            const { svg } = await mermaid.render(id, code);
+            svgContainer.innerHTML = svg;
+            if (status) {
+                status.textContent = "rendered";
+                status.classList.remove("text-[var(--fg-muted)]");
+                status.classList.add("text-[var(--green)]");
+            }
+        } catch (err) {
+            console.error("[MermaidViewer] render failed:", err);
+            // Keep the source visible as fallback
+            if (status) {
+                status.textContent = "render error — showing source";
+                status.classList.remove("text-[var(--fg-muted)]");
+                status.classList.add("text-[var(--amber)]");
+            }
+            // Swap to source tab automatically
+            const sourceTab = viewer.querySelector('[data-tab="source"]') as HTMLElement | null;
+            sourceTab?.click();
+        }
+    }
+
+    function wireUp(viewer: HTMLElement) {
+        const tabs = viewer.querySelectorAll<HTMLButtonElement>(".tab-btn");
+        const panes = viewer.querySelectorAll<HTMLElement>(".mv-pane");
+
+        tabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+                const target = tab.getAttribute("data-tab");
+                tabs.forEach((t) => {
+                    const active = t === tab;
+                    t.setAttribute("aria-selected", String(active));
+                    if (active) {
+                        t.classList.remove("text-[var(--fg-muted)]", "border-[var(--line-bright)]");
+                        t.classList.add("text-[var(--green)]", "border-[var(--green)]");
+                    } else {
+                        t.classList.remove("text-[var(--green)]", "border-[var(--green)]");
+                        t.classList.add("text-[var(--fg-muted)]", "border-[var(--line-bright)]");
+                    }
+                });
+                panes.forEach((p) => {
+                    p.classList.toggle("hidden", p.getAttribute("data-pane") !== target);
+                });
+            });
+        });
+
+        const copyBtn = viewer.querySelector(".copy-btn") as HTMLButtonElement | null;
+        copyBtn?.addEventListener("click", async () => {
+            const sourcePane = viewer.querySelector('[data-pane="source"] pre');
+            const text = sourcePane?.textContent ?? "";
+            try {
+                await navigator.clipboard.writeText(text);
+                copyBtn.textContent = "[ copied ]";
+                setTimeout(() => { copyBtn.textContent = "[ copy ]"; }, 1500);
+            } catch {
+                copyBtn.textContent = "[ failed ]";
+                setTimeout(() => { copyBtn.textContent = "[ copy ]"; }, 1500);
+            }
+        });
+
+        // Render once visible (or eagerly — viewers are usually above the fold of the section)
+        renderViewer(viewer);
+    }
+
+    document.querySelectorAll<HTMLElement>("[data-mermaid-viewer]").forEach(wireUp);
+</script>

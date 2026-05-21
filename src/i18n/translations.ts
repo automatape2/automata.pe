@@ -100,7 +100,25 @@ export const translations = {
                         "Sistema tipografico fluido (clamp) y grilla 4px"
                     ],
                     architecture: {
-                        context: `                  ┌──────────────────┐
+                        context: {
+                            mermaid: `C4Context
+    title Contexto del Sistema — LandingPager.ai
+
+    Person(marketer, "Marketer / Pequeña empresa", "Quiere validar oferta rapido")
+
+    System(landingpager, "LandingPager.ai", "Builder SaaS con IA + drag/drop")
+
+    System_Ext(openai, "OpenAI API", "Genera copy y secciones")
+    System_Ext(s3, "AWS S3 + CDN", "Assets de usuario")
+    System_Ext(stripe, "Stripe", "Billing & customer portal")
+
+    Rel(marketer, landingpager, "describe meta, publica landing")
+    Rel(landingpager, openai, "genera copy via")
+    Rel(landingpager, s3, "guarda assets en")
+    Rel(landingpager, stripe, "factura via")
+
+    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")`,
+                            ascii: `                  ┌──────────────────┐
                   │   Marketer /     │
                   │   Small biz      │
                   └─────────┬────────┘
@@ -116,8 +134,29 @@ export const translations = {
           ┌────────┐ ┌──────┐ ┌────────┐
           │ OpenAI │ │ S3 + │ │ Stripe │
           │  API   │ │ CDN  │ │ Billing│
-          └────────┘ └──────┘ └────────┘`,
-                        container: `┌──────────────────────────────────────────────────────┐
+          └────────┘ └──────┘ └────────┘`
+                        },
+                        container: {
+                            mermaid: `C4Container
+    title Vista de Contenedores — LandingPager.ai
+
+    Person(user, "Marketer")
+
+    System_Boundary(lp, "LandingPager.ai") {
+        Container(web, "Web App", "Next.js 14, React/TS", "UI principal")
+        Container(api, "API Routes", "Edge + Node, tRPC + Zod", "Endpoints tipados")
+        Container(builder, "Builder iframe", "dnd-kit + realtime preview", "Editor visual")
+        ContainerDb(db, "PostgreSQL", "Neon, Drizzle ORM", "Datos de proyectos")
+    }
+
+    System_Ext(openai, "OpenAI gpt-4o", "Copy + secciones")
+
+    Rel(user, web, "Usa", "HTTPS")
+    Rel(web, api, "Llama", "tRPC")
+    Rel(api, db, "Lee/escribe")
+    Rel(api, openai, "Genera copy")
+    Rel(web, builder, "Renderiza preview")`,
+                            ascii: `┌──────────────────────────────────────────────────────┐
 │                  LandingPager.ai                     │
 │                                                      │
 │  ┌──────────────┐         ┌────────────────────┐     │
@@ -137,28 +176,46 @@ export const translations = {
 │                           │  OpenAI gpt-4o     │     │
 │                           │  copy + secciones  │     │
 │                           └────────────────────┘     │
-└──────────────────────────────────────────────────────┘`,
-                        component: `┌────────────────────────────────────────────────────┐
+└──────────────────────────────────────────────────────┘`
+                        },
+                        component: {
+                            mermaid: `C4Component
+    title Builder · Vista de Componentes
+
+    Container_Boundary(builder, "Builder") {
+        Component(canvas, "Canvas", "React", "DnD context + seleccion")
+        Component(palette, "BlockPalette", "React", "30+ bloques + filtros")
+        Component(tree, "BlockTree", "Zustand", "Store + history")
+        Component(inspector, "Inspector", "React", "Props + bindings")
+        Component(renderer, "Renderer", "iframe", "Preview en vivo")
+    }
+
+    Rel(palette, canvas, "drag")
+    Rel(canvas, tree, "drop → mutate")
+    Rel(tree, renderer, "renderiza a")
+    Rel(tree, inspector, "nodo seleccionado")`,
+                            ascii: `┌────────────────────────────────────────────────────┐
 │           Builder · vista de componentes           │
 │                                                    │
 │   ┌──────────────┐       ┌──────────────────┐      │
-│   │ <Canvas/>    │◀──┐   │ <BlockPalette/>  │      │
+│   │  Canvas      │◀──┐   │  BlockPalette    │      │
 │   │  · DnD ctx   │   │   │  · 30+ bloques   │      │
 │   │  · seleccion │   │   │  · filtros       │      │
 │   └──────┬───────┘   │   └────────┬─────────┘      │
 │          │ drop     drag          │ drag           │
 │          ▼           │            ▼                │
 │   ┌──────────────┐   │   ┌──────────────────┐      │
-│   │ <BlockTree/> │───┘   │ <Inspector/>     │      │
+│   │  BlockTree   │───┘   │  Inspector       │      │
 │   │  Zustand     │       │  · props         │      │
 │   │  history     │       │  · bindings      │      │
 │   └──────────────┘       └──────────────────┘      │
 │          │                       │                 │
 │          ▼                       ▼                 │
 │   ┌──────────────────────────────────────┐         │
-│   │     <Renderer/> (iframe preview)     │         │
+│   │     Renderer (iframe preview)        │         │
 │   └──────────────────────────────────────┘         │
 └────────────────────────────────────────────────────┘`
+                        }
                     },
                     infrastructure: {
                         provider: "Vercel + AWS + Neon",
@@ -171,7 +228,25 @@ export const translations = {
                             "Stripe (billing + customer portal)",
                             "Sentry (errores), PostHog (analytics + flags)"
                         ],
-                        diagram: `                    ┌─────────────────┐
+                        diagram: {
+                            mermaid: `flowchart TD
+    user([User]) --> dns[Cloudflare DNS]
+    dns --> edge["Vercel Edge<br/>Next.js + ISR<br/>Edge middleware"]
+    edge --> db[("Neon Postgres<br/>pooled conns<br/>branch-per-PR")]
+    edge --> s3["AWS S3 + CloudFront<br/>assets / exports"]
+    edge --> fn["Vercel Functions<br/>Node runtime<br/>cron + colas"]
+    db --> drizzle["Drizzle ORM<br/>migraciones"]
+    fn --> external["OpenAI / Stripe<br/>APIs externas"]
+
+    classDef edge fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+
+    class user,dns ext
+    class edge,fn edge
+    class s3,external ext
+    class db,drizzle db`,
+                            ascii: `                    ┌─────────────────┐
    user ──────▶     │  Cloudflare DNS │
                     └────────┬────────┘
                              ▼
@@ -194,6 +269,7 @@ export const translations = {
 │ Drizzle ORM  │                    │ OpenAI / Stripe  │
 │ migraciones  │                    │  APIs externas   │
 └──────────────┘                    └──────────────────┘`
+                        }
                     },
                     stack: {
                         frontend: ["Next.js 14 (App Router)", "React 19", "TypeScript", "Tailwind CSS", "dnd-kit", "Zustand", "Radix UI"],
@@ -606,7 +682,25 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                         "Fluid typography (clamp) and 4px grid"
                     ],
                     architecture: {
-                        context: `                  ┌──────────────────┐
+                        context: {
+                            mermaid: `C4Context
+    title System Context — LandingPager.ai
+
+    Person(marketer, "Marketer / Small business", "Wants to validate offer fast")
+
+    System(landingpager, "LandingPager.ai", "SaaS landing builder with AI + drag/drop")
+
+    System_Ext(openai, "OpenAI API", "Generates copy and sections")
+    System_Ext(s3, "AWS S3 + CDN", "User assets")
+    System_Ext(stripe, "Stripe", "Billing & customer portal")
+
+    Rel(marketer, landingpager, "describes goal, publishes landing")
+    Rel(landingpager, openai, "generates copy via")
+    Rel(landingpager, s3, "stores assets in")
+    Rel(landingpager, stripe, "bills via")
+
+    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")`,
+                            ascii: `                  ┌──────────────────┐
                   │   Marketer /     │
                   │   Small business │
                   └─────────┬────────┘
@@ -622,8 +716,29 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
           ┌────────┐ ┌──────┐ ┌────────┐
           │ OpenAI │ │ S3 + │ │ Stripe │
           │  API   │ │ CDN  │ │ Billing│
-          └────────┘ └──────┘ └────────┘`,
-                        container: `┌──────────────────────────────────────────────────────┐
+          └────────┘ └──────┘ └────────┘`
+                        },
+                        container: {
+                            mermaid: `C4Container
+    title Container view — LandingPager.ai
+
+    Person(user, "Marketer")
+
+    System_Boundary(lp, "LandingPager.ai") {
+        Container(web, "Web App", "Next.js 14, React/TS", "Main UI")
+        Container(api, "API Routes", "Edge + Node, tRPC + Zod", "Typed endpoints")
+        Container(builder, "Builder iframe", "dnd-kit + realtime preview", "Visual editor")
+        ContainerDb(db, "PostgreSQL", "Neon, Drizzle ORM", "Project data")
+    }
+
+    System_Ext(openai, "OpenAI gpt-4o", "Copy + sections")
+
+    Rel(user, web, "Uses", "HTTPS")
+    Rel(web, api, "Calls", "tRPC")
+    Rel(api, db, "Reads/writes")
+    Rel(api, openai, "Generates copy")
+    Rel(web, builder, "Renders preview")`,
+                            ascii: `┌──────────────────────────────────────────────────────┐
 │                  LandingPager.ai                     │
 │                                                      │
 │  ┌──────────────┐         ┌────────────────────┐     │
@@ -643,28 +758,46 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
 │                           │  OpenAI gpt-4o     │     │
 │                           │  copy + sections   │     │
 │                           └────────────────────┘     │
-└──────────────────────────────────────────────────────┘`,
-                        component: `┌────────────────────────────────────────────────────┐
+└──────────────────────────────────────────────────────┘`
+                        },
+                        component: {
+                            mermaid: `C4Component
+    title Builder · Component view
+
+    Container_Boundary(builder, "Builder") {
+        Component(canvas, "Canvas", "React", "DnD context + selection")
+        Component(palette, "BlockPalette", "React", "30+ blocks + filters")
+        Component(tree, "BlockTree", "Zustand", "Store + history")
+        Component(inspector, "Inspector", "React", "Props + bindings")
+        Component(renderer, "Renderer", "iframe", "Live preview")
+    }
+
+    Rel(palette, canvas, "drag")
+    Rel(canvas, tree, "drop → mutate")
+    Rel(tree, renderer, "renders to")
+    Rel(tree, inspector, "selected node")`,
+                            ascii: `┌────────────────────────────────────────────────────┐
 │             Builder · Component view               │
 │                                                    │
 │   ┌──────────────┐       ┌──────────────────┐      │
-│   │ <Canvas/>    │◀──┐   │ <BlockPalette/>  │      │
+│   │  Canvas      │◀──┐   │  BlockPalette    │      │
 │   │  · DnD ctx   │   │   │  · 30+ blocks    │      │
 │   │  · selection │   │   │  · filters       │      │
 │   └──────┬───────┘   │   └────────┬─────────┘      │
 │          │ drop     drag          │ drag           │
 │          ▼           │            ▼                │
 │   ┌──────────────┐   │   ┌──────────────────┐      │
-│   │ <BlockTree/> │───┘   │ <Inspector/>     │      │
+│   │  BlockTree   │───┘   │  Inspector       │      │
 │   │  Zustand     │       │  · props         │      │
 │   │  history     │       │  · bindings      │      │
 │   └──────────────┘       └──────────────────┘      │
 │          │                       │                 │
 │          ▼                       ▼                 │
 │   ┌──────────────────────────────────────┐         │
-│   │     <Renderer/> (iframe preview)     │         │
+│   │     Renderer (iframe preview)        │         │
 │   └──────────────────────────────────────┘         │
 └────────────────────────────────────────────────────┘`
+                        }
                     },
                     infrastructure: {
                         provider: "Vercel + AWS + Neon",
@@ -677,7 +810,25 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                             "Stripe (billing + customer portal)",
                             "Sentry (errors), PostHog (analytics + flags)"
                         ],
-                        diagram: `                    ┌─────────────────┐
+                        diagram: {
+                            mermaid: `flowchart TD
+    user([User]) --> dns[Cloudflare DNS]
+    dns --> edge["Vercel Edge<br/>Next.js + ISR<br/>Edge middleware"]
+    edge --> db[("Neon Postgres<br/>pooled conns<br/>branch-per-PR")]
+    edge --> s3["AWS S3 + CloudFront<br/>assets / exports"]
+    edge --> fn["Vercel Functions<br/>Node runtime<br/>cron + queues"]
+    db --> drizzle["Drizzle ORM<br/>migrations"]
+    fn --> external["OpenAI / Stripe<br/>external APIs"]
+
+    classDef edge fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+
+    class user,dns ext
+    class edge,fn edge
+    class s3,external ext
+    class db,drizzle db`,
+                            ascii: `                    ┌─────────────────┐
    user ──────▶     │  Cloudflare DNS │
                     └────────┬────────┘
                              ▼
@@ -700,6 +851,7 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
 │ Drizzle ORM  │                    │ OpenAI / Stripe  │
 │ migrations   │                    │  external APIs   │
 └──────────────┘                    └──────────────────┘`
+                        }
                     },
                     stack: {
                         frontend: ["Next.js 14 (App Router)", "React 19", "TypeScript", "Tailwind CSS", "dnd-kit", "Zustand", "Radix UI"],

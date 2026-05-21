@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import MermaidViewer from "./MermaidViewer.astro";
 
 interface Props {
     project: any;
@@ -7,6 +8,14 @@ interface Props {
 }
 
 const { project, lang } = Astro.props;
+
+// Normalize a diagram entry into { mermaid?, ascii? }
+const normalizeDiagram = (v: any): { mermaid?: string; ascii?: string } | null => {
+    if (!v) return null;
+    if (typeof v === "string") return { ascii: v };
+    if (typeof v === "object") return { mermaid: v.mermaid, ascii: v.ascii };
+    return null;
+};
 
 const L = {
     en: {
@@ -281,7 +290,7 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
         </section>
     )}
 
-    <!-- 03 · Architecture (C4 diagrams) -->
+    <!-- 03 · Architecture (C4 diagrams: Mermaid view + source editor) -->
     {project.architecture && (
         <section class="mb-12">
             <div class="border-b border-[var(--line)] pb-4 mb-6">
@@ -291,24 +300,51 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
                 </h2>
             </div>
             <div class="space-y-6">
-                {project.architecture.context && (
-                    <div class="panel">
-                        <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Context} · c4-level-1</div></div>
-                        <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{project.architecture.context}</pre>
-                    </div>
-                )}
-                {project.architecture.container && (
-                    <div class="panel">
-                        <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Container} · c4-level-2</div></div>
-                        <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{project.architecture.container}</pre>
-                    </div>
-                )}
-                {project.architecture.component && (
-                    <div class="panel">
-                        <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Component} · c4-level-3</div></div>
-                        <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{project.architecture.component}</pre>
-                    </div>
-                )}
+                {(() => {
+                    const ctx = normalizeDiagram(project.architecture.context);
+                    return ctx && (ctx.mermaid ? (
+                        <MermaidViewer
+                            source={ctx.mermaid}
+                            label={`${L.sections.c4Context} · c4-level-1`}
+                            fallback={ctx.ascii}
+                        />
+                    ) : (
+                        <div class="panel">
+                            <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Context} · c4-level-1</div></div>
+                            <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{ctx.ascii}</pre>
+                        </div>
+                    ));
+                })()}
+                {(() => {
+                    const ctn = normalizeDiagram(project.architecture.container);
+                    return ctn && (ctn.mermaid ? (
+                        <MermaidViewer
+                            source={ctn.mermaid}
+                            label={`${L.sections.c4Container} · c4-level-2`}
+                            fallback={ctn.ascii}
+                        />
+                    ) : (
+                        <div class="panel">
+                            <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Container} · c4-level-2</div></div>
+                            <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{ctn.ascii}</pre>
+                        </div>
+                    ));
+                })()}
+                {(() => {
+                    const cmp = normalizeDiagram(project.architecture.component);
+                    return cmp && (cmp.mermaid ? (
+                        <MermaidViewer
+                            source={cmp.mermaid}
+                            label={`${L.sections.c4Component} · c4-level-3`}
+                            fallback={cmp.ascii}
+                        />
+                    ) : (
+                        <div class="panel">
+                            <div class="window-chrome"><div class="window-chrome-title">{L.sections.c4Component} · c4-level-3</div></div>
+                            <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{cmp.ascii}</pre>
+                        </div>
+                    ));
+                })()}
             </div>
         </section>
     )}
@@ -342,12 +378,19 @@ const metricsColsClass = project.metrics ? lgCols(Math.min(project.metrics.lengt
                         </ul>
                     )}
                 </div>
-                {project.infrastructure.diagram && (
-                    <div class="panel border-0 border-t lg:border-t-0 lg:border-l border-[var(--line)]">
-                        <div class="window-chrome"><div class="window-chrome-title">{L.sections.flow}</div></div>
-                        <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{project.infrastructure.diagram}</pre>
-                    </div>
-                )}
+                {project.infrastructure.diagram && (() => {
+                    const d = normalizeDiagram(project.infrastructure.diagram);
+                    return d && (d.mermaid ? (
+                        <div class="border-t lg:border-t-0 lg:border-l border-[var(--line)]">
+                            <MermaidViewer source={d.mermaid} label={L.sections.flow} fallback={d.ascii} />
+                        </div>
+                    ) : (
+                        <div class="panel border-0 border-t lg:border-t-0 lg:border-l border-[var(--line)]">
+                            <div class="window-chrome"><div class="window-chrome-title">{L.sections.flow}</div></div>
+                            <pre class="p-6 overflow-x-auto text-[12px] leading-[1.5] text-[var(--fg)] font-mono">{d.ascii}</pre>
+                        </div>
+                    ));
+                })()}
             </div>
         </section>
     )}
