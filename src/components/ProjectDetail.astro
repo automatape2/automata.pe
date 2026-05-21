@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import { codeToHtml } from "shiki";
 import MermaidViewer from "./MermaidViewer.astro";
 import MasterDetail from "./MasterDetail.astro";
 import Carousel from "./Carousel.astro";
@@ -13,6 +14,45 @@ interface Props {
 }
 
 const { project, lang, prev, next } = Astro.props;
+
+// Custom Shiki theme matching the terminal palette (green keywords, amber strings, cyan types)
+const automataShikiTheme: any = {
+    name: "automata",
+    type: "dark",
+    colors: {
+        "editor.background": "#000000",
+        "editor.foreground": "#E5E7EB",
+    },
+    tokenColors: [
+        { scope: ["comment", "punctuation.definition.comment"], settings: { foreground: "#6B7280", fontStyle: "italic" } },
+        { scope: ["keyword", "storage", "storage.type", "storage.modifier"], settings: { foreground: "#4ADE80" } },
+        { scope: ["keyword.control"], settings: { foreground: "#4ADE80" } },
+        { scope: ["string", "string.quoted", "string.template"], settings: { foreground: "#FBBF24" } },
+        { scope: ["constant.numeric", "constant.language"], settings: { foreground: "#67E8F9" } },
+        { scope: ["entity.name.function", "support.function", "meta.function-call.generic"], settings: { foreground: "#67E8F9" } },
+        { scope: ["variable", "variable.other"], settings: { foreground: "#E5E7EB" } },
+        { scope: ["entity.name.type", "support.type", "support.class", "entity.name.class"], settings: { foreground: "#06B6D4" } },
+        { scope: ["punctuation", "meta.brace"], settings: { foreground: "#9CA3AF" } },
+        { scope: ["variable.parameter"], settings: { foreground: "#E5E7EB" } },
+        { scope: ["meta.template.expression"], settings: { foreground: "#FBBF24" } },
+        { scope: ["keyword.operator"], settings: { foreground: "#9CA3AF" } },
+        { scope: ["entity.name.tag"], settings: { foreground: "#4ADE80" } },
+        { scope: ["entity.other.attribute-name"], settings: { foreground: "#FBBF24" } },
+    ],
+};
+
+// Pre-highlight all code snippets in techChallenges (server-side, zero client cost)
+const challenges = await Promise.all(
+    ((project.techChallenges || []) as any[]).map(async (ch) => ({
+        ...ch,
+        codeHtml: ch.code
+            ? await codeToHtml(ch.code, {
+                  lang: (ch.codeLang || "typescript") as any,
+                  theme: automataShikiTheme,
+              })
+            : null,
+    }))
+);
 const projectsBase = lang === "es" ? "/es/projects" : "/projects";
 
 // Normalize a diagram entry into { mermaid?, ascii? }
@@ -505,8 +545,8 @@ if (project.metrics || project.results || project.challenges) {
                 </p>
             </div>
 
-            <Carousel count={project.techChallenges.length} id="challenges">
-                {project.techChallenges.map((ch: any, i: number) => (
+            <Carousel count={challenges.length} id="challenges">
+                {challenges.map((ch: any, i: number) => (
                     <article data-carousel-slide class="w-full shrink-0">
                         <div class="window-chrome">
                             <div class="window-chrome-title">
@@ -540,14 +580,14 @@ if (project.metrics || project.results || project.challenges) {
                             </div>
 
                             {ch.code && (
-                                <div class="border border-[var(--line)] bg-black">
+                                <div class="code-block border border-[var(--line)] bg-black">
                                     {ch.codeLang && (
                                         <div class="px-4 py-2 border-b border-[var(--line)] text-[11px] text-[var(--fg-muted)] flex justify-between">
                                             <span>{ch.codeFile || `snippet-${i + 1}`}</span>
                                             <span>{ch.codeLang}</span>
                                         </div>
                                     )}
-                                    <pre class="p-4 overflow-x-auto text-[12.5px] leading-[1.6] text-[var(--fg)] font-mono">{ch.code}</pre>
+                                    <div class="shiki-wrap" set:html={ch.codeHtml || `<pre>${ch.code}</pre>`}></div>
                                 </div>
                             )}
 
