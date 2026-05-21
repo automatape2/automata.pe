@@ -1,0 +1,184 @@
+---
+// KeyboardHelp — press ? to open an overlay listing every available shortcut.
+---
+
+<div id="khelp-overlay" class="khelp-overlay" data-open="false" aria-hidden="true">
+    <div class="khelp-panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+        <div class="khelp-header">
+            <span class="khelp-prompt">$</span>
+            <span class="khelp-title">man automata</span>
+            <span class="khelp-spacer"></span>
+            <button type="button" data-khelp-close class="khelp-esc">[ esc ]</button>
+        </div>
+        <div class="khelp-body">
+            <div class="khelp-section">
+                <h4>navigation</h4>
+                <dl>
+                    <dt><kbd>⌘</kbd> <kbd>K</kbd> / <kbd>Ctrl</kbd> <kbd>K</kbd></dt>
+                    <dd>open command palette · search projects & sections</dd>
+
+                    <dt><kbd>?</kbd></dt>
+                    <dd>open this help overlay</dd>
+
+                    <dt><kbd>Esc</kbd></dt>
+                    <dd>close any open overlay or lightbox</dd>
+                </dl>
+            </div>
+
+            <div class="khelp-section">
+                <h4>case study</h4>
+                <dl>
+                    <dt><kbd>←</kbd> / <kbd>→</kbd></dt>
+                    <dd>inside the challenges carousel — previous / next slide</dd>
+
+                    <dt>hover heading + <kbd>click #</kbd></dt>
+                    <dd>copy a deep link to that section</dd>
+
+                    <dt><kbd>click</kbd> screenshot</dt>
+                    <dd>open in lightbox · arrows page through</dd>
+
+                    <dt><kbd>click [ copy ]</kbd></dt>
+                    <dd>copy a code snippet to the clipboard</dd>
+                </dl>
+            </div>
+
+            <div class="khelp-section">
+                <h4>diagrams</h4>
+                <dl>
+                    <dt><kbd>click view / source</kbd></dt>
+                    <dd>toggle between rendered Mermaid and editable source</dd>
+
+                    <dt>edit source</dt>
+                    <dd>re-renders the view automatically (400ms debounce)</dd>
+
+                    <dt><kbd>[ reset ]</kbd></dt>
+                    <dd>revert the diagram to the original source</dd>
+                </dl>
+            </div>
+
+            <div class="khelp-footer">
+                <span class="text-[var(--fg-muted)]">// press <kbd>?</kbd> anytime to re-open this</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style is:global>
+    .khelp-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 220;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 10vh;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    .khelp-overlay[data-open="true"] { display: flex; }
+
+    .khelp-panel {
+        width: min(640px, calc(100vw - 2rem));
+        max-height: 80vh;
+        overflow-y: auto;
+        background: var(--panel);
+        border: 1px solid var(--line-bright);
+        animation: khelp-in 120ms ease-out;
+    }
+    @keyframes khelp-in {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .khelp-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+    }
+    .khelp-prompt { color: var(--green); font-weight: 700; }
+    .khelp-title { color: var(--fg); font-size: 14px; }
+    .khelp-spacer { flex: 1; }
+    .khelp-esc {
+        font-size: 11px;
+        padding: 2px 6px;
+        background: transparent;
+        border: 1px solid var(--line-bright);
+        color: var(--fg-muted);
+        cursor: pointer;
+    }
+    .khelp-esc:hover { color: var(--green); border-color: var(--green); }
+
+    .khelp-body { padding: 16px; }
+    .khelp-section + .khelp-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .khelp-section h4 {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--fg-muted);
+        margin: 0 0 10px;
+    }
+    .khelp-section dl {
+        display: grid;
+        grid-template-columns: minmax(140px, 200px) 1fr;
+        gap: 8px 16px;
+        margin: 0;
+        font-size: 12.5px;
+    }
+    .khelp-section dt { color: var(--fg); }
+    .khelp-section dd { margin: 0; color: var(--fg-dim); }
+    .khelp-section kbd {
+        display: inline-block;
+        padding: 1px 6px;
+        font-size: 11px;
+        color: var(--fg);
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-bottom-width: 2px;
+        border-radius: 3px;
+        margin-right: 4px;
+    }
+    .khelp-footer { margin-top: 18px; font-size: 11px; }
+    .khelp-footer kbd { display: inline-block; padding: 0 4px; font-size: 11px; }
+</style>
+
+<script>
+    const overlay = document.getElementById("khelp-overlay");
+    const closeBtn = overlay?.querySelector<HTMLButtonElement>("[data-khelp-close]");
+    if (overlay) {
+        function open() {
+            overlay.setAttribute("data-open", "true");
+            overlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+        }
+        function close() {
+            overlay.setAttribute("data-open", "false");
+            overlay.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+        }
+
+        document.addEventListener("keydown", (e) => {
+            const target = e.target as HTMLElement | null;
+            const editing =
+                target &&
+                (target.tagName === "INPUT" ||
+                    target.tagName === "TEXTAREA" ||
+                    target.isContentEditable);
+            const isOpen = overlay.getAttribute("data-open") === "true";
+
+            if (!editing && (e.key === "?" || (e.key === "/" && e.shiftKey))) {
+                e.preventDefault();
+                isOpen ? close() : open();
+            } else if (isOpen && e.key === "Escape") {
+                e.preventDefault();
+                close();
+            }
+        });
+        closeBtn?.addEventListener("click", close);
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) close();
+        });
+    }
+</script>

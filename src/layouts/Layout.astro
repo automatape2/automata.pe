@@ -5,6 +5,7 @@ import ScrollToTop from "../components/ScrollToTop.astro";
 import Footer from "../components/Footer.astro";
 import VisitTracker from "../components/VisitTracker.astro";
 import CommandPalette from "../components/CommandPalette.astro";
+import KeyboardHelp from "../components/KeyboardHelp.astro";
 import Lightbox from "../components/Lightbox.astro";
 import { getLangFromUrl, getTranslations } from "../i18n/utils";
 import { personalInfo } from "../config/personal";
@@ -246,6 +247,7 @@ const ldPayload = structuredData ?? (
         <Footer />
         <ScrollToTop />
         <CommandPalette commands={cmdkCommands} />
+        <KeyboardHelp />
         <Lightbox />
         <VisitTracker />
 
