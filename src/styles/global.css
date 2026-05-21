@@ -505,6 +505,111 @@ body {
 .cursor-glow { display: none !important; }
 
 /* ========================================
+   Print stylesheet — clean PDF export
+   ======================================== */
+
+@media print {
+    /* Force a readable light theme for paper */
+    :root {
+        --bg: #ffffff;
+        --bg-elev: #ffffff;
+        --panel: #ffffff;
+        --panel-2: #ffffff;
+        --line: #d1d5db;
+        --line-bright: #9ca3af;
+        --fg: #000000;
+        --fg-dim: #1f2937;
+        --fg-muted: #4b5563;
+        --green: #15803d;
+        --cyan: #0e7490;
+        --amber: #b45309;
+        --red: #b91c1c;
+    }
+
+    html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    /* Strip chrome that doesn't make sense on paper */
+    header[class*="border-b"],
+    [data-toc-mobile],
+    .toc-desktop,
+    [data-carousel-prev],
+    [data-carousel-next],
+    [data-carousel-dot],
+    [data-lightbox-trigger]::after,
+    #cmdk-overlay,
+    #khelp-overlay,
+    #lightbox,
+    .cmdk-overlay,
+    .lb-overlay,
+    .permalink-btn,
+    .mv-source-editor,
+    .mv-edit-footer,
+    [data-pane="source"],
+    .window-chrome,
+    .mv-skeleton,
+    [data-challenges-prev],
+    [data-challenges-next],
+    .challenges-dot,
+    .mv-status,
+    .copy-btn,
+    [data-code-copy],
+    .btn-cli,
+    .cmdk-overlay,
+    [data-gh-stats],
+    footer,
+    .panel-accent {
+        display: none !important;
+    }
+
+    /* Linearize carousel: show ALL slides stacked */
+    [data-carousel-track] {
+        display: block !important;
+        transform: none !important;
+    }
+    [data-carousel-slide] {
+        width: 100% !important;
+        page-break-inside: avoid;
+        margin-bottom: 16px;
+        border: 1px solid #d1d5db;
+        padding: 12px;
+    }
+
+    /* Linearize masterdetail: show all panes */
+    .md-grid > nav { display: none !important; }
+    [data-md-key].hidden { display: block !important; }
+    [data-md-key] { page-break-before: always; }
+
+    /* Sections expanded fully */
+    .toc, .toc-desktop, .toc-mobile { display: none !important; }
+    [data-animate] { opacity: 1 !important; transform: none !important; }
+
+    /* Remove fixed positioning so nothing overlaps */
+    * { position: static !important; }
+
+    /* Compact code blocks */
+    .shiki-wrap pre.shiki {
+        font-size: 10px !important;
+        border: 1px solid #d1d5db !important;
+        page-break-inside: avoid;
+    }
+    .shiki-wrap pre.shiki * { color: #000 !important; }
+
+    /* Visible link URLs after each href */
+    a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 9px;
+        color: #4b5563;
+    }
+
+    /* Section page breaks */
+    section[id] { page-break-inside: avoid; }
+    h1, h2, h3 { page-break-after: avoid; }
+}
+
+/* ========================================
    Shiki code blocks — tame the inline styles
    ======================================== */
 
