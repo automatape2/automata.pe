@@ -1,0 +1,7 @@
+# Automata — https://automata.pe
+# All crawlers allowed everywhere.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://automata.pe/sitemap.xml
