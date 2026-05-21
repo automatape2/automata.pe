@@ -905,4 +905,33 @@ if (project.lessons && project.lessons.length > 0) {
             }
         });
     });
+
+    // ============ Section permalinks ============
+    // For every <section id="..."> in the page, find its first heading and add a copy-link button.
+    document.querySelectorAll<HTMLElement>("section[id]").forEach((section) => {
+        const id = section.id;
+        if (!id) return;
+        const heading = section.querySelector<HTMLElement>("h2, h3");
+        if (!heading) return;
+        heading.setAttribute("data-section-permalink", "");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "permalink-btn";
+        btn.textContent = "#";
+        btn.setAttribute("aria-label", `Copy link to ${id}`);
+        btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const url = `${location.origin}${location.pathname}#${id}`;
+            try {
+                await navigator.clipboard.writeText(url);
+                btn.setAttribute("data-copied", "true");
+                history.replaceState(null, "", `#${id}`);
+                setTimeout(() => btn.removeAttribute("data-copied"), 1200);
+            } catch {
+                // fallback: focus the section
+                section.scrollIntoView({ behavior: "smooth" });
+            }
+        });
+        heading.appendChild(btn);
+    });
 </script>

@@ -432,6 +432,49 @@ body {
   text-shadow: 0 0 12px rgba(74, 222, 128, 0.45);
 }
 
+/* ========================================
+   Section permalinks
+   ======================================== */
+
+[data-section-permalink] {
+    position: relative;
+}
+[data-section-permalink] .permalink-btn {
+    position: absolute;
+    left: -28px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    color: var(--fg-muted);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 150ms, color 150ms;
+}
+[data-section-permalink]:hover .permalink-btn { opacity: 1; }
+.permalink-btn:hover,
+.permalink-btn:focus-visible { color: var(--green); outline: none; }
+.permalink-btn[data-copied="true"] {
+    opacity: 1;
+    color: var(--green);
+}
+@media (max-width: 640px) {
+    /* Inline permalink on mobile (no negative-left tricks) */
+    [data-section-permalink] .permalink-btn {
+        position: static;
+        transform: none;
+        margin-left: 8px;
+        opacity: 0.5;
+    }
+}
+
 /* Disable old animations that would conflict */
 .magnetic { transition: none !important; }
 .cursor-glow { display: none !important; }
