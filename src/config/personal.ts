@@ -9,7 +9,7 @@ export const personalInfo = {
     // Brand/Company
     brandName: "Automata",
     fullName: "Automata",
-    tagline: "Automatizacion Inteligente",
+    tagline: "Tecnologia que nace en tu operacion",
 
     // Contact Information
     email: "contacto@automata.pe",

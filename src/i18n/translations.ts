@@ -11,69 +11,69 @@ export const translations = {
     es: {
         nav: {
             home: "Inicio",
-            services: "Servicios",
-            solutions: "Soluciones",
+            services: "Soluciones",
+            solutions: "Proyectos",
             tech: "Tecnologias",
             contact: "Contacto"
         },
         hero: {
-            greeting: "AUTOMATIZACION INTELIGENTE",
-            title: "Automatizamos tu negocio ",
-            titleHighlight: "con IA",
+            greeting: "TECNOLOGIA QUE OPERA CONTIGO",
+            title: "Tecnologia que nace en tu ",
+            titleHighlight: "operacion",
             titleEnd: "",
-            description: "Soluciones que eliminan tareas repetitivas, integran sistemas y optimizan procesos. Workflows con n8n, integraciones con GPT y Claude, pipelines de datos automatizados.",
+            description: "Acompañamos a empresas en consultoria, desarrollo, cloud, IoT y staffing IT. Hombro a hombro con tu equipo: entendemos tus procesos, tus riesgos y tus urgencias para que la tecnologia sea un habilitador, no un riesgo.",
             cta1: "Ver Soluciones",
-            cta2: "Agenda una Demo",
+            cta2: "Conversemos",
             socialLinks: {
                 github: personalInfo.socialLinks.github,
                 linkedin: personalInfo.socialLinks.linkedin
             }
         },
         services: {
-            sectionTitle: "Servicios",
-            subtitle: "Soluciones de automatizacion para cada necesidad",
+            sectionTitle: "Soluciones",
+            subtitle: "Capacidades end-to-end para acompañarte en cada etapa de tu transformacion",
             items: [
                 {
-                    name: "Workflows n8n",
-                    description: "Automatizacion visual sin codigo. Conecta apps, APIs y bases de datos en minutos.",
-                    icon: "workflow",
-                    gradient: "from-orange-500 to-red-500"
-                },
-                {
-                    name: "Integracion IA",
-                    description: "GPT-4, Claude, LangChain integrados en tus procesos de negocio.",
-                    icon: "brain",
-                    gradient: "from-purple-500 to-pink-500"
-                },
-                {
-                    name: "ETL & Data Pipelines",
-                    description: "Extraccion, transformacion y carga de datos automatizada.",
-                    icon: "database",
-                    gradient: "from-blue-500 to-cyan-500"
-                },
-                {
-                    name: "RPA",
-                    description: "Automatizacion robotica de procesos repetitivos en cualquier aplicacion.",
-                    icon: "robot",
-                    gradient: "from-green-500 to-emerald-500"
-                },
-                {
-                    name: "Chatbots IA",
-                    description: "Asistentes inteligentes para atencion al cliente y soporte 24/7.",
-                    icon: "chat",
+                    name: "Consultoria & Arquitectura",
+                    description: "Levantamos procesos, analizamos riesgos y diseñamos arquitecturas modernas y escalables. Definimos hojas de ruta tecnologicas alineadas a tu operacion.",
+                    icon: "blueprint",
                     gradient: "from-cyan-500 to-blue-500"
                 },
                 {
-                    name: "Web Scraping",
-                    description: "Extraccion automatizada de datos de cualquier sitio web.",
-                    icon: "globe",
-                    gradient: "from-yellow-500 to-orange-500"
+                    name: "Fabrica de Software",
+                    description: "Desarrollo web, movil y plataformas empresariales. Stack moderno con Node.js, Laravel, Python, React y React Native, potenciado con IA en cada etapa.",
+                    icon: "code",
+                    gradient: "from-blue-500 to-indigo-500"
+                },
+                {
+                    name: "Infraestructura Cloud",
+                    description: "Implementaciones en AWS, Azure e hibridas. Automatizacion, monitoreo, gobernanza de costos y migraciones asistidas con minima friccion.",
+                    icon: "cloud",
+                    gradient: "from-sky-500 to-cyan-500"
+                },
+                {
+                    name: "IoT & Hardware",
+                    description: "Conectamos dispositivos fisicos con plataformas digitales. Telemetria, sensores, Raspberry Pi y protocolos industriales como MQTT, Modbus y RS-485.",
+                    icon: "chip",
+                    gradient: "from-emerald-500 to-teal-500"
+                },
+                {
+                    name: "Staffing IT",
+                    description: "Talento tecnico especializado evaluado con IA. Perfiles fullstack, cloud, QA, data y DevOps integrados a tu equipo de forma agil.",
+                    icon: "team",
+                    gradient: "from-purple-500 to-pink-500"
+                },
+                {
+                    name: "Automatizacion con IA",
+                    description: "Workflows con n8n, agentes con GPT y Claude, RPA y pipelines de datos. Eliminamos tareas repetitivas e integramos tus sistemas.",
+                    icon: "brain",
+                    gradient: "from-orange-500 to-red-500"
                 }
             ]
         },
         solutions: {
-            sectionTitle: "Soluciones",
-            subtitle: "Productos y casos de uso reales",
+            sectionTitle: "Proyectos & Casos",
+            subtitle: "Implementaciones reales que combinan tecnologia, operacion e IA",
             items: [
                 {
                     slug: "landingpager",
@@ -87,7 +87,7 @@ export const translations = {
                 {
                     slug: "ms_crm",
                     title: "MS CRM",
-                    description: "Sistema CRM con automatizacion de seguimiento, segmentos dinamicos y timeline de interacciones.",
+                    description: "Sistema CRM con automatizacion de seguimiento, segmentos dinamicos y timeline de interacciones para fuerza de ventas.",
                     tech: ["Laravel", "Livewire", "MySQL", "n8n"],
                     image: msCrmImage2,
                     screenshots: [msCrmImage, msCrmImage2, msCrmImage3],
@@ -97,7 +97,7 @@ export const translations = {
                 {
                     slug: "education_portal",
                     title: "Portal Educativo",
-                    description: "Portal con recursos automatizados, notificaciones inteligentes y sincronizacion de calendarios.",
+                    description: "Portal institucional con recursos automatizados, notificaciones inteligentes y sincronizacion de calendarios.",
                     tech: ["Laravel", "Livewire", "MySQL", "APIs"],
                     image: educationPortalImage,
                     demoUrl: "https://automata.pe/education_portal",
@@ -106,7 +106,7 @@ export const translations = {
                 {
                     slug: "whatsapp-cotizador",
                     title: "Bot Cotizador WhatsApp",
-                    description: "Chatbot que responde consultas 24/7, calcula cotizaciones desde tu catalogo y agenda citas automaticamente.",
+                    description: "Chatbot que responde 24/7, calcula cotizaciones desde tu catalogo y agenda citas automaticamente.",
                     tech: ["n8n", "WhatsApp API", "OpenAI", "Google Sheets"],
                     image: msCrmImage,
                     type: "caso"
@@ -122,9 +122,25 @@ export const translations = {
                 {
                     slug: "monitor-precios",
                     title: "Monitor de Precios Competencia",
-                    description: "Scraper que revisa precios de competidores diariamente y te alerta cuando hay cambios importantes.",
+                    description: "Scraper que revisa precios de competidores diariamente y alerta cuando hay cambios importantes.",
                     tech: ["Python", "n8n", "Telegram", "PostgreSQL"],
                     image: educationPortalImage,
+                    type: "caso"
+                },
+                {
+                    slug: "iot-telemetria",
+                    title: "Telemetria Industrial IoT",
+                    description: "Lectura de sensores Modbus/MQTT en planta, dashboards en tiempo real y alertas tempranas de fallas.",
+                    tech: ["MQTT", "Node-RED", "TimescaleDB", "Grafana"],
+                    image: msCrmImage,
+                    type: "caso"
+                },
+                {
+                    slug: "cloud-migration",
+                    title: "Migracion a AWS",
+                    description: "Migracion asistida de cargas legacy a AWS con IaC, observabilidad y gobernanza de costos desde el dia uno.",
+                    tech: ["AWS", "Terraform", "Docker", "CloudWatch"],
+                    image: msCrmImage2,
                     type: "caso"
                 },
                 {
@@ -136,25 +152,9 @@ export const translations = {
                     type: "caso"
                 },
                 {
-                    slug: "contenido-social",
-                    title: "Generador de Contenido Social",
-                    description: "Crea posts para redes con IA, los programa automaticamente y te envia reportes de metricas semanales.",
-                    tech: ["n8n", "OpenAI", "Buffer API", "Google Sheets"],
-                    image: msCrmImage2,
-                    type: "caso"
-                },
-                {
-                    slug: "alertas-stock",
-                    title: "Alertas de Stock Inteligentes",
-                    description: "Monitorea inventario en multiples canales de venta y notifica cuando hay que reponer productos.",
-                    tech: ["n8n", "Shopify API", "WhatsApp", "PostgreSQL"],
-                    image: msCrmImage3,
-                    type: "caso"
-                },
-                {
                     slug: "transcriptor-reuniones",
                     title: "Transcriptor de Reuniones",
-                    description: "Graba tus calls de Zoom/Meet, transcribe con IA, extrae tareas y envia resumenes al equipo.",
+                    description: "Graba calls de Zoom/Meet, transcribe con IA, extrae tareas y envia resumenes al equipo.",
                     tech: ["n8n", "Whisper AI", "OpenAI", "Slack"],
                     image: educationPortalImage,
                     type: "caso"
@@ -166,52 +166,60 @@ export const translations = {
                     tech: ["n8n", "OpenAI", "Airtable", "Email"],
                     image: msCrmImage,
                     type: "caso"
+                },
+                {
+                    slug: "contenido-social",
+                    title: "Generador de Contenido Social",
+                    description: "Crea posts con IA, los programa automaticamente y envia reportes de metricas semanales.",
+                    tech: ["n8n", "OpenAI", "Buffer API", "Google Sheets"],
+                    image: msCrmImage2,
+                    type: "caso"
                 }
             ]
         },
         techStack: {
             sectionTitle: "Stack Tecnologico",
-            subtitle: "Herramientas que dominamos",
+            subtitle: "Herramientas y plataformas que dominamos end-to-end",
             categories: [
                 {
-                    name: "Automatizacion",
-                    items: ["n8n", "Make", "Zapier", "Python"]
+                    name: "Arquitectura & Cloud",
+                    items: ["AWS", "Azure", "Docker", "Kubernetes"]
                 },
                 {
-                    name: "Inteligencia Artificial",
-                    items: ["OpenAI", "Anthropic", "LangChain", "Hugging Face"]
+                    name: "Desarrollo",
+                    items: ["Laravel", "Node.js", "React", "Python"]
                 },
                 {
-                    name: "Backend",
-                    items: ["Laravel", "Node.js", "Python", "PostgreSQL"]
+                    name: "IA & Automatizacion",
+                    items: ["OpenAI", "Anthropic", "LangChain", "n8n"]
                 },
                 {
-                    name: "Cloud & DevOps",
-                    items: ["AWS", "Docker", "GitHub Actions", "Vercel"]
+                    name: "IoT & Datos",
+                    items: ["MQTT", "PostgreSQL", "Grafana", "Raspberry Pi"]
                 }
             ]
         },
         metrics: {
-            sectionTitle: "Impacto",
-            subtitle: "Resultados que hablan por si solos",
+            sectionTitle: "Por que confiar en nosotros",
+            subtitle: "Acompañamiento end-to-end con responsabilidad sobre cada proyecto",
             items: [
-                { value: "500+", label: "Horas ahorradas" },
-                { value: "50+", label: "Automatizaciones" },
-                { value: "99.9%", label: "Uptime" },
-                { value: "10+", label: "Integraciones" }
+                { value: "End-to-end", label: "Capacidades sin terceros" },
+                { value: "50+", label: "Proyectos entregados" },
+                { value: "24/7", label: "Acompañamiento post-implementacion" },
+                { value: "100%", label: "Compromiso con tu operacion" }
             ]
         },
         contact: {
-            title: "Automatiza tu negocio hoy",
-            description: "Agenda una consulta gratuita. Analizamos tus procesos y te mostramos como automatizarlos.",
+            title: "Hablemos de tu operacion",
+            description: "Cuentanos tus procesos, riesgos y urgencias. Te respondemos con una propuesta clara, sin jerga, alineada a tu negocio.",
             email: personalInfo.email,
             emailLabel: "Email",
-            ctaLabel: "Agenda una Demo",
+            ctaLabel: "Agenda una reunion",
             socialLabel: "Siguenos"
         },
         footer: {
             copyright: "Automata. Todos los derechos reservados.",
-            tagline: "Automatizacion inteligente para tu negocio.",
+            tagline: "Tecnologia que nace en tu operacion.",
             quickLinks: "Enlaces",
             contactTitle: "Contacto",
             socialTitle: "Redes",
@@ -222,69 +230,69 @@ export const translations = {
     en: {
         nav: {
             home: "Home",
-            services: "Services",
-            solutions: "Solutions",
+            services: "Solutions",
+            solutions: "Projects",
             tech: "Tech",
             contact: "Contact"
         },
         hero: {
-            greeting: "INTELLIGENT AUTOMATION",
-            title: "We automate your business ",
-            titleHighlight: "with AI",
+            greeting: "TECHNOLOGY THAT OPERATES WITH YOU",
+            title: "Technology born from your ",
+            titleHighlight: "operation",
             titleEnd: "",
-            description: "Solutions that eliminate repetitive tasks, integrate systems and optimize processes. n8n workflows, GPT and Claude integrations, automated data pipelines.",
+            description: "We partner with companies on consulting, software, cloud, IoT and IT staffing. Shoulder to shoulder with your team: we understand your processes, risks and urgencies so technology becomes an enabler, not a risk.",
             cta1: "View Solutions",
-            cta2: "Book a Demo",
+            cta2: "Let's Talk",
             socialLinks: {
                 github: personalInfo.socialLinks.github,
                 linkedin: personalInfo.socialLinks.linkedin
             }
         },
         services: {
-            sectionTitle: "Services",
-            subtitle: "Automation solutions for every need",
+            sectionTitle: "Solutions",
+            subtitle: "End-to-end capabilities to support every stage of your transformation",
             items: [
                 {
-                    name: "n8n Workflows",
-                    description: "Visual no-code automation. Connect apps, APIs and databases in minutes.",
-                    icon: "workflow",
-                    gradient: "from-orange-500 to-red-500"
-                },
-                {
-                    name: "AI Integration",
-                    description: "GPT-4, Claude, LangChain integrated into your business processes.",
-                    icon: "brain",
-                    gradient: "from-purple-500 to-pink-500"
-                },
-                {
-                    name: "ETL & Data Pipelines",
-                    description: "Automated data extraction, transformation and loading.",
-                    icon: "database",
-                    gradient: "from-blue-500 to-cyan-500"
-                },
-                {
-                    name: "RPA",
-                    description: "Robotic process automation for repetitive tasks in any application.",
-                    icon: "robot",
-                    gradient: "from-green-500 to-emerald-500"
-                },
-                {
-                    name: "AI Chatbots",
-                    description: "Intelligent assistants for customer service and 24/7 support.",
-                    icon: "chat",
+                    name: "Consulting & Architecture",
+                    description: "We map processes, analyze risks and design modern, scalable architectures. Tech roadmaps aligned to your real operation.",
+                    icon: "blueprint",
                     gradient: "from-cyan-500 to-blue-500"
                 },
                 {
-                    name: "Web Scraping",
-                    description: "Automated data extraction from any website.",
-                    icon: "globe",
-                    gradient: "from-yellow-500 to-orange-500"
+                    name: "Software Factory",
+                    description: "Web, mobile and enterprise platforms. Modern stack with Node.js, Laravel, Python, React and React Native, AI-augmented at every step.",
+                    icon: "code",
+                    gradient: "from-blue-500 to-indigo-500"
+                },
+                {
+                    name: "Cloud Infrastructure",
+                    description: "AWS, Azure and hybrid deployments. Automation, monitoring, cost governance and low-friction migrations.",
+                    icon: "cloud",
+                    gradient: "from-sky-500 to-cyan-500"
+                },
+                {
+                    name: "IoT & Hardware",
+                    description: "We connect physical devices with digital platforms. Telemetry, sensors, Raspberry Pi and industrial protocols like MQTT, Modbus and RS-485.",
+                    icon: "chip",
+                    gradient: "from-emerald-500 to-teal-500"
+                },
+                {
+                    name: "IT Staffing",
+                    description: "Specialized tech talent evaluated with AI. Fullstack, cloud, QA, data and DevOps profiles seamlessly embedded in your team.",
+                    icon: "team",
+                    gradient: "from-purple-500 to-pink-500"
+                },
+                {
+                    name: "AI Automation",
+                    description: "n8n workflows, GPT and Claude agents, RPA and data pipelines. We eliminate repetitive tasks and integrate your systems.",
+                    icon: "brain",
+                    gradient: "from-orange-500 to-red-500"
                 }
             ]
         },
         solutions: {
-            sectionTitle: "Solutions",
-            subtitle: "Products and real use cases",
+            sectionTitle: "Projects & Cases",
+            subtitle: "Real implementations combining technology, operations and AI",
             items: [
                 {
                     slug: "landingpager",
@@ -298,7 +306,7 @@ export const translations = {
                 {
                     slug: "ms_crm",
                     title: "MS CRM",
-                    description: "CRM system with automated follow-up, dynamic segments and interaction timeline.",
+                    description: "CRM system with automated follow-up, dynamic segments and interaction timeline for sales teams.",
                     tech: ["Laravel", "Livewire", "MySQL", "n8n"],
                     image: msCrmImage2,
                     screenshots: [msCrmImage, msCrmImage2, msCrmImage3],
@@ -308,7 +316,7 @@ export const translations = {
                 {
                     slug: "education_portal",
                     title: "Education Portal",
-                    description: "Portal with automated resources, smart notifications and calendar sync.",
+                    description: "Institutional portal with automated resources, smart notifications and calendar sync.",
                     tech: ["Laravel", "Livewire", "MySQL", "APIs"],
                     image: educationPortalImage,
                     demoUrl: "https://automata.pe/education_portal",
@@ -339,6 +347,22 @@ export const translations = {
                     type: "case"
                 },
                 {
+                    slug: "iot-telemetria",
+                    title: "Industrial IoT Telemetry",
+                    description: "Modbus/MQTT sensor readings on the plant floor, real-time dashboards and early failure alerts.",
+                    tech: ["MQTT", "Node-RED", "TimescaleDB", "Grafana"],
+                    image: msCrmImage,
+                    type: "case"
+                },
+                {
+                    slug: "cloud-migration",
+                    title: "AWS Migration",
+                    description: "Assisted migration of legacy workloads to AWS with IaC, observability and cost governance from day one.",
+                    tech: ["AWS", "Terraform", "Docker", "CloudWatch"],
+                    image: msCrmImage2,
+                    type: "case"
+                },
+                {
                     slug: "onboarding-empleados",
                     title: "Automatic Onboarding",
                     description: "Bot that sends documents to new employees, schedules onboarding meetings and follows up automatically.",
@@ -347,25 +371,9 @@ export const translations = {
                     type: "case"
                 },
                 {
-                    slug: "contenido-social",
-                    title: "Social Content Generator",
-                    description: "Creates social media posts with AI, schedules them automatically and sends weekly metrics reports.",
-                    tech: ["n8n", "OpenAI", "Buffer API", "Google Sheets"],
-                    image: msCrmImage2,
-                    type: "case"
-                },
-                {
-                    slug: "alertas-stock",
-                    title: "Smart Stock Alerts",
-                    description: "Monitors inventory across multiple sales channels and notifies when products need restocking.",
-                    tech: ["n8n", "Shopify API", "WhatsApp", "PostgreSQL"],
-                    image: msCrmImage3,
-                    type: "case"
-                },
-                {
                     slug: "transcriptor-reuniones",
                     title: "Meeting Transcriber",
-                    description: "Records your Zoom/Meet calls, transcribes with AI, extracts tasks and sends summaries to the team.",
+                    description: "Records Zoom/Meet calls, transcribes with AI, extracts tasks and sends summaries to the team.",
                     tech: ["n8n", "Whisper AI", "OpenAI", "Slack"],
                     image: educationPortalImage,
                     type: "case"
@@ -377,52 +385,60 @@ export const translations = {
                     tech: ["n8n", "OpenAI", "Airtable", "Email"],
                     image: msCrmImage,
                     type: "case"
+                },
+                {
+                    slug: "contenido-social",
+                    title: "Social Content Generator",
+                    description: "Creates social media posts with AI, schedules them automatically and sends weekly metrics reports.",
+                    tech: ["n8n", "OpenAI", "Buffer API", "Google Sheets"],
+                    image: msCrmImage2,
+                    type: "case"
                 }
             ]
         },
         techStack: {
             sectionTitle: "Tech Stack",
-            subtitle: "Tools we master",
+            subtitle: "Tools and platforms we master end-to-end",
             categories: [
                 {
-                    name: "Automation",
-                    items: ["n8n", "Make", "Zapier", "Python"]
+                    name: "Architecture & Cloud",
+                    items: ["AWS", "Azure", "Docker", "Kubernetes"]
                 },
                 {
-                    name: "Artificial Intelligence",
-                    items: ["OpenAI", "Anthropic", "LangChain", "Hugging Face"]
+                    name: "Development",
+                    items: ["Laravel", "Node.js", "React", "Python"]
                 },
                 {
-                    name: "Backend",
-                    items: ["Laravel", "Node.js", "Python", "PostgreSQL"]
+                    name: "AI & Automation",
+                    items: ["OpenAI", "Anthropic", "LangChain", "n8n"]
                 },
                 {
-                    name: "Cloud & DevOps",
-                    items: ["AWS", "Docker", "GitHub Actions", "Vercel"]
+                    name: "IoT & Data",
+                    items: ["MQTT", "PostgreSQL", "Grafana", "Raspberry Pi"]
                 }
             ]
         },
         metrics: {
-            sectionTitle: "Impact",
-            subtitle: "Results that speak for themselves",
+            sectionTitle: "Why trust us",
+            subtitle: "End-to-end accompaniment, taking responsibility for every project",
             items: [
-                { value: "500+", label: "Hours saved" },
-                { value: "50+", label: "Automations" },
-                { value: "99.9%", label: "Uptime" },
-                { value: "10+", label: "Integrations" }
+                { value: "End-to-end", label: "No third-party dependencies" },
+                { value: "50+", label: "Projects delivered" },
+                { value: "24/7", label: "Post-implementation support" },
+                { value: "100%", label: "Commitment to your operation" }
             ]
         },
         contact: {
-            title: "Automate your business today",
-            description: "Book a free consultation. We analyze your processes and show you how to automate them.",
+            title: "Let's talk about your operation",
+            description: "Tell us your processes, risks and urgencies. We'll respond with a clear proposal, no jargon, aligned to your business.",
             email: personalInfo.email,
             emailLabel: "Email",
-            ctaLabel: "Book a Demo",
+            ctaLabel: "Book a meeting",
             socialLabel: "Follow Us"
         },
         footer: {
             copyright: "Automata. All rights reserved.",
-            tagline: "Intelligent automation for your business.",
+            tagline: "Technology born from your operation.",
             quickLinks: "Links",
             contactTitle: "Contact",
             socialTitle: "Social",
