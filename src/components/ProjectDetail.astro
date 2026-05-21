@@ -649,9 +649,15 @@ if (project.metrics || project.results || project.challenges) {
                     <span class="text-[var(--green)]">$</span> ls ./{L.sections.screenshots}
                 </h2>
             </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-0 border border-[var(--line)]">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-0 border border-[var(--line)]" data-lightbox-group>
                 {project.screenshots.map((shot: any, i: number) => (
-                    <a href={shot.src} target="_blank" rel="noopener noreferrer" class={`group overflow-hidden bg-black ${i > 0 ? 'border-t md:border-t-0 md:border-l border-[var(--line)]' : ''} ${i === 2 ? 'lg:border-l' : ''}`}>
+                    <a
+                        href={shot.src}
+                        data-lightbox-trigger
+                        data-lightbox-src={shot.src}
+                        data-lightbox-caption={`${project.title} — screenshot ${i + 1}`}
+                        class={`group overflow-hidden bg-black cursor-zoom-in ${i > 0 ? 'border-t md:border-t-0 md:border-l border-[var(--line)]' : ''} ${i === 2 ? 'lg:border-l' : ''}`}
+                    >
                         <Image
                             src={shot}
                             alt={`${project.title} ${L.sections.screenshots} ${i + 1}`}

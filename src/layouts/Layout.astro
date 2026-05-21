@@ -5,6 +5,7 @@ import ScrollToTop from "../components/ScrollToTop.astro";
 import Footer from "../components/Footer.astro";
 import VisitTracker from "../components/VisitTracker.astro";
 import CommandPalette from "../components/CommandPalette.astro";
+import Lightbox from "../components/Lightbox.astro";
 import { getLangFromUrl, getTranslations } from "../i18n/utils";
 import { personalInfo } from "../config/personal";
 import { translations } from "../i18n/translations";
@@ -185,6 +186,7 @@ const absoluteOgImage = ogImage.startsWith("http")
         <Footer />
         <ScrollToTop />
         <CommandPalette commands={cmdkCommands} />
+        <Lightbox />
         <VisitTracker />
 
         <script src="/sw-register.js" defer></script>
