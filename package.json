@@ -8,7 +8,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "audit:i18n": "node tools/i18n-audit.mjs"
   },
   "dependencies": {
     "@lucide/astro": "^0.563.0",
