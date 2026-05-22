@@ -736,6 +736,283 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                     ]
                 },
                 {
+                    slug: "facturador-sunat",
+                    title: "Facturador Electronico SUNAT",
+                    description: "SaaS multi-tenant de facturacion electronica para Peru: emite todo el catalogo SUNAT (factura, boleta, NC/ND, guia de remision, retenciones, percepciones) con cola async, aislamiento multi-empresa y API REST.",
+                    tech: ["Laravel 11", "Filament 3", "MySQL 8", "Greenter", "PHP 8.3"],
+                    image: msCrmImage2,
+                    demoUrl: "https://automata.pe/facturador",
+                    githubUrl: "https://github.com/automatape2/facturador-sunat",
+                    type: "producto",
+                    year: "2026",
+                    role: "Arquitectura · BE · Integraciones SUNAT",
+                    timeline: "~3 semanas",
+                    team: "Solo founder + LLM pair",
+                    fullDescription: "Facturador electronico SaaS para Peru con integracion SUNAT via Greenter (SOAP) y gre-api (REST OAuth2). Multi-tenant nativo: cada usuario tiene sus empresas, clientes, productos y comprobantes aislados por global scopes. Cubre el catalogo SUNAT completo — Factura 01, Boleta 03, NC 07, ND 08, GRE 09, Baja RA, Recibo por Honorarios 02, Retenciones 20, Percepciones 40, Detracciones SPOT, Resumen Diario RC y PLE 14.1 — mas un panel super-admin SaaS, API REST de 47 endpoints con SDK PHP, y modo Fake para demo/dev offline.",
+                    problem: "Las PyMEs peruanas estan obligadas a emitir comprobantes electronicos, pero los facturadores existentes son caros, cerrados o no soportan multi-empresa para contadores que manejan N clientes. Integrar SUNAT directo es complejo: firma XML, correlativos sin huecos, CDR asincronico, y la GRE usa un API OAuth2 totalmente distinto al SOAP de comprobantes.",
+                    audience: "PyMEs peruanas que facturan, contadores que gestionan multiples empresas desde un solo login, y desarrolladores que necesitan integrar facturacion SUNAT en su propio ERP via API REST.",
+                    designTools: ["Filament 3 (admin scaffolding)", "Blade + Tailwind", "Figma (landing publica)"],
+                    designSystem: [
+                        "Filament 3 como design system base (tablas, forms, acciones, badges)",
+                        "Multi-panel: /admin (tenants) y /super-admin (dueño del SaaS)",
+                        "RBAC con Shield: admin / contador / vendedor + 144 permisos finos",
+                        "Estados de comprobante con color semantico (pendiente / aceptado / rechazado / baja)",
+                        "Branding por empresa: logo, color y footer en PDFs y emails"
+                    ],
+                    architecture: {
+                        context: {
+                            mermaid: `flowchart TD
+    owner((("Owner / Contador<br/><i>emite y gestiona N empresas</i>")))
+    vendedor((("Vendedor<br/><i>emite desde POS</i>")))
+    sys["<b>Facturador SaaS</b><br/><i>multi-tenant</i><br/>catalogo SUNAT + ERP"]
+    sunat["<b>SUNAT</b><br/><i>CPE SOAP + GRE REST</i>"]
+    apis["<b>apis.net.pe</b><br/><i>RUC / DNI / TC</i>"]
+    mp["<b>MercadoPago</b><br/><i>upgrade Plan Pro</i>"]
+    wa["<b>WhatsApp / SMTP</b><br/><i>envio de comprobantes</i>"]
+
+    owner -->|emite, configura| sys
+    vendedor -->|POS| sys
+    sys -->|XML firmado, recibe CDR| sunat
+    sys -->|consulta padron| apis
+    sys -->|checkout + webhook HMAC| mp
+    sys -->|PDF al cliente| wa
+
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef system fill:#0D1117,stroke:#06B6D4,color:#E5E7EB,stroke-width:1.5px
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class owner,vendedor person
+    class sys system
+    class sunat,apis,mp,wa ext`,
+                            ascii: ""
+                        },
+                        container: {
+                            mermaid: `flowchart TD
+    user((("Owner / Vendedor")))
+    erp((("ERP externo")))
+
+    subgraph app ["Facturador Electronico"]
+        direction LR
+        admin["<b>Admin Panel</b><br/><i>Filament 3 + Livewire</i><br/>/admin tenants"]
+        super["<b>Super-Admin</b><br/><i>Filament 3</i><br/>/super-admin MRR"]
+        api["<b>API REST v1</b><br/><i>Laravel + Sanctum</i><br/>47 endpoints"]
+        worker["<b>Queue Worker</b><br/><i>6 jobs async</i>"]
+        domain["<b>Domain Layer</b><br/><i>Use Cases + Services</i>"]
+    end
+
+    db[("<b>MySQL 8.4</b><br/><i>60+ tablas, jobs, audit</i>")]
+    sunat["<b>SUNAT CPE/GRE</b><br/><i>SOAP + OAuth2 REST</i>"]
+
+    user -->|sesion HTTPS| admin
+    user -->|sesion HTTPS| super
+    erp -->|Bearer token| api
+    admin --> domain
+    api --> domain
+    domain --> db
+    worker -->|envia XML| sunat
+    domain --> worker
+
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef container fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class user,erp person
+    class admin,super,api,worker,domain container
+    class db db
+    class sunat ext
+
+    style app fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
+                            ascii: ""
+                        },
+                        component: {
+                            mermaid: `flowchart TD
+    subgraph domain ["Capa de Dominio &middot; vista de componentes"]
+        direction LR
+        uc["<b>Use Cases</b><br/><i>EmitirComprobante<br/>AnularComprobante<br/>EmitirGuiaRemision</i>"]
+        svc["<b>Domain Services</b><br/><i>CalculadoraTributaria<br/>NumeradorService (lock)<br/>QuotaService</i>"]
+        intg["<b>Integration Services</b><br/><i>SunatService + Fake<br/>GreService (OAuth2)<br/>ApisNetPe</i>"]
+    end
+
+    sunat["<b>SUNAT</b>"]
+
+    uc -->|compone reglas| svc
+    uc -->|envia a externos| intg
+    intg --> sunat
+
+    classDef component fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class uc,svc,intg component
+    class sunat ext
+
+    style domain fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
+                            ascii: ""
+                        }
+                    },
+                    infrastructure: {
+                        provider: "Laravel + MySQL (Laragon dev · VPS/cloud prod)",
+                        services: [
+                            "PHP-FPM 8.3 sirviendo Laravel 11",
+                            "Queue worker (database driver): 6 jobs async",
+                            "Scheduler cron: HeartbeatCommand cada minuto (status page)",
+                            "MySQL 8.4 InnoDB utf8mb4 — BD + sessions + cache + queue + audit",
+                            "Storage local (XMLs firmados, CDRs, PFX, PDFs) — S3 en roadmap",
+                            "Redis configurado opcional para escalar cache/queue",
+                            "Sentry (error tracking, solo production)"
+                        ],
+                        diagram: {
+                            mermaid: `flowchart TD
+    user[Usuario]
+    nginx["Nginx / PHP-FPM<br/>Laravel 11"]
+    queue["Queue Worker<br/>artisan queue:work"]
+    cron["Scheduler<br/>artisan schedule:run"]
+    db[("MySQL 8.4")]
+    storage["Storage local<br/>XML / CDR / PDF"]
+    sunat["SUNAT<br/>SOAP + REST"]
+
+    user --> nginx
+    nginx --> db
+    nginx -->|dispatch job| queue
+    queue -->|envia XML| sunat
+    queue --> storage
+    cron --> db
+
+    classDef edge fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+
+    class user ext
+    class nginx,queue,cron edge
+    class db,storage db
+    class sunat ext`,
+                            ascii: ""
+                        }
+                    },
+                    stack: {
+                        frontend: ["Filament 3", "Livewire 3", "Blade", "Alpine.js", "Tailwind CSS"],
+                        backend: ["Laravel 11.52", "PHP 8.3", "Sanctum (API)", "Greenter v5 (SOAP)", "gre-api v1 (OAuth2)"],
+                        data: ["MySQL 8.4 (60+ tablas)", "Redis (opcional)", "Storage local / S3"],
+                        devops: ["GitHub Actions", "Pest (49 tests)", "Sentry", "MercadoPago webhooks", "Spatie ActivityLog"]
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["concurrency", "database", "sunat"],
+                            problem: "Correlativos de comprobante sin huecos ni duplicados bajo emision concurrente",
+                            constraint: "SUNAT exige numeracion secuencial por serie sin saltos. Dos requests simultaneos pidiendo el siguiente numero pueden generar duplicados (rechazo SUNAT) o huecos (observacion).",
+                            approach: "El siguiente correlativo se obtiene dentro de una transaccion con lock pesimista (SELECT ... FOR UPDATE) sobre la fila del contador. El segundo request espera al primero. Asignacion local, no depende de SUNAT.",
+                            algorithm: "Pessimistic locking: lockForUpdate() dentro de DB::transaction(). El row del correlativo se bloquea hasta commit, serializando los incrementos.",
+                            codeFile: "app/Domain/Services/NumeradorService.php",
+                            codeLang: "php",
+                            code: `public function siguiente(Empresa $empresa, string $tipo, string $serie): int
+{
+    return DB::transaction(function () use ($empresa, $tipo, $serie) {
+        $correlativo = Correlativo::where('empresa_id', $empresa->id)
+            ->where('tipo', $tipo)
+            ->where('serie', $serie)
+            ->lockForUpdate()        // SELECT ... FOR UPDATE
+            ->firstOrCreate([], ['numero' => 0]);
+
+        $correlativo->increment('numero');
+        return $correlativo->numero; // sin huecos, sin duplicados
+    });
+}`,
+                            outcome: "0 correlativos duplicados o con hueco en pruebas de carga concurrente. La asignacion es local (<5ms), independiente de la latencia de SUNAT."
+                        },
+                        {
+                            tags: ["backend", "queues", "ux"],
+                            problem: "El HTTP debe terminar en <500ms aunque SUNAT tarde 30s en responder",
+                            constraint: "El envio a SUNAT (SOAP) puede tardar segundos o timeoutear. El usuario no puede quedarse esperando, pero el comprobante debe quedar registrado y enviarse igual.",
+                            approach: "El use case firma el XML y asigna correlativo localmente (rapido), persiste el comprobante en estado 'pendiente', y despacha un job a la cola. El controller responde 202 Accepted de inmediato. El worker envia a SUNAT y actualiza el estado; la UI hace polling.",
+                            algorithm: "Command-Query split + async queue: emision sincrona (firma + correlativo) / envio asincrono (SUNAT). El estado del comprobante es una maquina: pendiente → enviado → aceptado/rechazado.",
+                            codeFile: "app/Http/Controllers/Api/ComprobanteController.php",
+                            codeLang: "php",
+                            code: `public function store(EmitirComprobanteRequest $req): JsonResponse
+{
+    // Firma XML + correlativo local — rapido, no toca SUNAT
+    $comprobante = $this->emitir->handle($req->toDto());
+
+    // Envio a SUNAT en background
+    EnviarComprobanteJob::dispatch($comprobante);
+
+    return response()->json(
+        ComprobanteResource::make($comprobante),
+        202 // Accepted: aun no confirmado por SUNAT
+    );
+}`,
+                            outcome: "Respuesta HTTP p95 < 500ms aun con SUNAT lento. Reintentos automaticos (3 tries, backoff 10s) si SUNAT esta caido, sin perder el comprobante."
+                        },
+                        {
+                            tags: ["multi-tenant", "security", "laravel"],
+                            problem: "Aislar datos entre empresas sin fugas, sin filtrar manualmente en cada query",
+                            constraint: "Un contador ve N empresas; un owner solo la suya. Olvidar un where('empresa_id', ...) en cualquier query filtra datos de otro tenant — un bug de seguridad grave.",
+                            approach: "Un trait BelongsToTenant agrega un global scope automatico a cada modelo tenant-owned: toda query se filtra por las empresas del usuario actual, y al crear se autocompleta el empresa_id. Imposible olvidarlo.",
+                            algorithm: "Global query scope + model events. El aislamiento vive en un solo lugar (el trait), no disperso en controllers. Tests cross-tenant explicitos verifican que no hay fuga.",
+                            codeFile: "app/Models/Concerns/BelongsToTenant.php",
+                            codeLang: "php",
+                            code: `protected static function bootBelongsToTenant(): void
+{
+    static::addGlobalScope('tenant', function (Builder $q) {
+        if ($user = auth()->user()) {
+            $q->whereIn('empresa_id', $user->empresaIds());
+        }
+    });
+
+    static::creating(function ($model) {
+        $model->empresa_id ??= currentEmpresa()->id;
+    });
+}`,
+                            outcome: "0 fugas cross-tenant en 49 tests Pest (incluyendo casos que intentan leer datos de otra empresa explicitamente). Un solo punto de auditoria de seguridad."
+                        },
+                        {
+                            tags: ["sunat", "oauth2", "async"],
+                            problem: "La Guia de Remision (GRE) usa un API OAuth2 REST async, distinto del SOAP de comprobantes",
+                            constraint: "Mientras Factura/Boleta van por SOAP sincrono-ish, la GRE 09 usa gre-api: OAuth2 client_credentials, envio que devuelve un ticket, y consulta de estado por polling. Dos integraciones SUNAT con contratos opuestos.",
+                            approach: "Un GreService separado maneja el flujo OAuth2: cachea el token 50min, envia el XML y recibe un ticket, y despacha un job de polling con delay que consulta el estado hasta resolver. Reusa la misma maquina de estados del comprobante.",
+                            algorithm: "Token bucket cacheado + ticket polling con backoff. El flujo GRE es un sub-grafo async dentro del mismo modelo de estados, aislado en su propio service.",
+                            codeFile: "app/Domain/Integrations/Sunat/GreService.php",
+                            codeLang: "php",
+                            code: `// OAuth2 client_credentials, cacheado ~50min
+$token = Cache::remember('gre_token', 3000, fn () => $this->oauth());
+
+// Envio devuelve un ticket, no el CDR directamente
+$ticket = $this->client->enviarGuia($xmlFirmado, $token);
+
+// Polling async del estado del ticket
+ConsultarTicketGreJob::dispatch($comprobante, $ticket)
+    ->delay(now()->addSeconds(5));`,
+                            outcome: "GRE entregada de forma confiable con polling + backoff, sin bloquear ni mezclarse con el flujo SOAP de comprobantes. Mismo estado final (aceptado/rechazado) para toda la UI."
+                        }
+                    ],
+                    testing: {
+                        strategy: "49 tests Pest cubriendo:\n- Emision de cada tipo de comprobante (01/03/07/08)\n- Calculo tributario (IGV, ISC, exoneradas, gratuitas)\n- Aislamiento multi-tenant (casos cross-tenant explicitos)\n- Cuotas por plan (free 100/mes, pro ilimitado)\n- Numerador concurrente\nGitHub Actions corre la suite + migraciones MySQL en cada push.",
+                        coverage: "49 tests",
+                        tools: ["Pest", "GitHub Actions", "MySQL en CI", "SUNAT_FAKE para tests offline"]
+                    },
+                    metrics: [
+                        { value: "8+", label: "tipos de comprobante SUNAT" },
+                        { value: "47", label: "endpoints API REST" },
+                        { value: "<500ms", label: "respuesta HTTP (SUNAT async)" },
+                        { value: "60+", label: "tablas, 49 tests Pest" }
+                    ],
+                    challenges: "Correlativos concurrentes, latencia impredecible de SUNAT, aislamiento multi-tenant sin fugas, y la GRE con su API OAuth2 distinto. Los detalles tecnicos estan en la seccion 06.",
+                    results: "Sistema que emite el catalogo SUNAT completo con tenancy nativa, demoable 100% offline (modo Fake firma XML real y simula CDR), API REST documentada con OpenAPI 3.0 + Swagger UI + SDK PHP oficial. Listo para produccion con credenciales SEE reales.",
+                    lessons: [
+                        {
+                            title: "Modo Fake desde el dia uno, no como afterthought",
+                            body: "SUNAT_FAKE=true firma XML real pero simula el CDR aceptado. Permitio demos sin credenciales, dev offline, y tests deterministas. Si hubiera dependido de SUNAT real para cada prueba, el ciclo de feedback habria sido inviable. La integracion externa critica necesita un doble desde el primer commit."
+                        },
+                        {
+                            title: "La cola async no es optimizacion, es requisito",
+                            body: "Empezar con envio sincrono y 'despues optimizar' habria significado reescribir el flujo entero. Cuando la dependencia externa es impredecible (SUNAT puede tardar 30s o caerse), el async es parte del diseño, no un add-on. El estado del comprobante como maquina lo hizo natural."
+                        },
+                        {
+                            title: "Global scopes > filtros manuales para multi-tenancy",
+                            body: "Centralizar el aislamiento en un trait con global scope convirtio 'seguridad que depende de que ningun dev olvide un where' en 'seguridad por defecto, imposible de olvidar'. El costo: tener disciplina con los scopes al hacer queries de super-admin (donde si hay que saltarlos explicitamente)."
+                        }
+                    ]
+                },
+                {
                     slug: "ms_crm",
                     title: "MS CRM",
                     description: "Sistema CRM con automatizacion de seguimiento, segmentos dinamicos y timeline de interacciones para fuerza de ventas.",
@@ -1602,6 +1879,283 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                         {
                             title: "LLM pair-programming changes the explore/build ratio",
                             body: "Claude Code sessions let me try 4 layouts (stacked → carousel → tabs → master-detail) in the time it would take to try one by hand. The unexpected consequence: I had to enforce granular commits as discipline, otherwise auditing what I had approved became impossible."
+                        }
+                    ]
+                },
+                {
+                    slug: "facturador-sunat",
+                    title: "SUNAT E-Invoicing",
+                    description: "Multi-tenant SaaS for Peru electronic invoicing: issues the full SUNAT catalog (invoice, receipt, credit/debit notes, dispatch guide, withholdings, perceptions) with an async queue, per-company isolation and a REST API.",
+                    tech: ["Laravel 11", "Filament 3", "MySQL 8", "Greenter", "PHP 8.3"],
+                    image: msCrmImage2,
+                    demoUrl: "https://automata.pe/facturador",
+                    githubUrl: "https://github.com/automatape2/facturador-sunat",
+                    type: "product",
+                    year: "2026",
+                    role: "Architecture · BE · SUNAT integrations",
+                    timeline: "~3 weeks",
+                    team: "Solo founder + LLM pair",
+                    fullDescription: "SaaS electronic invoicing for Peru integrating SUNAT via Greenter (SOAP) and gre-api (REST OAuth2). Natively multi-tenant: every user has their own companies, customers, products and documents isolated by global scopes. Covers the full SUNAT catalog — Invoice 01, Receipt 03, Credit Note 07, Debit Note 08, Dispatch Guide 09, Void RA, Fees Receipt 02, Withholdings 20, Perceptions 40, SPOT detractions, Daily Summary RC and PLE 14.1 — plus a SaaS super-admin panel, a 47-endpoint REST API with a PHP SDK, and a Fake mode for offline demo/dev.",
+                    problem: "Peruvian SMBs are legally required to issue electronic documents, but existing invoicers are expensive, closed, or don't support the multi-company model accountants need to manage N clients. Integrating SUNAT directly is hard: XML signing, gap-free sequential numbering, asynchronous CDR, and the dispatch guide uses an entirely different OAuth2 API from the document SOAP.",
+                    audience: "Peruvian SMBs that invoice, accountants managing multiple companies from a single login, and developers who need to embed SUNAT invoicing into their own ERP via REST API.",
+                    designTools: ["Filament 3 (admin scaffolding)", "Blade + Tailwind", "Figma (public landing)"],
+                    designSystem: [
+                        "Filament 3 as the base design system (tables, forms, actions, badges)",
+                        "Multi-panel: /admin (tenants) and /super-admin (SaaS owner)",
+                        "RBAC via Shield: admin / accountant / salesperson + 144 fine-grained permissions",
+                        "Document status with semantic color (pending / accepted / rejected / voided)",
+                        "Per-company branding: logo, color and footer in PDFs and emails"
+                    ],
+                    architecture: {
+                        context: {
+                            mermaid: `flowchart TD
+    owner((("Owner / Accountant<br/><i>issues, manages N companies</i>")))
+    seller((("Salesperson<br/><i>issues from POS</i>")))
+    sys["<b>Invoicing SaaS</b><br/><i>multi-tenant</i><br/>SUNAT catalog + ERP"]
+    sunat["<b>SUNAT</b><br/><i>CPE SOAP + GRE REST</i>"]
+    apis["<b>apis.net.pe</b><br/><i>RUC / DNI / FX</i>"]
+    mp["<b>MercadoPago</b><br/><i>Pro plan upgrade</i>"]
+    wa["<b>WhatsApp / SMTP</b><br/><i>document delivery</i>"]
+
+    owner -->|issue, configure| sys
+    seller -->|POS| sys
+    sys -->|signed XML, receives CDR| sunat
+    sys -->|lookup taxpayer| apis
+    sys -->|checkout + HMAC webhook| mp
+    sys -->|PDF to customer| wa
+
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef system fill:#0D1117,stroke:#06B6D4,color:#E5E7EB,stroke-width:1.5px
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class owner,seller person
+    class sys system
+    class sunat,apis,mp,wa ext`,
+                            ascii: ""
+                        },
+                        container: {
+                            mermaid: `flowchart TD
+    user((("Owner / Salesperson")))
+    erp((("External ERP")))
+
+    subgraph app ["E-Invoicing System"]
+        direction LR
+        admin["<b>Admin Panel</b><br/><i>Filament 3 + Livewire</i><br/>/admin tenants"]
+        super["<b>Super-Admin</b><br/><i>Filament 3</i><br/>/super-admin MRR"]
+        api["<b>REST API v1</b><br/><i>Laravel + Sanctum</i><br/>47 endpoints"]
+        worker["<b>Queue Worker</b><br/><i>6 async jobs</i>"]
+        domain["<b>Domain Layer</b><br/><i>Use Cases + Services</i>"]
+    end
+
+    db[("<b>MySQL 8.4</b><br/><i>60+ tables, jobs, audit</i>")]
+    sunat["<b>SUNAT CPE/GRE</b><br/><i>SOAP + OAuth2 REST</i>"]
+
+    user -->|HTTPS session| admin
+    user -->|HTTPS session| super
+    erp -->|Bearer token| api
+    admin --> domain
+    api --> domain
+    domain --> db
+    worker -->|sends XML| sunat
+    domain --> worker
+
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef container fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class user,erp person
+    class admin,super,api,worker,domain container
+    class db db
+    class sunat ext
+
+    style app fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
+                            ascii: ""
+                        },
+                        component: {
+                            mermaid: `flowchart TD
+    subgraph domain ["Domain Layer &middot; component view"]
+        direction LR
+        uc["<b>Use Cases</b><br/><i>IssueDocument<br/>VoidDocument<br/>IssueDispatchGuide</i>"]
+        svc["<b>Domain Services</b><br/><i>TaxCalculator<br/>NumberingService (lock)<br/>QuotaService</i>"]
+        intg["<b>Integration Services</b><br/><i>SunatService + Fake<br/>GreService (OAuth2)<br/>ApisNetPe</i>"]
+    end
+
+    sunat["<b>SUNAT</b>"]
+
+    uc -->|composes rules| svc
+    uc -->|sends to externals| intg
+    intg --> sunat
+
+    classDef component fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#6B7280,color:#9CA3AF
+
+    class uc,svc,intg component
+    class sunat ext
+
+    style domain fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`,
+                            ascii: ""
+                        }
+                    },
+                    infrastructure: {
+                        provider: "Laravel + MySQL (Laragon dev · VPS/cloud prod)",
+                        services: [
+                            "PHP-FPM 8.3 serving Laravel 11",
+                            "Queue worker (database driver): 6 async jobs",
+                            "Scheduler cron: HeartbeatCommand every minute (status page)",
+                            "MySQL 8.4 InnoDB utf8mb4 — DB + sessions + cache + queue + audit",
+                            "Local storage (signed XMLs, CDRs, PFX, PDFs) — S3 on the roadmap",
+                            "Redis configured optional to scale cache/queue",
+                            "Sentry (error tracking, production only)"
+                        ],
+                        diagram: {
+                            mermaid: `flowchart TD
+    user[User]
+    nginx["Nginx / PHP-FPM<br/>Laravel 11"]
+    queue["Queue Worker<br/>artisan queue:work"]
+    cron["Scheduler<br/>artisan schedule:run"]
+    db[("MySQL 8.4")]
+    storage["Local storage<br/>XML / CDR / PDF"]
+    sunat["SUNAT<br/>SOAP + REST"]
+
+    user --> nginx
+    nginx --> db
+    nginx -->|dispatch job| queue
+    queue -->|sends XML| sunat
+    queue --> storage
+    cron --> db
+
+    classDef edge fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+
+    class user ext
+    class nginx,queue,cron edge
+    class db,storage db
+    class sunat ext`,
+                            ascii: ""
+                        }
+                    },
+                    stack: {
+                        frontend: ["Filament 3", "Livewire 3", "Blade", "Alpine.js", "Tailwind CSS"],
+                        backend: ["Laravel 11.52", "PHP 8.3", "Sanctum (API)", "Greenter v5 (SOAP)", "gre-api v1 (OAuth2)"],
+                        data: ["MySQL 8.4 (60+ tables)", "Redis (optional)", "Local storage / S3"],
+                        devops: ["GitHub Actions", "Pest (49 tests)", "Sentry", "MercadoPago webhooks", "Spatie ActivityLog"]
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["concurrency", "database", "sunat"],
+                            problem: "Gap-free, duplicate-free document numbering under concurrent issuance",
+                            constraint: "SUNAT requires sequential numbering per series with no gaps. Two simultaneous requests asking for the next number can produce duplicates (SUNAT rejection) or gaps (observation).",
+                            approach: "The next correlative is read inside a transaction with a pessimistic lock (SELECT ... FOR UPDATE) on the counter row. The second request waits for the first. Assignment is local — it never depends on SUNAT.",
+                            algorithm: "Pessimistic locking: lockForUpdate() inside DB::transaction(). The counter row is locked until commit, serializing the increments.",
+                            codeFile: "app/Domain/Services/NumberingService.php",
+                            codeLang: "php",
+                            code: `public function next(Company $company, string $type, string $series): int
+{
+    return DB::transaction(function () use ($company, $type, $series) {
+        $counter = Correlative::where('company_id', $company->id)
+            ->where('type', $type)
+            ->where('series', $series)
+            ->lockForUpdate()        // SELECT ... FOR UPDATE
+            ->firstOrCreate([], ['number' => 0]);
+
+        $counter->increment('number');
+        return $counter->number; // no gaps, no duplicates
+    });
+}`,
+                            outcome: "0 duplicate or gapped correlatives under concurrent load tests. Assignment is local (<5ms), independent of SUNAT latency."
+                        },
+                        {
+                            tags: ["backend", "queues", "ux"],
+                            problem: "HTTP must finish in <500ms even when SUNAT takes 30s to respond",
+                            constraint: "The SOAP send to SUNAT can take seconds or time out. The user can't wait, but the document must still be recorded and sent.",
+                            approach: "The use case signs the XML and assigns the correlative locally (fast), persists the document as 'pending', and dispatches a queue job. The controller returns 202 Accepted immediately. The worker sends to SUNAT and updates status; the UI polls.",
+                            algorithm: "Command-Query split + async queue: synchronous issuance (sign + number) / asynchronous send (SUNAT). Document status is a state machine: pending → sent → accepted/rejected.",
+                            codeFile: "app/Http/Controllers/Api/DocumentController.php",
+                            codeLang: "php",
+                            code: `public function store(IssueDocumentRequest $req): JsonResponse
+{
+    // Sign XML + local correlative — fast, never touches SUNAT
+    $document = $this->issue->handle($req->toDto());
+
+    // Send to SUNAT in the background
+    SendDocumentJob::dispatch($document);
+
+    return response()->json(
+        DocumentResource::make($document),
+        202 // Accepted: not yet confirmed by SUNAT
+    );
+}`,
+                            outcome: "HTTP response p95 < 500ms even with SUNAT slow. Automatic retries (3 tries, 10s backoff) if SUNAT is down, without losing the document."
+                        },
+                        {
+                            tags: ["multi-tenant", "security", "laravel"],
+                            problem: "Isolate data across companies with no leaks, without filtering manually in every query",
+                            constraint: "An accountant sees N companies; an owner only theirs. Forgetting one where('company_id', ...) in any query leaks another tenant's data — a serious security bug.",
+                            approach: "A BelongsToTenant trait adds an automatic global scope to every tenant-owned model: every query filters by the current user's companies, and on create the company_id is auto-filled. Impossible to forget.",
+                            algorithm: "Global query scope + model events. Isolation lives in one place (the trait), not scattered across controllers. Explicit cross-tenant tests verify there's no leak.",
+                            codeFile: "app/Models/Concerns/BelongsToTenant.php",
+                            codeLang: "php",
+                            code: `protected static function bootBelongsToTenant(): void
+{
+    static::addGlobalScope('tenant', function (Builder $q) {
+        if ($user = auth()->user()) {
+            $q->whereIn('company_id', $user->companyIds());
+        }
+    });
+
+    static::creating(function ($model) {
+        $model->company_id ??= currentCompany()->id;
+    });
+}`,
+                            outcome: "0 cross-tenant leaks across 49 Pest tests (including cases that explicitly try to read another company's data). A single security audit point."
+                        },
+                        {
+                            tags: ["sunat", "oauth2", "async"],
+                            problem: "The dispatch guide (GRE) uses an async OAuth2 REST API, different from the document SOAP",
+                            constraint: "While Invoice/Receipt go over SOAP, the GRE 09 uses gre-api: OAuth2 client_credentials, a send that returns a ticket, and status lookup by polling. Two SUNAT integrations with opposite contracts.",
+                            approach: "A separate GreService handles the OAuth2 flow: caches the token ~50min, sends the XML and gets a ticket, then dispatches a delayed polling job that checks status until resolved. Reuses the same document state machine.",
+                            algorithm: "Cached token bucket + ticket polling with backoff. The GRE flow is an async sub-graph within the same state model, isolated in its own service.",
+                            codeFile: "app/Domain/Integrations/Sunat/GreService.php",
+                            codeLang: "php",
+                            code: `// OAuth2 client_credentials, cached ~50min
+$token = Cache::remember('gre_token', 3000, fn () => $this->oauth());
+
+// Send returns a ticket, not the CDR directly
+$ticket = $this->client->sendGuide($signedXml, $token);
+
+// Async polling of the ticket status
+CheckGreTicketJob::dispatch($document, $ticket)
+    ->delay(now()->addSeconds(5));`,
+                            outcome: "GRE delivered reliably via polling + backoff, without blocking or mixing with the document SOAP flow. Same final status (accepted/rejected) for the whole UI."
+                        }
+                    ],
+                    testing: {
+                        strategy: "49 Pest tests covering:\n- Issuance of each document type (01/03/07/08)\n- Tax calculation (IGV, ISC, exempt, free items)\n- Multi-tenant isolation (explicit cross-tenant cases)\n- Plan quotas (free 100/mo, pro unlimited)\n- Concurrent numbering\nGitHub Actions runs the suite + MySQL migrations on every push.",
+                        coverage: "49 tests",
+                        tools: ["Pest", "GitHub Actions", "MySQL in CI", "SUNAT_FAKE for offline tests"]
+                    },
+                    metrics: [
+                        { value: "8+", label: "SUNAT document types" },
+                        { value: "47", label: "REST API endpoints" },
+                        { value: "<500ms", label: "HTTP response (SUNAT async)" },
+                        { value: "60+", label: "tables, 49 Pest tests" }
+                    ],
+                    challenges: "Concurrent numbering, unpredictable SUNAT latency, leak-free multi-tenancy, and the GRE with its different OAuth2 API. The technical breakdowns are in section 06.",
+                    results: "A system that issues the full SUNAT catalog with native tenancy, demoable 100% offline (Fake mode signs real XML and simulates the CDR), with a REST API documented via OpenAPI 3.0 + Swagger UI + an official PHP SDK. Production-ready with real SEE credentials.",
+                    lessons: [
+                        {
+                            title: "Fake mode from day one, not as an afterthought",
+                            body: "SUNAT_FAKE=true signs real XML but simulates an accepted CDR. It enabled demos without credentials, offline dev, and deterministic tests. Had every test depended on real SUNAT, the feedback loop would've been unworkable. A critical external integration needs a double from the very first commit."
+                        },
+                        {
+                            title: "The async queue isn't an optimization, it's a requirement",
+                            body: "Starting with synchronous sends and 'optimizing later' would've meant rewriting the whole flow. When the external dependency is unpredictable (SUNAT can take 30s or go down), async is part of the design, not an add-on. Modeling document status as a state machine made it natural."
+                        },
+                        {
+                            title: "Global scopes > manual filters for multi-tenancy",
+                            body: "Centralizing isolation in a trait with a global scope turned 'security that depends on no dev ever forgetting a where' into 'secure by default, impossible to forget'. The cost: discipline with the scopes on super-admin queries, where you do have to bypass them explicitly."
                         }
                     ]
                 },
