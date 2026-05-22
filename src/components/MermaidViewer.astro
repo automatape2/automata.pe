@@ -7,6 +7,9 @@ interface Props {
 
 const { source, label, fallback } = Astro.props;
 const uid = `mv-${Math.random().toString(36).slice(2, 10)}`;
+// Sequence diagrams are tall/wide; render at natural size with scroll instead of
+// shrinking them to the flowchart size cap (which makes them illegible).
+const isSequence = source.trim().startsWith("sequenceDiagram");
 // Stable key for share URLs — derived from the label, falls back to the uid.
 const shareKey = (label || uid)
     .toLowerCase()
@@ -52,7 +55,7 @@ const shareKey = (label || uid)
 
     <!-- View pane (rendered SVG) -->
     <div class="mv-pane" data-pane="view">
-        <div class="mv-svg p-4 overflow-auto bg-[var(--bg)] flex items-center justify-center min-h-[120px] max-h-[420px] relative">
+        <div class={`mv-svg p-4 overflow-auto bg-[var(--bg)] flex items-center justify-center min-h-[120px] max-h-[420px] relative${isSequence ? " is-seq" : ""}`}>
             <pre class="mv-source-raw whitespace-pre font-mono text-[12px] text-[var(--fg-dim)] hidden">{source}</pre>
             <!-- Skeleton placeholders while Mermaid loads -->
             <div class="mv-skeleton" aria-hidden="true">
@@ -130,6 +133,14 @@ const shareKey = (label || uid)
         height: auto !important;
         display: block;
         margin: 0 auto;
+    }
+
+    /* Sequence diagrams: render at natural size, scroll within a taller box */
+    .mv-svg.is-seq { max-height: 70vh; align-items: flex-start; justify-content: flex-start; }
+    .mv-svg.is-seq svg {
+        max-width: none !important;
+        max-height: none !important;
+        margin: 0;
     }
 
     /* ============ Mermaid C4 — remap inline fills/strokes to terminal palette ============ */

@@ -886,49 +886,457 @@ export const GET: APIRoute = ({ params }) => {
                     },
                     sequences: [
                         {
-                            title: "Issue & sign an invoice",
-                            description: "From the POST to a signed, SUNAT-accepted CDR. The XML is built, signed with the company cert, sent to SUNAT and the response (CDR) is stored.",
+                            title: "Emitir comprobante",
+                            description: "Diagrama real del proyecto. Fase 1 sincrona dentro del request (recalculo de montos, detraccion SPOT, correlativo atomico con FOR UPDATE, commit y encolado); Fase 2 async en el worker (build UBL + firma + envio); Fase 3 listeners en paralelo (email, descuento de stock, notificacion, webhook); y el sad path con reintento por backoff.",
                             mermaid: `sequenceDiagram
-    participant C as Client app
-    participant API as Laravel API
-    participant B as XML Builder
-    participant S as Signer (xmlseclibs)
-    participant SU as SUNAT (SOAP)
+    autonumber
+    actor User as Vendedor
+    participant UI as Panel
+    participant UC as EmitirComprobante
+    participant CT as CalculadoraTributaria
+    participant Num as NumeradorService
+    participant Comp as Comprobante
     participant DB as MySQL
+    participant Q as Queue
+    participant W as Worker
+    participant Build as DocumentBuilder
+    participant SS as SunatService
+    participant SUNAT as SUNAT
+    participant Ev as Event Bus
+    participant Lis as Listeners
 
-    C->>API: POST /invoices (payload)
-    API->>API: validate + assign correlative
-    API->>B: build UBL 2.1 XML
-    B-->>API: unsigned XML
-    API->>S: sign with company cert
-    S-->>API: signed XML + digest
-    API->>SU: sendBill(zip)
-    SU-->>API: CDR (accepted / rejected)
-    API->>DB: persist invoice + CDR + status
-    API-->>C: 201 { status, cdr_url }`
+    rect rgb(13, 20, 30)
+    Note over User,DB: FASE 1 - Sincrono dentro del request HTTP
+
+    User->>UI: click Emitir
+    UI->>UC: invoke comprobante
+
+    UC->>UC: validar estado editable, detalles no vacio, cliente asignado
+    alt validacion falla
+        UC-->>UI: throw DomainException
+        UI-->>User: mensaje de error
+    end
+
+    UC->>DB: BEGIN TRANSACTION
+
+    Note over UC,Comp: Paso A - Recalcular montos de todas las lineas
+
+    loop por cada detalle
+        UC->>CT: calcularLinea con LineaInput
+        CT-->>UC: LineaCalculada con valorVenta igv icbper total
+        UC->>Comp: detalle aplicarMontosDesde EN MEMORIA solamente
+    end
+
+    UC->>Comp: sincronizarMontosDetalles
+    Comp->>DB: 1 sola query INSERT ON DUPLICATE KEY UPDATE para los N detalles
+
+    UC->>CT: calcularTotales lineas y descuento global
+    CT-->>UC: TotalesComprobante con oper gravadas exoneradas inafectas igv total
+    UC->>Comp: fill totales y save
+    Comp->>DB: UPDATE comprobante SET totales recalculados
+
+    Note over UC,Comp: Paso B - Validar y aplicar detraccion SPOT
+
+    UC->>Comp: aplicarDetraccion
+    alt aplica detraccion y porcentaje presente
+        Comp->>Comp: verificar umbral minimo del rubro Cat 54
+        alt total bajo umbral
+            Comp-->>UC: throw DomainException el rubro X requiere total mayor a S/ N
+            UC-->>UI: re throw rollback de transaccion
+        end
+        Comp->>Comp: detraccion_monto igual round total por porcentaje
+        Comp->>DB: UPDATE comprobante SET detraccion_monto
+    end
+
+    Note over UC,Num: Paso C - Asignar correlativo atomico
+
+    alt correlativo es null
+        UC->>Num: siguiente sobre serieModel
+        Num->>DB: SELECT correlativo_actual FOR UPDATE sobre fila series
+        Num->>DB: UPDATE series SET correlativo_actual mas 1
+        Num-->>UC: correlativo N
+        UC->>Comp: correlativo igual N
+    end
+
+    UC->>Comp: estado igual ENCOLADO y save
+    Comp->>DB: UPDATE comprobante SET correlativo y estado
+
+    UC->>DB: COMMIT
+
+    UC->>Q: dispatch EnviarComprobanteASunat con id
+    UC-->>UI: void
+    UI-->>User: comprobante encolado para envio
+    end
+
+    rect rgb(28, 23, 12)
+    Note over W,SUNAT: FASE 2 - Async en el worker fuera del request
+
+    W->>Q: reservar job
+    W->>DB: SELECT comprobante con empresa cliente detalles relacionados
+    DB-->>W: comprobante
+
+    alt estado ya emitido o RECHAZADO
+        Note over W: Idempotencia skip si fue retry duplicado
+        W-->>Q: ACK sin enviar
+    else continua envio
+        W->>Build: build con comprobante
+        Build-->>W: DocumentInterface Invoice UBL 2.1
+
+        W->>SS: enviar comprobante y document
+        Note over SS,SUNAT: Aca pasa toda la firma XMLDSig + SOAP + CDR<br>ver flujo de firma y envio para el detalle
+        SS-->>W: EnvioResultado con success code description cdr paths
+
+        W->>W: aplicarResultado mapea code a estado
+        W->>DB: UPDATE comprobante SET estado code description observaciones hash
+
+        W->>Ev: dispatch ComprobanteEstadoActualizado con comprobante refrescado
+        W-->>Q: ACK
+    end
+    end
+
+    rect rgb(12, 26, 16)
+    Note over Ev,Lis: FASE 3 - Listeners reaccionan al event en paralelo
+
+    Ev->>Lis: EnviarComprobanteAceptadoMail
+    alt estado emitido y cliente con email
+        Lis->>Lis: Mail to cliente con PDF y XML
+    end
+
+    Ev->>Lis: DescontarStockComprobanteAceptado
+    alt estado ACEPTADO o ACEPTADO_OBSERVADO
+        loop por cada detalle con producto y controla_stock
+            Lis->>DB: INSERT movimientos_stock y UPDATE productos stock_actual
+        end
+    end
+
+    Ev->>Lis: NotificarOwnerEstadoComprobante
+    Lis->>DB: INSERT notificacion in app para el owner bell icon
+
+    Ev->>Lis: DespacharWebhookComprobante
+    alt estado terminal aceptado rechazado error
+        Lis->>Lis: POST a cada webhook suscrito de la empresa
+    end
+    end
+
+    rect rgb(30, 14, 14)
+    Note over W,DB: SAD PATH - job revienta antes de aplicarResultado
+
+    Note over W: Exception no manejada timeout SOAP cert vencido OOM
+    W->>W: failed Throwable callback
+    W->>DB: UPDATE comprobante SET estado ERROR_ENVIO code JOB_FAILED description substr 500
+
+    Note over W,DB: Si tries menor a 3 backoff 30s reintento automatico<br>Si tries igual 3 queda en failed_jobs para reintento manual desde panel
+    end`
                         },
                         {
-                            title: "Retry on SUNAT timeout",
-                            description: "SUNAT's SOAP endpoint times out often. The job is queued and retried with backoff; the invoice never gets a duplicate correlative because signing is idempotent per correlative.",
+                            title: "Firma XMLDSig y envio SOAP a SUNAT",
+                            description: "Diagrama real del proyecto. Detalle de la firma y envio: carga del certificado PEM por empresa, firma XMLDSig del UBL 2.1 (la clave privada nunca sale del server), envio SOAP con WSSE UsernameToken sobre TLS, y parseo del CDR firmado por SUNAT.",
                             mermaid: `sequenceDiagram
-    participant API as Laravel API
-    participant Q as Queue (jobs)
-    participant W as Worker
-    participant SU as SUNAT (SOAP)
+    autonumber
+    participant Job as EnviarComprobanteASunat
+    participant SS as SunatService
+    participant GF as GreenterFactoryService
+    participant See as GreenterSee
+    participant FS as Storage
     participant DB as MySQL
+    participant SUNAT as SUNAT_SOAP
 
-    API->>DB: save invoice (status=pending)
-    API->>Q: dispatch SendBill job
-    loop until accepted or max attempts
-        W->>Q: reserve job
-        W->>SU: sendBill(zip)
-        alt timeout / 5xx
-            SU-->>W: error
-            W->>Q: release with backoff
-        else CDR returned
-            SU-->>W: CDR
-            W->>DB: update status + store CDR
+    rect rgb(13, 20, 30)
+    Note over Job,SUNAT: FASE 1 - Setup del cliente See para esta empresa
+
+    Job->>SS: enviar comprobante y document
+    SS->>GF: buildSee con empresa
+
+    GF->>DB: SELECT certificado_path FROM empresas
+    DB-->>GF: certs/demo.pem
+
+    GF->>FS: file_get_contents del PEM
+    FS-->>GF: contenido del PEM con cert publico mas clave privada
+    Note over GF,FS: El PEM lleva clave PRIVADA y jamas sale del server
+
+    GF->>See: new See
+    GF->>See: setCertificate con el PEM
+    GF->>See: setService con endpoint beta o produccion
+    GF->>See: setClaveSOL con ruc y usuario y clave
+    Note over See: see queda configurado con cert mas endpoint mas claveSOL
+    See-->>GF: see instance
+    GF-->>SS: see
+    end
+
+    rect rgb(28, 23, 12)
+    Note over Job,SUNAT: FASE 2 - Firmar XML antes de enviar
+
+    SS->>See: getXmlSigned con document
+    Note over See: 1 Serializa Invoice a XML UBL 2.1
+    Note over See: 2 Calcula SHA256 del XML canonicalizado
+    Note over See: 3 Cifra digest con CLAVE PRIVADA del cert
+    Note over See: 4 Embebe ds Signature en el XML
+    See-->>SS: xmlFirmado con ds Signature dentro
+
+    SS->>FS: Storage put del xml firmado
+    SS->>DB: UPDATE comprobantes SET xml_path
+    Note over SS,FS: Guardamos el XML antes de enviar como evidencia
+    end
+
+    rect rgb(12, 26, 16)
+    Note over Job,SUNAT: FASE 3 - Envio SOAP a SUNAT con firma dentro del XML
+
+    SS->>See: send con document
+    Note over See: Envuelve XML firmado en ZIP
+    Note over See: Construye SOAP con WSSE UsernameToken
+    Note over See: username es RUC mas USUARIO_SOL
+    Note over See: password es claveSOL plaintext sobre TLS
+    Note over See: POST HTTPS al endpoint billService
+
+    See->>SUNAT: POST HTTPS con SOAP body con XML firmado en base64
+    Note over SUNAT: SUNAT valida en orden 1 WSSE UsernameToken
+    Note over SUNAT: 2 Firma XMLDSig usando cert publico embebido
+    Note over SUNAT: 3 Esquema UBL 2.1 y montos
+    SUNAT-->>See: SOAP response con applicationResponse ZIP del CDR
+
+    See-->>SS: BillResult con success cdrZip y error
+    end
+
+    rect rgb(30, 14, 14)
+    Note over Job,SUNAT: FASE 4 - Procesar el CDR firmado por SUNAT
+
+    alt envio exitoso
+        SS->>FS: Storage put del CDR zip
+        SS->>DB: UPDATE comprobantes SET cdr_path
+
+        SS->>SS: cdrParser parse del cdrZip
+        Note over SS: 1 Descomprime ZIP
+        Note over SS: 2 Lee XML del CDR
+        Note over SS: 3 Extrae ResponseCode 0 aceptado o 2074 rechazado
+        Note over SS: 4 Extrae Notes con observaciones
+        Note over SS: 5 NO verifica firma de SUNAT se confia por TLS
+        SS->>SS: new CdrResultado con code description notes
+    else error tecnico timeout o SUNAT caida
+        SS->>DB: INSERT sunat_logs con exception
+        SS-->>Job: throw con Job tries 3 y backoff 30s
+    end
+
+    SS->>SS: new EnvioResultado con success code description cdr y paths
+
+    SS->>DB: INSERT sunat_logs con request response y duracion_ms
+
+    SS-->>Job: EnvioResultado
+    end`
+                        },
+                        {
+                            title: "Anular comprobante (comunicacion de baja)",
+                            description: "Diagrama real del proyecto. Valida el plazo de 7 dias, agrupa N anulaciones del dia en una sola Comunicacion de Baja (1 RA), envia async con polling del ticket cada 30s, y revierte el estado del comprobante en los caminos de error.",
+                            mermaid: `sequenceDiagram
+    autonumber
+    actor User as Vendedor
+    participant UI as Panel/API
+    participant UC as AnularComprobante
+    participant DB
+    participant Q as Queue
+    participant W as queue:work
+    participant B as BajaBuilderService
+    participant S as BajaService<br/>(Real o Fake)
+    participant SUNAT
+
+    rect rgb(13, 20, 30)
+    Note over User,DB: Fase 1 - Validacion + persistencia (sync)
+
+    User->>UI: accion Anular + motivo
+    UI->>UC: __invoke(comprobante, motivo)
+
+    UC->>UC: validar()
+    alt comprobante NO esta emitido
+        UC-->>UI: throw DomainException<br/>Solo se puede anular aceptado por SUNAT
+    else fecha_emision mas de 7 dias
+        UC-->>UI: throw DomainException<br/>Han pasado N dias - Use Nota de Credito
+    end
+
+    UC->>DB: BEGIN TRANSACTION
+
+    UC->>DB: SELECT comunicacion_bajas<br/>WHERE empresa_id=? AND fecha=hoy<br/>AND estado=borrador FOR UPDATE
+    DB-->>UC: cb existente o null
+
+    alt CB del dia ya existe en borrador
+        Note over UC: Reusar - 1 RA agrupa N anulaciones
+    else no existe
+        UC->>DB: SELECT max(correlativo)+1 FOR UPDATE
+        UC->>DB: INSERT comunicacion_baja (correlativo, estado=borrador)
+    end
+
+    UC->>DB: INSERT comunicacion_baja_detalle (cb_id, comprobante_id, motivo)
+    UC->>DB: UPDATE comprobante SET estado=ANULADO_PENDIENTE
+
+    alt CB estaba en BORRADOR
+        UC->>DB: UPDATE cb SET estado=ENCOLADO
+        UC->>Q: dispatch EnviarBajaASunat(cb.id)
+        Note over UC,Q: Dispatch solo 1 vez por CB - anulaciones<br/>siguientes del dia NO encolan nuevo job
+    end
+
+    UC->>DB: COMMIT
+    UC-->>UI: ComunicacionBaja con detalles
+    UI-->>User: Anulacion registrada - pendiente envio SUNAT
+    end
+
+    rect rgb(28, 23, 12)
+    Note over W,SUNAT: Fase 2 - Envio async (worker)
+
+    W->>Q: reservar job EnviarBajaASunat
+    W->>DB: SELECT cb WITH detalles.comprobante y empresa
+    DB-->>W: cb fresco (incluye anulaciones agregadas mientras esperaba)
+
+    alt cb.estado=ACEPTADA o RECHAZADA
+        Note over W: Idempotencia - skip si retry duplicado
+        W-->>Q: ACK
+    else
+        W->>B: build(cb)
+        B-->>W: Voided UBL 2.1<br/>(VoidedDocumentsLine por cada detalle)
+
+        W->>S: enviar(cb, document)
+        S->>S: firmar XML + guardar en storage
+
+        alt SUNAT_FAKE true
+            S->>S: simular ticket + CDR aceptado
+        else produccion
+            S->>SUNAT: sendSummary SOAP
+            SUNAT-->>S: ticket
+            loop polling cada 30s, hasta 5 min
+                S->>SUNAT: getStatus(ticket)
+                SUNAT-->>S: PROCESANDO o ACEPTADO o RECHAZADO
+            end
+            S->>S: guardar CDR
         end
+
+        S-->>W: BajaEnvioResultado<br/>success, ticket, xml, cdr
+
+        W->>W: aplicarResultado()
+        W->>DB: BEGIN TRANSACTION
+
+        alt resultado.aceptado()
+            W->>DB: UPDATE cb SET estado=ACEPTADA, ticket, hash
+            loop por cada detalle de la CB
+                W->>DB: UPDATE comprobante SET estado=ANULADO
+            end
+        else resultado.success false
+            W->>DB: UPDATE cb SET estado=ERROR
+            loop por cada detalle
+                W->>DB: UPDATE comprobante SET estado=ACEPTADO<br/>(revertir para que user reintente)
+            end
+        else rechazado (success pero CDR no cero)
+            W->>DB: UPDATE cb SET estado=RECHAZADA, codigo, descripcion
+            loop por cada detalle
+                W->>DB: UPDATE comprobante SET estado=ACEPTADO (revertir)
+            end
+        end
+
+        W->>DB: COMMIT
+        W-->>Q: ACK
+    end
+    end
+
+    rect rgb(30, 14, 14)
+    Note over W,DB: Fase 3 - Sad path - job revienta
+
+    W->>W: failed(Throwable)
+    W->>DB: UPDATE cb SET estado=ERROR, code=JOB_FAILED
+    loop por cada detalle
+        W->>DB: UPDATE comprobante SET estado=ACEPTADO (revertir)
+    end
+    end`
+                        },
+                        {
+                            title: "Resumen diario de boletas",
+                            description: "Diagrama real del proyecto. Agrega las boletas (tipo 03) no resumidas del dia, separa la generacion del envio para que el contador revise antes, y envia async con polling del ticket. Una boleta solo puede estar en un resumen (check NOT EXISTS).",
+                            mermaid: `sequenceDiagram
+    autonumber
+    actor User as Contador
+    participant UI as Panel/API
+    participant Gen as GenerarResumenDiario<br/>__invoke
+    participant DB
+    participant Env as GenerarResumenDiario<br/>enviarASunat
+    participant Q as Queue
+    participant W as queue:work
+    participant S as ResumenService<br/>(Real o Fake)
+    participant SUNAT as SUNAT SOAP
+
+    rect rgb(13, 20, 30)
+    Note over User,DB: Fase 1 - Generacion (agregar boletas no resumidas)
+
+    User->>UI: GenerarResumenDiario para fecha_referencia
+    UI->>Gen: __invoke(empresa, fechaRef)
+
+    Gen->>DB: SELECT resumen WHERE empresa AND fecha_referencia=fechaRef<br/>AND estado in (aceptada, encolado, enviado_pendiente)
+    DB-->>Gen: resumen existente o null
+
+    alt ya existe RC para esa fecha
+        Gen-->>UI: throw DomainException<br/>Ya existe un resumen (RC-YYYYMMDD-N)<br/>para fecha X en estado Y
+    end
+
+    Gen->>DB: SELECT boletas WHERE empresa<br/>AND tipo_comprobante=03<br/>AND fecha_emision=fechaRef<br/>AND estado in (aceptado, anulado)<br/>AND NOT EXISTS resumen_items con ese comprobante_id
+    DB-->>Gen: boletas elegibles
+
+    alt boletas vacio
+        Gen-->>UI: throw DomainException<br/>No hay boletas elegibles para resumir
+    end
+
+    Gen->>DB: BEGIN TRANSACTION
+    Gen->>DB: SELECT count(resumenes hoy) para correlativo
+    Gen->>DB: INSERT resumen_diario<br/>(empresa, fecha_generacion=hoy,<br/>fecha_referencia=fechaRef,<br/>correlativo, estado=borrador)
+    DB-->>Gen: resumen.id=12
+
+    loop por cada boleta
+        Gen->>DB: INSERT resumen_diario_item<br/>(resumen_id=12, comprobante_id,<br/>tipo_doc=03, serie, correlativo,<br/>estado_item=3 si ANULADO sino 1,<br/>moneda, total, mto_oper_*, mto_igv,<br/>cliente_tipo_doc, cliente_num_doc)
+    end
+
+    Gen->>DB: COMMIT
+    Gen-->>UI: resumen con items cargados
+    UI-->>User: RC-YYYYMMDD-N generado con N items - revisalo antes de enviar
+    end
+
+    rect rgb(28, 23, 12)
+    Note over User,SUNAT: Fase 2 - Envio a SUNAT (separado para que el user revise antes)
+
+    User->>UI: click Enviar a SUNAT
+    UI->>Env: enviarASunat(resumen)
+
+    Env->>Env: validar estado=borrador
+    alt estado distinto borrador
+        Env-->>UI: throw DomainException
+    end
+
+    Env->>DB: UPDATE resumen SET estado=encolado
+    Env->>Q: dispatch EnviarResumenDiarioASunat(resumen.id)
+    Env-->>UI: encolado
+
+    Note over W,SUNAT: Worker procesa async (similar a Comunicacion de Baja)
+
+    W->>Q: reservar job
+    W->>DB: SELECT resumen WITH items
+    DB-->>W: resumen
+
+    W->>S: enviar(resumen)
+    S->>S: armar Summary UBL 2.1 + firmar
+
+    alt SUNAT_FAKE true
+        S->>S: simular ticket + CDR aceptado
+    else produccion
+        S->>SUNAT: sendSummary SOAP
+        SUNAT-->>S: ticket
+        loop polling cada 30s, hasta 5 min
+            S->>SUNAT: getStatus(ticket)
+            SUNAT-->>S: PROCESANDO o ACEPTADA o RECHAZADA
+        end
+        S->>S: guardar CDR
+    end
+
+    S-->>W: ResumenEnvioResultado
+
+    alt aceptada
+        W->>DB: UPDATE resumen SET estado=ACEPTADA, ticket, hash, cdr
+    else rechazada
+        W->>DB: UPDATE resumen SET estado=RECHAZADA, codigo, descripcion
+    else error
+        W->>DB: UPDATE resumen SET estado=ERROR_ENVIO
+    end
     end`
                         }
                     ],
@@ -2729,49 +3137,457 @@ export const GET: APIRoute = ({ params }) => {
                     },
                     sequences: [
                         {
-                            title: "Emitir y firmar un comprobante",
-                            description: "Del POST al CDR firmado y aceptado por SUNAT. Se arma el XML, se firma con el certificado de la empresa, se envia a SUNAT y se guarda la respuesta (CDR).",
+                            title: "Issue an invoice",
+                            description: "Real project diagram. Phase 1 is synchronous inside the HTTP request (recalculate amounts, SPOT detraction, atomic correlative with FOR UPDATE, commit and enqueue); Phase 2 is async in the worker (build UBL + sign + send); Phase 3 are listeners reacting in parallel (email, stock decrement, notification, webhook); plus the sad path with backoff retry.",
                             mermaid: `sequenceDiagram
-    participant C as App cliente
-    participant API as API Laravel
-    participant B as Constructor XML
-    participant S as Firmador (xmlseclibs)
-    participant SU as SUNAT (SOAP)
+    autonumber
+    actor User as Seller
+    participant UI as Panel
+    participant UC as IssueInvoice
+    participant CT as TaxCalculator
+    participant Num as NumberingService
+    participant Comp as Invoice
     participant DB as MySQL
+    participant Q as Queue
+    participant W as Worker
+    participant Build as DocumentBuilder
+    participant SS as SunatService
+    participant SUNAT as SUNAT
+    participant Ev as Event Bus
+    participant Lis as Listeners
 
-    C->>API: POST /invoices (payload)
-    API->>API: valida + asigna correlativo
-    API->>B: arma XML UBL 2.1
-    B-->>API: XML sin firmar
-    API->>S: firma con cert de la empresa
-    S-->>API: XML firmado + digest
-    API->>SU: sendBill(zip)
-    SU-->>API: CDR (aceptado / rechazado)
-    API->>DB: guarda comprobante + CDR + estado
-    API-->>C: 201 { estado, cdr_url }`
+    rect rgb(13, 20, 30)
+    Note over User,DB: PHASE 1 - Synchronous inside the HTTP request
+
+    User->>UI: click Issue
+    UI->>UC: invoke invoice
+
+    UC->>UC: validate editable state, non-empty lines, client assigned
+    alt validation fails
+        UC-->>UI: throw DomainException
+        UI-->>User: error message
+    end
+
+    UC->>DB: BEGIN TRANSACTION
+
+    Note over UC,Comp: Step A - Recalculate amounts for every line
+
+    loop per line
+        UC->>CT: calcLine with LineInput
+        CT-->>UC: CalculatedLine with netAmount igv icbper total
+        UC->>Comp: line applyAmountsFrom IN MEMORY only
+    end
+
+    UC->>Comp: syncLineAmounts
+    Comp->>DB: single INSERT ON DUPLICATE KEY UPDATE for the N lines
+
+    UC->>CT: calcTotals lines and global discount
+    CT-->>UC: InvoiceTotals with taxed exempt unaffected igv total
+    UC->>Comp: fill totals and save
+    Comp->>DB: UPDATE invoice SET recalculated totals
+
+    Note over UC,Comp: Step B - Validate and apply SPOT detraction
+
+    UC->>Comp: applyDetraction
+    alt detraction applies and rate present
+        Comp->>Comp: check minimum threshold for the Cat-54 category
+        alt total below threshold
+            Comp-->>UC: throw DomainException category X requires total over S/ N
+            UC-->>UI: re-throw, transaction rollback
+        end
+        Comp->>Comp: detraction_amount = round(total * rate)
+        Comp->>DB: UPDATE invoice SET detraction_amount
+    end
+
+    Note over UC,Num: Step C - Assign atomic correlative
+
+    alt correlative is null
+        UC->>Num: next over serieModel
+        Num->>DB: SELECT current_correlative FOR UPDATE on the series row
+        Num->>DB: UPDATE series SET current_correlative + 1
+        Num-->>UC: correlative N
+        UC->>Comp: correlative = N
+    end
+
+    UC->>Comp: state = QUEUED and save
+    Comp->>DB: UPDATE invoice SET correlative and state
+
+    UC->>DB: COMMIT
+
+    UC->>Q: dispatch SendInvoiceToSunat with id
+    UC-->>UI: void
+    UI-->>User: invoice queued for sending
+    end
+
+    rect rgb(28, 23, 12)
+    Note over W,SUNAT: PHASE 2 - Async in the worker, outside the request
+
+    W->>Q: reserve job
+    W->>DB: SELECT invoice with company client lines (eager)
+    DB-->>W: invoice
+
+    alt state already issued or REJECTED
+        Note over W: Idempotency - skip if it was a duplicate retry
+        W-->>Q: ACK without sending
+    else continue sending
+        W->>Build: build with invoice
+        Build-->>W: DocumentInterface Invoice UBL 2.1
+
+        W->>SS: send invoice and document
+        Note over SS,SUNAT: All the XMLDSig signing + SOAP + CDR happens here<br>see the sign-and-send flow for the detail
+        SS-->>W: SendResult with success code description cdr paths
+
+        W->>W: applyResult maps code to state
+        W->>DB: UPDATE invoice SET state code description notes hash
+
+        W->>Ev: dispatch InvoiceStateUpdated with refreshed invoice
+        W-->>Q: ACK
+    end
+    end
+
+    rect rgb(12, 26, 16)
+    Note over Ev,Lis: PHASE 3 - Listeners react to the event in parallel
+
+    Ev->>Lis: SendAcceptedInvoiceMail
+    alt state issued and client has email
+        Lis->>Lis: Mail to client with PDF and XML
+    end
+
+    Ev->>Lis: DecrementStockOnAcceptedInvoice
+    alt state ACCEPTED or ACCEPTED_WITH_NOTES
+        loop per line with product and tracks_stock
+            Lis->>DB: INSERT stock_movements and UPDATE products current_stock
+        end
+    end
+
+    Ev->>Lis: NotifyOwnerInvoiceState
+    Lis->>DB: INSERT in-app notification for the owner (bell icon)
+
+    Ev->>Lis: DispatchInvoiceWebhook
+    alt terminal state accepted rejected error
+        Lis->>Lis: POST to each webhook the company subscribed
+    end
+    end
+
+    rect rgb(30, 14, 14)
+    Note over W,DB: SAD PATH - job blows up before applyResult
+
+    Note over W: Unhandled exception: SOAP timeout, expired cert, OOM
+    W->>W: failed(Throwable) callback
+    W->>DB: UPDATE invoice SET state SEND_ERROR code JOB_FAILED description substr 500
+
+    Note over W,DB: If tries < 3, backoff 30s auto-retry<br>If tries = 3, lands in failed_jobs for manual retry from the panel
+    end`
                         },
                         {
-                            title: "Reintento ante timeout de SUNAT",
-                            description: "El SOAP de SUNAT se cae seguido. El job se encola y reintenta con backoff; el comprobante nunca recibe un correlativo duplicado porque la firma es idempotente por correlativo.",
+                            title: "XMLDSig signing and SOAP send to SUNAT",
+                            description: "Real project diagram. The signing and sending detail: load the per-company PEM certificate, XMLDSig-sign the UBL 2.1 (the private key never leaves the server), SOAP send with a WSSE UsernameToken over TLS, and parse SUNAT's signed CDR.",
                             mermaid: `sequenceDiagram
-    participant API as API Laravel
-    participant Q as Cola (jobs)
-    participant W as Worker
-    participant SU as SUNAT (SOAP)
+    autonumber
+    participant Job as SendInvoiceToSunat
+    participant SS as SunatService
+    participant GF as GreenterFactoryService
+    participant See as GreenterSee
+    participant FS as Storage
     participant DB as MySQL
+    participant SUNAT as SUNAT_SOAP
 
-    API->>DB: guarda comprobante (estado=pendiente)
-    API->>Q: despacha job SendBill
-    loop hasta aceptado o max intentos
-        W->>Q: reserva el job
-        W->>SU: sendBill(zip)
-        alt timeout / 5xx
-            SU-->>W: error
-            W->>Q: libera con backoff
-        else CDR devuelto
-            SU-->>W: CDR
-            W->>DB: actualiza estado + guarda CDR
+    rect rgb(13, 20, 30)
+    Note over Job,SUNAT: PHASE 1 - Set up the See client for this company
+
+    Job->>SS: send invoice and document
+    SS->>GF: buildSee with company
+
+    GF->>DB: SELECT certificate_path FROM companies
+    DB-->>GF: certs/demo.pem
+
+    GF->>FS: file_get_contents of the PEM
+    FS-->>GF: PEM contents with public cert plus private key
+    Note over GF,FS: The PEM holds the PRIVATE key and never leaves the server
+
+    GF->>See: new See
+    GF->>See: setCertificate with the PEM
+    GF->>See: setService with beta or production endpoint
+    GF->>See: setClaveSOL with ruc and user and password
+    Note over See: see is now configured with cert plus endpoint plus claveSOL
+    See-->>GF: see instance
+    GF-->>SS: see
+    end
+
+    rect rgb(28, 23, 12)
+    Note over Job,SUNAT: PHASE 2 - Sign the XML before sending
+
+    SS->>See: getXmlSigned with document
+    Note over See: 1 Serialize Invoice to XML UBL 2.1
+    Note over See: 2 Compute SHA256 of the canonicalized XML
+    Note over See: 3 Encrypt the digest with the cert PRIVATE KEY
+    Note over See: 4 Embed ds:Signature into the XML
+    See-->>SS: signedXml with ds:Signature inside
+
+    SS->>FS: Storage put of the signed xml
+    SS->>DB: UPDATE invoices SET xml_path
+    Note over SS,FS: We store the XML before sending as evidence
+    end
+
+    rect rgb(12, 26, 16)
+    Note over Job,SUNAT: PHASE 3 - SOAP send to SUNAT with the signature inside the XML
+
+    SS->>See: send with document
+    Note over See: Wraps the signed XML in a ZIP
+    Note over See: Builds the SOAP with a WSSE UsernameToken
+    Note over See: username is RUC plus SOL_USER
+    Note over See: password is claveSOL plaintext over TLS
+    Note over See: POST HTTPS to the billService endpoint
+
+    See->>SUNAT: POST HTTPS with SOAP body, signed XML in base64
+    Note over SUNAT: SUNAT validates in order 1 WSSE UsernameToken
+    Note over SUNAT: 2 XMLDSig signature using the embedded public cert
+    Note over SUNAT: 3 UBL 2.1 schema and amounts
+    SUNAT-->>See: SOAP response with applicationResponse ZIP of the CDR
+
+    See-->>SS: BillResult with success cdrZip and error
+    end
+
+    rect rgb(30, 14, 14)
+    Note over Job,SUNAT: PHASE 4 - Process the CDR signed by SUNAT
+
+    alt send succeeded
+        SS->>FS: Storage put of the CDR zip
+        SS->>DB: UPDATE invoices SET cdr_path
+
+        SS->>SS: cdrParser parse of the cdrZip
+        Note over SS: 1 Unzip the ZIP
+        Note over SS: 2 Read the CDR XML
+        Note over SS: 3 Extract ResponseCode 0 accepted or 2074 rejected
+        Note over SS: 4 Extract Notes with observations
+        Note over SS: 5 Does NOT verify SUNAT signature; trusts TLS
+        SS->>SS: new CdrResult with code description notes
+    else technical error timeout or SUNAT down
+        SS->>DB: INSERT sunat_logs with exception
+        SS-->>Job: throw, Job tries 3 and backoff 30s
+    end
+
+    SS->>SS: new SendResult with success code description cdr and paths
+
+    SS->>DB: INSERT sunat_logs with request response and duration_ms
+
+    SS-->>Job: SendResult
+    end`
+                        },
+                        {
+                            title: "Void an invoice (communication of voids)",
+                            description: "Real project diagram. Validates the 7-day window, groups N voids of the same day into a single Communication of Voids (1 RA), sends async with ticket polling every 30s, and reverts the invoice state on the error paths.",
+                            mermaid: `sequenceDiagram
+    autonumber
+    actor User as Seller
+    participant UI as Panel/API
+    participant UC as VoidInvoice
+    participant DB
+    participant Q as Queue
+    participant W as queue:work
+    participant B as VoidBuilderService
+    participant S as VoidService<br/>(Real or Fake)
+    participant SUNAT
+
+    rect rgb(13, 20, 30)
+    Note over User,DB: Phase 1 - Validation + persistence (sync)
+
+    User->>UI: Void action + reason
+    UI->>UC: __invoke(invoice, reason)
+
+    UC->>UC: validate()
+    alt invoice is NOT issued
+        UC-->>UI: throw DomainException<br/>Can only void what SUNAT accepted
+    else issue_date older than 7 days
+        UC-->>UI: throw DomainException<br/>N days have passed - Use a Credit Note
+    end
+
+    UC->>DB: BEGIN TRANSACTION
+
+    UC->>DB: SELECT communication_voids<br/>WHERE company_id=? AND date=today<br/>AND state=draft FOR UPDATE
+    DB-->>UC: existing cb or null
+
+    alt today's CB already exists as draft
+        Note over UC: Reuse - 1 RA groups N voids
+    else does not exist
+        UC->>DB: SELECT max(correlative)+1 FOR UPDATE
+        UC->>DB: INSERT communication_void (correlative, state=draft)
+    end
+
+    UC->>DB: INSERT communication_void_detail (cb_id, invoice_id, reason)
+    UC->>DB: UPDATE invoice SET state=VOID_PENDING
+
+    alt CB was in DRAFT
+        UC->>DB: UPDATE cb SET state=QUEUED
+        UC->>Q: dispatch SendVoidToSunat(cb.id)
+        Note over UC,Q: Dispatch only once per CB - later voids<br/>of the same day do NOT enqueue a new job
+    end
+
+    UC->>DB: COMMIT
+    UC-->>UI: CommunicationVoid with details
+    UI-->>User: Void registered - pending SUNAT send
+    end
+
+    rect rgb(28, 23, 12)
+    Note over W,SUNAT: Phase 2 - Async send (worker)
+
+    W->>Q: reserve job SendVoidToSunat
+    W->>DB: SELECT cb WITH details.invoice and company
+    DB-->>W: fresh cb (includes voids added while it waited)
+
+    alt cb.state=ACCEPTED or REJECTED
+        Note over W: Idempotency - skip if duplicate retry
+        W-->>Q: ACK
+    else
+        W->>B: build(cb)
+        B-->>W: Voided UBL 2.1<br/>(VoidedDocumentsLine per detail)
+
+        W->>S: send(cb, document)
+        S->>S: sign XML + store it
+
+        alt SUNAT_FAKE true
+            S->>S: simulate ticket + accepted CDR
+        else production
+            S->>SUNAT: sendSummary SOAP
+            SUNAT-->>S: ticket
+            loop poll every 30s, up to 5 min
+                S->>SUNAT: getStatus(ticket)
+                SUNAT-->>S: PROCESSING or ACCEPTED or REJECTED
+            end
+            S->>S: store CDR
         end
+
+        S-->>W: VoidSendResult<br/>success, ticket, xml, cdr
+
+        W->>W: applyResult()
+        W->>DB: BEGIN TRANSACTION
+
+        alt result.accepted()
+            W->>DB: UPDATE cb SET state=ACCEPTED, ticket, hash
+            loop per CB detail
+                W->>DB: UPDATE invoice SET state=VOIDED
+            end
+        else result.success false
+            W->>DB: UPDATE cb SET state=ERROR
+            loop per detail
+                W->>DB: UPDATE invoice SET state=ACCEPTED<br/>(revert so user can retry)
+            end
+        else rejected (success but CDR not zero)
+            W->>DB: UPDATE cb SET state=REJECTED, code, description
+            loop per detail
+                W->>DB: UPDATE invoice SET state=ACCEPTED (revert)
+            end
+        end
+
+        W->>DB: COMMIT
+        W-->>Q: ACK
+    end
+    end
+
+    rect rgb(30, 14, 14)
+    Note over W,DB: Phase 3 - Sad path - job blows up
+
+    W->>W: failed(Throwable)
+    W->>DB: UPDATE cb SET state=ERROR, code=JOB_FAILED
+    loop per detail
+        W->>DB: UPDATE invoice SET state=ACCEPTED (revert)
+    end
+    end`
+                        },
+                        {
+                            title: "Daily summary of receipts",
+                            description: "Real project diagram. Aggregates the day's not-yet-summarized receipts (type 03), separates generation from sending so the accountant reviews first, and sends async with ticket polling. A receipt can only belong to one summary (NOT EXISTS check).",
+                            mermaid: `sequenceDiagram
+    autonumber
+    actor User as Accountant
+    participant UI as Panel/API
+    participant Gen as GenerateDailySummary<br/>__invoke
+    participant DB
+    participant Env as GenerateDailySummary<br/>sendToSunat
+    participant Q as Queue
+    participant W as queue:work
+    participant S as SummaryService<br/>(Real or Fake)
+    participant SUNAT as SUNAT SOAP
+
+    rect rgb(13, 20, 30)
+    Note over User,DB: Phase 1 - Generation (aggregate not-summarized receipts)
+
+    User->>UI: GenerateDailySummary for reference_date
+    UI->>Gen: __invoke(company, refDate)
+
+    Gen->>DB: SELECT summary WHERE company AND reference_date=refDate<br/>AND state in (accepted, queued, sent_pending)
+    DB-->>Gen: existing summary or null
+
+    alt RC already exists for that date
+        Gen-->>UI: throw DomainException<br/>A summary (RC-YYYYMMDD-N) already exists<br/>for date X in state Y
+    end
+
+    Gen->>DB: SELECT receipts WHERE company<br/>AND document_type=03<br/>AND issue_date=refDate<br/>AND state in (accepted, voided)<br/>AND NOT EXISTS summary_items with that invoice_id
+    DB-->>Gen: eligible receipts
+
+    alt receipts empty
+        Gen-->>UI: throw DomainException<br/>No eligible receipts to summarize
+    end
+
+    Gen->>DB: BEGIN TRANSACTION
+    Gen->>DB: SELECT count(today's summaries) for correlative
+    Gen->>DB: INSERT daily_summary<br/>(company, generation_date=today,<br/>reference_date=refDate,<br/>correlative, state=draft)
+    DB-->>Gen: summary.id=12
+
+    loop per receipt
+        Gen->>DB: INSERT daily_summary_item<br/>(summary_id=12, invoice_id,<br/>doc_type=03, series, correlative,<br/>item_state=3 if VOIDED else 1,<br/>currency, total, op_amounts_*, igv_amount,<br/>client_doc_type, client_doc_num)
+    end
+
+    Gen->>DB: COMMIT
+    Gen-->>UI: summary with items loaded
+    UI-->>User: RC-YYYYMMDD-N generated with N items - review before sending
+    end
+
+    rect rgb(28, 23, 12)
+    Note over User,SUNAT: Phase 2 - Send to SUNAT (separate so the user reviews first)
+
+    User->>UI: click Send to SUNAT
+    UI->>Env: sendToSunat(summary)
+
+    Env->>Env: validate state=draft
+    alt state not draft
+        Env-->>UI: throw DomainException
+    end
+
+    Env->>DB: UPDATE summary SET state=queued
+    Env->>Q: dispatch SendDailySummaryToSunat(summary.id)
+    Env-->>UI: queued
+
+    Note over W,SUNAT: Worker processes async (similar to Communication of Voids)
+
+    W->>Q: reserve job
+    W->>DB: SELECT summary WITH items
+    DB-->>W: summary
+
+    W->>S: send(summary)
+    S->>S: build Summary UBL 2.1 + sign
+
+    alt SUNAT_FAKE true
+        S->>S: simulate ticket + accepted CDR
+    else production
+        S->>SUNAT: sendSummary SOAP
+        SUNAT-->>S: ticket
+        loop poll every 30s, up to 5 min
+            S->>SUNAT: getStatus(ticket)
+            SUNAT-->>S: PROCESSING or ACCEPTED or REJECTED
+        end
+        S->>S: store CDR
+    end
+
+    S-->>W: SummarySendResult
+
+    alt accepted
+        W->>DB: UPDATE summary SET state=ACCEPTED, ticket, hash, cdr
+    else rejected
+        W->>DB: UPDATE summary SET state=REJECTED, code, description
+    else error
+        W->>DB: UPDATE summary SET state=SEND_ERROR
+    end
     end`
                         }
                     ],
