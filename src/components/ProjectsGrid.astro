@@ -167,8 +167,22 @@ const labels = lang === "es"
         const counter = root.querySelector<HTMLElement>("[data-pg-count]");
         const empty = root.querySelector<HTMLElement>("[data-pg-empty]");
 
-        let activeType = "all";
-        let activeTech = "all";
+        // Initialize from URL (?type=product&tech=React) so filtered views are shareable.
+        const params = new URLSearchParams(window.location.search);
+        let activeType = params.get("type") || "all";
+        let activeTech = params.get("tech") || "all";
+
+        function syncUrl() {
+            const u = new URL(window.location.href);
+            activeType === "all" ? u.searchParams.delete("type") : u.searchParams.set("type", activeType);
+            activeTech === "all" ? u.searchParams.delete("tech") : u.searchParams.set("tech", activeTech);
+            history.replaceState(null, "", u.toString());
+        }
+
+        function setActiveButtons() {
+            typeBtns.forEach((x) => x.setAttribute("data-active", String((x.getAttribute("data-pg-type") || "all") === activeType)));
+            techBtns.forEach((x) => x.setAttribute("data-active", String((x.getAttribute("data-pg-tech") || "all") === activeTech)));
+        }
 
         function apply() {
             let visible = 0;
@@ -192,16 +206,22 @@ const labels = lang === "es"
         typeBtns.forEach((b) =>
             b.addEventListener("click", () => {
                 activeType = b.getAttribute("data-pg-type") || "all";
-                typeBtns.forEach((x) => x.setAttribute("data-active", String(x === b)));
+                setActiveButtons();
                 apply();
+                syncUrl();
             })
         );
         techBtns.forEach((b) =>
             b.addEventListener("click", () => {
                 activeTech = b.getAttribute("data-pg-tech") || "all";
-                techBtns.forEach((x) => x.setAttribute("data-active", String(x === b)));
+                setActiveButtons();
                 apply();
+                syncUrl();
             })
         );
+
+        // Apply initial state from URL on load
+        setActiveButtons();
+        apply();
     });
 </script>
