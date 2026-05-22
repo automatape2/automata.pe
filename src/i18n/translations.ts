@@ -884,6 +884,54 @@ export const GET: APIRoute = ({ params }) => {
                             ascii: ""
                         }
                     },
+                    sequences: [
+                        {
+                            title: "Issue & sign an invoice",
+                            description: "From the POST to a signed, SUNAT-accepted CDR. The XML is built, signed with the company cert, sent to SUNAT and the response (CDR) is stored.",
+                            mermaid: `sequenceDiagram
+    participant C as Client app
+    participant API as Laravel API
+    participant B as XML Builder
+    participant S as Signer (xmlseclibs)
+    participant SU as SUNAT (SOAP)
+    participant DB as MySQL
+
+    C->>API: POST /invoices (payload)
+    API->>API: validate + assign correlative
+    API->>B: build UBL 2.1 XML
+    B-->>API: unsigned XML
+    API->>S: sign with company cert
+    S-->>API: signed XML + digest
+    API->>SU: sendBill(zip)
+    SU-->>API: CDR (accepted / rejected)
+    API->>DB: persist invoice + CDR + status
+    API-->>C: 201 { status, cdr_url }`
+                        },
+                        {
+                            title: "Retry on SUNAT timeout",
+                            description: "SUNAT's SOAP endpoint times out often. The job is queued and retried with backoff; the invoice never gets a duplicate correlative because signing is idempotent per correlative.",
+                            mermaid: `sequenceDiagram
+    participant API as Laravel API
+    participant Q as Queue (jobs)
+    participant W as Worker
+    participant SU as SUNAT (SOAP)
+    participant DB as MySQL
+
+    API->>DB: save invoice (status=pending)
+    API->>Q: dispatch SendBill job
+    loop until accepted or max attempts
+        W->>Q: reserve job
+        W->>SU: sendBill(zip)
+        alt timeout / 5xx
+            SU-->>W: error
+            W->>Q: release with backoff
+        else CDR returned
+            SU-->>W: CDR
+            W->>DB: update status + store CDR
+        end
+    end`
+                        }
+                    ],
                     infrastructure: {
                         provider: "Laravel + MySQL (Laragon dev · VPS/cloud prod)",
                         services: [
@@ -2679,6 +2727,54 @@ export const GET: APIRoute = ({ params }) => {
                             ascii: ""
                         }
                     },
+                    sequences: [
+                        {
+                            title: "Emitir y firmar un comprobante",
+                            description: "Del POST al CDR firmado y aceptado por SUNAT. Se arma el XML, se firma con el certificado de la empresa, se envia a SUNAT y se guarda la respuesta (CDR).",
+                            mermaid: `sequenceDiagram
+    participant C as App cliente
+    participant API as API Laravel
+    participant B as Constructor XML
+    participant S as Firmador (xmlseclibs)
+    participant SU as SUNAT (SOAP)
+    participant DB as MySQL
+
+    C->>API: POST /invoices (payload)
+    API->>API: valida + asigna correlativo
+    API->>B: arma XML UBL 2.1
+    B-->>API: XML sin firmar
+    API->>S: firma con cert de la empresa
+    S-->>API: XML firmado + digest
+    API->>SU: sendBill(zip)
+    SU-->>API: CDR (aceptado / rechazado)
+    API->>DB: guarda comprobante + CDR + estado
+    API-->>C: 201 { estado, cdr_url }`
+                        },
+                        {
+                            title: "Reintento ante timeout de SUNAT",
+                            description: "El SOAP de SUNAT se cae seguido. El job se encola y reintenta con backoff; el comprobante nunca recibe un correlativo duplicado porque la firma es idempotente por correlativo.",
+                            mermaid: `sequenceDiagram
+    participant API as API Laravel
+    participant Q as Cola (jobs)
+    participant W as Worker
+    participant SU as SUNAT (SOAP)
+    participant DB as MySQL
+
+    API->>DB: guarda comprobante (estado=pendiente)
+    API->>Q: despacha job SendBill
+    loop hasta aceptado o max intentos
+        W->>Q: reserva el job
+        W->>SU: sendBill(zip)
+        alt timeout / 5xx
+            SU-->>W: error
+            W->>Q: libera con backoff
+        else CDR devuelto
+            SU-->>W: CDR
+            W->>DB: actualiza estado + guarda CDR
+        end
+    end`
+                        }
+                    ],
                     infrastructure: {
                         provider: "Laravel + MySQL (Laragon dev · VPS/cloud prod)",
                         services: [

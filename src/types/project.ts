@@ -22,6 +22,13 @@ export interface ArchitectureDiagrams {
     component?: Diagram | string;
 }
 
+/** A named sequence/flow diagram (Mermaid sequenceDiagram source). */
+export interface SequenceDiagram {
+    title: string;
+    description?: string;
+    mermaid: string;
+}
+
 export interface Infrastructure {
     provider?: string;
     services?: string[];
@@ -104,6 +111,7 @@ export interface Project {
 
     // Architecture / infra / stack
     architecture?: ArchitectureDiagrams;
+    sequences?: SequenceDiagram[];
     infrastructure?: Infrastructure;
     stack?: StackGroups;
     codeHighlights?: CodeHighlight[];

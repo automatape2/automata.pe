@@ -260,6 +260,20 @@ const shareKey = (label || uid)
                         .relation, .rel, .relation_label { stroke: #6B7280 !important; }
                         .relation_label tspan { fill: #9CA3AF !important; }
                         .legend { fill: #0A0A0A !important; stroke: #374151 !important; }
+
+                        /* ---- sequenceDiagram ---- */
+                        .actor { fill: #0D1117 !important; stroke: #4ADE80 !important; }
+                        text.actor, text.actor > tspan { fill: #E5E7EB !important; stroke: none !important; }
+                        .actor-line { stroke: #374151 !important; }
+                        .messageLine0, .messageLine1 { stroke: #6B7280 !important; }
+                        .messageText { fill: #9CA3AF !important; stroke: none !important; }
+                        #arrowhead path, .arrowMarkerPath { fill: #6B7280 !important; stroke: #6B7280 !important; }
+                        .activation0, .activation1, .activation2 { fill: #111827 !important; stroke: #06B6D4 !important; }
+                        .labelBox { fill: #0D1117 !important; stroke: #06B6D4 !important; }
+                        .labelText, .labelText > tspan, .loopText, .loopText > tspan { fill: #06B6D4 !important; stroke: none !important; }
+                        .loopLine { stroke: #06B6D4 !important; }
+                        .note { fill: #1F2937 !important; stroke: #FBBF24 !important; }
+                        .noteText, .noteText > tspan { fill: #E5E7EB !important; stroke: none !important; }
                     `,
                 });
                 return m;

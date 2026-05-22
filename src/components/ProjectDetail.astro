@@ -103,6 +103,7 @@ const L = {
             spec: "// spec", status: "// status",
             discovery: "discovery", design: "design",
             architecture: "architecture", infra: "infrastructure",
+            sequences: "sequences", sequencesHint: "// runtime flows — who talks to whom, in what order",
             implementation: "implementation",
             techChallenges: "technical challenges",
             testing: "testing & ci",
@@ -142,6 +143,7 @@ const L = {
             spec: "// spec", status: "// estado",
             discovery: "descubrimiento", design: "diseño",
             architecture: "arquitectura", infra: "infraestructura",
+            sequences: "secuencias", sequencesHint: "// flujos en runtime — quien habla con quien y en que orden",
             implementation: "implementacion",
             techChallenges: "desafios tecnicos",
             testing: "testing & ci",
@@ -222,6 +224,9 @@ if (project.designTools || project.designSystem || project.figmaUrl) {
 }
 if (project.architecture) {
     tocItems.push({ id: "sec-architecture", label: L.sections.architecture, sublabel: "section 03" });
+}
+if (project.sequences && project.sequences.length > 0) {
+    tocItems.push({ id: "sec-sequences", label: L.sections.sequences, sublabel: "section 03b" });
 }
 if (project.infrastructure) {
     tocItems.push({ id: "sec-infrastructure", label: L.sections.infra, sublabel: "section 04" });
@@ -502,6 +507,39 @@ if (project.lessons && project.lessons.length > 0) {
                             )}
                         </div>
                     )}
+                </MasterDetail>
+            </section>
+        );
+    })()}
+
+    <!-- 03b · Sequence diagrams (master-detail: sidebar picker + active flow) -->
+    {project.sequences && project.sequences.length > 0 && (() => {
+        const items = project.sequences.map((s, i) => ({
+            key: `seq-${i}`,
+            label: s.title,
+            sublabel: `flow-${String(i + 1).padStart(2, "0")}`,
+        }));
+        return (
+            <section id="sec-sequences" class="mb-10 scroll-mt-20">
+                <div class="border-b border-[var(--line)] pb-3 mb-5">
+                    <div class="text-xs text-[var(--fg-muted)] mb-1">// section 03b · {L.sections.sequences}</div>
+                    <h2 class="heading-mono text-2xl">
+                        <span class="text-[var(--green)]">$</span> cat ./{L.sections.sequences}.md
+                    </h2>
+                    <p class="text-xs text-[var(--fg-muted)] mt-2">{L.sections.sequencesHint}</p>
+                </div>
+
+                <MasterDetail items={items} title="// flows">
+                    {project.sequences.map((s, i) => (
+                        <div data-md-key={`seq-${i}`} class={i === 0 ? "" : "hidden"}>
+                            {s.description && (
+                                <p class="text-sm text-[var(--fg-dim)] mb-3 leading-relaxed">
+                                    <span class="text-[var(--fg-muted)]">// </span>{s.description}
+                                </p>
+                            )}
+                            <MermaidViewer source={s.mermaid} label={`${s.title} · flow-${String(i + 1).padStart(2, "0")}`} />
+                        </div>
+                    ))}
                 </MasterDetail>
             </section>
         );
