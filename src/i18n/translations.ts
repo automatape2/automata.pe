@@ -1510,7 +1510,59 @@ GROUP BY bucket, sensor_id;`
                     description: "Bot que envia documentos a nuevos empleados, programa reuniones de induccion y hace seguimiento automatico.",
                     tech: ["n8n", "Slack", "Google Calendar", "Notion"],
                     image: msCrmImage,
-                    type: "caso"
+                    type: "caso",
+                    year: "2025",
+                    role: "Automatizacion · RRHH · Integraciones",
+                    fullDescription: "Cuando RRHH marca a un empleado como contratado, un flujo n8n dispara el onboarding completo: crea su pagina en Notion, le manda los documentos por Slack, agenda las reuniones de induccion en Google Calendar y hace seguimiento de las tareas pendientes. Cero checklists olvidados.",
+                    problem: "El onboarding vivia en un checklist de Excel que alguien tenia que ejecutar a mano: enviar docs, agendar reuniones, recordar firmas. Pasos que se saltaban y nuevos empleados perdidos su primera semana.",
+                    audience: "Empresas que contratan seguido y quieren un onboarding consistente sin depender de que RRHH recuerde cada paso.",
+                    infrastructure: {
+                        provider: "n8n + Slack + Google Calendar + Notion",
+                        services: ["Trigger (alta en sistema de RRHH)", "n8n (orquestacion del flujo)", "Notion API (pagina del empleado)", "Slack (envio de docs + recordatorios)", "Google Calendar (reuniones de induccion)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    hr[RRHH: empleado contratado] -->|trigger| n8n["n8n workflow"]
+    n8n --> notion[Crea pagina Notion]
+    n8n --> slack[Envia docs por Slack]
+    n8n --> cal[Agenda inducciones]
+    n8n --> followup["Seguimiento (recordatorios)"]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class n8n edge
+    class hr,notion,slack,cal,followup ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["automation", "state", "hr"],
+                            problem: "Hacer seguimiento de tareas que el empleado todavia no completo, sin spamear",
+                            constraint: "Firmar contrato, leer politicas, completar perfil: tareas con plazos distintos. Recordar todo todos los dias molesta; no recordar deja tareas sin hacer.",
+                            approach: "Cada tarea tiene un estado y un plazo en Notion. Un cron diario en n8n revisa solo las pendientes vencidas y manda UN recordatorio agrupado por Slack, no uno por tarea.",
+                            algorithm: "Maquina de estado por tarea + recordatorio agrupado: el cron filtra pendientes vencidas y agrega en un solo mensaje por empleado.",
+                            codeFile: "n8n · Function node (followup)",
+                            codeLang: "javascript",
+                            code: `// Solo pendientes vencidas, agrupadas por empleado
+const overdue = tasks.filter(t =>
+  t.status === 'pending' && new Date(t.dueDate) < new Date()
+);
+const byEmployee = groupBy(overdue, 'employeeId');
+// un solo Slack DM por persona, no uno por tarea
+return Object.entries(byEmployee).map(([id, ts]) => ({ id, tasks: ts }));`
+                        }
+                    ],
+                    metrics: [
+                        { value: "0 pasos", label: "olvidados" },
+                        { value: "dia 1", label: "todo listo automatico" },
+                        { value: "1 recordatorio", label: "agrupado, no spam" }
+                    ],
+                    results: "Cada contratacion dispara un onboarding identico y completo. RRHH solo marca 'contratado' y el sistema hace el resto, con seguimiento hasta que las tareas se cierran.",
+                    lessons: [
+                        {
+                            title: "Agrupa recordatorios o te silencian",
+                            body: "Un recordatorio por tarea convierte la herramienta en spam y la gente la ignora. Agregar las pendientes en un solo mensaje diario por persona mantuvo el seguimiento util."
+                        }
+                    ]
                 },
                 {
                     slug: "transcriptor-reuniones",
@@ -3090,7 +3142,59 @@ GROUP BY bucket, sensor_id;`
                     description: "Bot that sends documents to new employees, schedules onboarding meetings and follows up automatically.",
                     tech: ["n8n", "Slack", "Google Calendar", "Notion"],
                     image: msCrmImage,
-                    type: "case"
+                    type: "case",
+                    year: "2025",
+                    role: "Automation · HR · Integrations",
+                    fullDescription: "When HR marks an employee as hired, an n8n flow triggers the full onboarding: creates their Notion page, sends documents over Slack, schedules induction meetings on Google Calendar, and follows up on pending tasks. Zero forgotten checklists.",
+                    problem: "Onboarding lived in an Excel checklist someone had to run by hand: send docs, schedule meetings, chase signatures. Steps got skipped and new hires felt lost their first week.",
+                    audience: "Companies that hire often and want consistent onboarding without depending on HR remembering every step.",
+                    infrastructure: {
+                        provider: "n8n + Slack + Google Calendar + Notion",
+                        services: ["Trigger (new hire in the HR system)", "n8n (flow orchestration)", "Notion API (employee page)", "Slack (docs + reminders)", "Google Calendar (induction meetings)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    hr[HR: employee hired] -->|trigger| n8n["n8n workflow"]
+    n8n --> notion[Create Notion page]
+    n8n --> slack[Send docs via Slack]
+    n8n --> cal[Schedule inductions]
+    n8n --> followup["Follow-up (reminders)"]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class n8n edge
+    class hr,notion,slack,cal,followup ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["automation", "state", "hr"],
+                            problem: "Follow up on tasks the employee hasn't done yet, without spamming",
+                            constraint: "Sign contract, read policies, complete profile: tasks with different deadlines. Reminding everything every day annoys; not reminding leaves tasks undone.",
+                            approach: "Each task has a status and a due date in Notion. A daily n8n cron checks only overdue pending tasks and sends ONE grouped Slack reminder, not one per task.",
+                            algorithm: "Per-task state machine + grouped reminder: the cron filters overdue pendings and aggregates into a single message per employee.",
+                            codeFile: "n8n · Function node (followup)",
+                            codeLang: "javascript",
+                            code: `// Only overdue pendings, grouped per employee
+const overdue = tasks.filter(t =>
+  t.status === 'pending' && new Date(t.dueDate) < new Date()
+);
+const byEmployee = groupBy(overdue, 'employeeId');
+// one Slack DM per person, not one per task
+return Object.entries(byEmployee).map(([id, ts]) => ({ id, tasks: ts }));`
+                        }
+                    ],
+                    metrics: [
+                        { value: "0 steps", label: "forgotten" },
+                        { value: "day 1", label: "everything ready automatically" },
+                        { value: "1 reminder", label: "grouped, not spam" }
+                    ],
+                    results: "Every hire triggers an identical, complete onboarding. HR just marks 'hired' and the system does the rest, following up until tasks close.",
+                    lessons: [
+                        {
+                            title: "Group reminders or get muted",
+                            body: "One reminder per task turns the tool into spam and people ignore it. Aggregating pendings into a single daily message per person kept the follow-up useful."
+                        }
+                    ]
                 },
                 {
                     slug: "transcriptor-reuniones",
