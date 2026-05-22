@@ -1175,7 +1175,68 @@ Notification::send(
                     description: "Chatbot que responde 24/7, calcula cotizaciones desde tu catalogo y agenda citas automaticamente.",
                     tech: ["n8n", "WhatsApp API", "OpenAI", "Google Sheets"],
                     image: msCrmImage,
-                    type: "caso"
+                    type: "caso",
+                    year: "2025",
+                    role: "Automatizacion · IA · Integraciones",
+                    fullDescription: "Bot de WhatsApp que atiende consultas comerciales 24/7: entiende lenguaje natural con un LLM, arma cotizaciones leyendo el catalogo desde Google Sheets, y agenda citas en el calendario. Orquestado en n8n, sin servidor propio que mantener.",
+                    problem: "El equipo comercial respondia las mismas preguntas de precios todo el dia, perdia leads fuera de horario, y las cotizaciones manuales tardaban horas. WhatsApp era el canal pero no escalaba.",
+                    audience: "PyMEs con catalogo de productos/servicios que reciben consultas por WhatsApp y quieren cotizar y agendar sin tener a alguien pegado al telefono.",
+                    infrastructure: {
+                        provider: "n8n (self-host o cloud) + WhatsApp Business API",
+                        services: ["n8n (orquestacion de workflow)", "WhatsApp Business API (Meta/Twilio)", "OpenAI (NLU + extraccion de intencion)", "Google Sheets (catalogo + precios)", "Google Calendar (agenda)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    user((("Cliente"))) -->|mensaje| wa[WhatsApp API]
+    wa --> n8n["n8n workflow"]
+    n8n -->|intencion + entidades| ai[OpenAI]
+    ai --> n8n
+    n8n -->|lee precios| sheets[Google Sheets]
+    n8n -->|agenda| cal[Google Calendar]
+    n8n -->|responde cotizacion| wa
+    wa --> user
+
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class user person
+    class n8n edge
+    class wa,ai,sheets,cal ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["ai", "nlu", "automation"],
+                            problem: "Pasar de texto libre del cliente a una cotizacion estructurada y confiable",
+                            constraint: "El cliente escribe 'cuanto x 3 cajas del producto azul para el viernes'. Hay que extraer producto, cantidad y fecha sin alucinar precios.",
+                            approach: "El LLM solo extrae intencion + entidades (producto, cantidad, fecha) como JSON; los PRECIOS los pone n8n leyendo Google Sheets, nunca el modelo. Asi el LLM interpreta pero no inventa numeros.",
+                            algorithm: "Separacion NLU/calculo: el modelo hace structured extraction, el workflow hace el lookup de precio determinista. El LLM nunca toca el numero final.",
+                            codeFile: "n8n · OpenAI node (system prompt)",
+                            codeLang: "javascript",
+                            code: `// El modelo SOLO extrae, no cotiza
+{
+  "system": "Extract intent and entities as JSON. Never invent prices.",
+  "schema": {
+    "intent": "quote | schedule | other",
+    "product": "string",
+    "qty": "number",
+    "date": "ISO date | null"
+  }
+}
+// n8n luego: precio = lookup(sheets, product) * qty`
+                        }
+                    ],
+                    metrics: [
+                        { value: "24/7", label: "atencion sin humano" },
+                        { value: "<1 min", label: "cotizacion vs horas antes" },
+                        { value: "0 precios", label: "inventados por el LLM" }
+                    ],
+                    results: "Los leads fuera de horario dejan de perderse, las cotizaciones salen al instante desde el catalogo real, y el equipo solo entra cuando el bot agenda una cita.",
+                    lessons: [
+                        {
+                            title: "El LLM interpreta; el sistema decide los numeros",
+                            body: "Dejar que el modelo 'cotice' lleva a precios inventados. Acotarlo a extraccion de entidades y resolver el precio con un lookup deterministico fue la diferencia entre demo y produccion."
+                        }
+                    ]
                 },
                 {
                     slug: "facturas-automaticas",
@@ -2460,7 +2521,68 @@ Notification::send(
                     description: "Chatbot that answers inquiries 24/7, calculates quotes from your catalog and schedules appointments automatically.",
                     tech: ["n8n", "WhatsApp API", "OpenAI", "Google Sheets"],
                     image: msCrmImage,
-                    type: "case"
+                    type: "case",
+                    year: "2025",
+                    role: "Automation · AI · Integrations",
+                    fullDescription: "A WhatsApp bot that handles sales inquiries 24/7: it understands natural language with an LLM, builds quotes by reading the catalog from Google Sheets, and books appointments on the calendar. Orchestrated in n8n, with no server of its own to maintain.",
+                    problem: "The sales team answered the same pricing questions all day, lost leads after hours, and manual quotes took hours. WhatsApp was the channel but it didn't scale.",
+                    audience: "SMBs with a product/service catalog that get WhatsApp inquiries and want to quote and book without someone glued to the phone.",
+                    infrastructure: {
+                        provider: "n8n (self-host or cloud) + WhatsApp Business API",
+                        services: ["n8n (workflow orchestration)", "WhatsApp Business API (Meta/Twilio)", "OpenAI (NLU + intent extraction)", "Google Sheets (catalog + prices)", "Google Calendar (scheduling)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    user((("Customer"))) -->|message| wa[WhatsApp API]
+    wa --> n8n["n8n workflow"]
+    n8n -->|intent + entities| ai[OpenAI]
+    ai --> n8n
+    n8n -->|reads prices| sheets[Google Sheets]
+    n8n -->|books| cal[Google Calendar]
+    n8n -->|replies with quote| wa
+    wa --> user
+
+    classDef person fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class user person
+    class n8n edge
+    class wa,ai,sheets,cal ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["ai", "nlu", "automation"],
+                            problem: "Turn a customer's free text into a structured, trustworthy quote",
+                            constraint: "The customer writes 'how much for 3 boxes of the blue one for Friday'. You must extract product, quantity and date without hallucinating prices.",
+                            approach: "The LLM only extracts intent + entities (product, qty, date) as JSON; PRICES come from n8n reading Google Sheets, never from the model. So the LLM interprets but never invents numbers.",
+                            algorithm: "NLU/compute split: the model does structured extraction, the workflow does the deterministic price lookup. The LLM never touches the final number.",
+                            codeFile: "n8n · OpenAI node (system prompt)",
+                            codeLang: "javascript",
+                            code: `// The model ONLY extracts, never quotes
+{
+  "system": "Extract intent and entities as JSON. Never invent prices.",
+  "schema": {
+    "intent": "quote | schedule | other",
+    "product": "string",
+    "qty": "number",
+    "date": "ISO date | null"
+  }
+}
+// n8n then: price = lookup(sheets, product) * qty`
+                        }
+                    ],
+                    metrics: [
+                        { value: "24/7", label: "service with no human" },
+                        { value: "<1 min", label: "quote vs hours before" },
+                        { value: "0 prices", label: "invented by the LLM" }
+                    ],
+                    results: "After-hours leads stop slipping away, quotes go out instantly from the real catalog, and the team only steps in once the bot books a meeting.",
+                    lessons: [
+                        {
+                            title: "The LLM interprets; the system decides the numbers",
+                            body: "Letting the model 'quote' leads to invented prices. Constraining it to entity extraction and resolving the price with a deterministic lookup was the difference between demo and production."
+                        }
+                    ]
                 },
                 {
                     slug: "facturas-automaticas",
