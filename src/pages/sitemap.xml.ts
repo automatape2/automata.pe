@@ -3,7 +3,11 @@ import { translations } from "../i18n/translations";
 
 const SITE = "https://automata.pe";
 
-const staticPaths = ["/", "/en", "/es"];
+const staticPaths = [
+    "/", "/en", "/es",
+    "/projects", "/es/projects",
+    "/privacy", "/terms", "/es/privacy", "/es/terms",
+];
 
 function url(loc: string, lastmod = new Date().toISOString().slice(0, 10)) {
     return `  <url>\n    <loc>${SITE}${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`;

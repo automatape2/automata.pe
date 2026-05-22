@@ -1,0 +1,50 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LegalDoc from "../components/LegalDoc.astro";
+
+const updated = "2026-05-22";
+const sections = [
+    {
+        heading: "Purpose of this site",
+        body: [
+            "automata.pe is the portfolio and information site of Automata. The case studies describe real and representative engineering work. Some figures and links may be illustrative or anonymized to protect client confidentiality.",
+        ],
+    },
+    {
+        heading: "Intellectual property",
+        body: [
+            "The design, code samples, diagrams and written content are the property of Automata unless otherwise credited. You may quote or reference them with attribution; you may not republish the site wholesale.",
+        ],
+    },
+    {
+        heading: "No warranty",
+        body: [
+            "The site is provided 'as is'. Code snippets shown in case studies are illustrative and not guaranteed to be production-ready as-is. External links and live demos are maintained on a best-effort basis.",
+        ],
+    },
+    {
+        heading: "Engagements",
+        body: [
+            "Submitting the contact form or booking a call does not create a binding agreement. Any project engagement is governed by a separate written contract.",
+        ],
+    },
+    {
+        heading: "Contact",
+        body: [
+            "Questions about these terms: contacto@automata.pe.",
+        ],
+    },
+];
+---
+
+<Layout title="Terms | Automata" description="Terms of use for the Automata site.">
+    <LegalDoc
+        file="terms.md"
+        title="Terms"
+        updated={updated}
+        intro="Terms of use for this site and its content."
+        sections={sections}
+        backHref="/en"
+        backLabel="cd ..  // back home"
+    />
+</Layout>

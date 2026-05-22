@@ -1,0 +1,51 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LegalDoc from "../components/LegalDoc.astro";
+
+const updated = "2026-05-22";
+const sections = [
+    {
+        heading: "What we collect",
+        body: [
+            "When you submit the contact form we receive the name, email and message you provide. We use this only to reply to your inquiry.",
+            "We use Plausible Analytics, a cookieless, privacy-friendly service that records aggregate page views and outbound clicks. It does not track you across sites or store personal identifiers.",
+        ],
+    },
+    {
+        heading: "What we do NOT collect",
+        body: [
+            "No cookies for tracking, no advertising pixels, no fingerprinting, no selling of data to third parties. There is no account system, so we hold no passwords or profiles.",
+        ],
+    },
+    {
+        heading: "Third parties",
+        body: [
+            "Form submissions are processed by Formspree. GitHub stats shown on project pages are fetched live from GitHub's public API. Diagrams load the Mermaid library from a CDN. Each has its own privacy policy.",
+        ],
+    },
+    {
+        heading: "Your rights",
+        body: [
+            "Under Peru's Personal Data Protection Law (Ley N° 29733) you may request access to, correction of, or deletion of any personal data we hold about you. Write to contacto@automata.pe and we will respond within the legal timeframe.",
+        ],
+    },
+    {
+        heading: "Contact",
+        body: [
+            "Questions about this policy: contacto@automata.pe.",
+        ],
+    },
+];
+---
+
+<Layout title="Privacy | Automata" description="How Automata handles your data.">
+    <LegalDoc
+        file="privacy.md"
+        title="Privacy"
+        updated={updated}
+        intro="Plain-language summary of how this site handles data."
+        sections={sections}
+        backHref="/en"
+        backLabel="cd ..  // back home"
+    />
+</Layout>

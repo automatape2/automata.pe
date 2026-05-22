@@ -1,0 +1,50 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import LegalDoc from "../../components/LegalDoc.astro";
+
+const updated = "2026-05-22";
+const sections = [
+    {
+        heading: "Proposito del sitio",
+        body: [
+            "automata.pe es el sitio de portfolio e informacion de Automata. Los case studies describen trabajo de ingenieria real y representativo. Algunas cifras y enlaces pueden ser ilustrativos o anonimizados para proteger la confidencialidad de clientes.",
+        ],
+    },
+    {
+        heading: "Propiedad intelectual",
+        body: [
+            "El diseño, los ejemplos de codigo, los diagramas y el contenido escrito son propiedad de Automata salvo que se indique lo contrario. Puedes citarlos o referenciarlos con atribucion; no puedes republicar el sitio completo.",
+        ],
+    },
+    {
+        heading: "Sin garantia",
+        body: [
+            "El sitio se ofrece 'tal cual'. Los snippets de codigo en los case studies son ilustrativos y no se garantiza que sean production-ready tal como aparecen. Los enlaces externos y demos en vivo se mantienen con mejor esfuerzo.",
+        ],
+    },
+    {
+        heading: "Contrataciones",
+        body: [
+            "Enviar el formulario o agendar una llamada no crea un acuerdo vinculante. Cualquier proyecto se rige por un contrato escrito aparte.",
+        ],
+    },
+    {
+        heading: "Contacto",
+        body: [
+            "Consultas sobre estos terminos: contacto@automata.pe.",
+        ],
+    },
+];
+---
+
+<Layout title="Terminos | Automata" description="Terminos de uso del sitio de Automata.">
+    <LegalDoc
+        file="terminos.md"
+        title="Terminos"
+        updated={updated}
+        intro="Terminos de uso de este sitio y su contenido."
+        sections={sections}
+        backHref="/es"
+        backLabel="cd ..  // volver al inicio"
+    />
+</Layout>

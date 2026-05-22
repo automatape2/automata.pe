@@ -72,8 +72,8 @@ const year = new Date().getFullYear();
                 <span class="text-[var(--green)]">●</span> {year} {t.footer.copyright}
             </p>
             <div class="flex gap-5">
-                <a href="#" class="link-mono">{t.footer.privacy}</a>
-                <a href="#" class="link-mono">{t.footer.terms}</a>
+                <a href={lang === "es" ? "/es/privacy" : "/privacy"} class="link-mono">{t.footer.privacy}</a>
+                <a href={lang === "es" ? "/es/terms" : "/terms"} class="link-mono">{t.footer.terms}</a>
             </div>
         </div>
     </div>

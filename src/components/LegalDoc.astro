@@ -1,0 +1,50 @@
+---
+// LegalDoc — terminal-styled wrapper for legal pages (privacy / terms).
+interface Section {
+    heading: string;
+    body: string[];
+}
+interface Props {
+    file: string;        // e.g. "privacy.md"
+    title: string;
+    updated: string;     // ISO date
+    intro: string;
+    sections: Section[];
+    backHref: string;
+    backLabel: string;
+}
+const { file, title, updated, intro, sections, backHref, backLabel } = Astro.props;
+---
+
+<div class="max-w-3xl mx-auto px-6 lg:px-12 py-12">
+    <a href={backHref} class="inline-flex items-center gap-2 text-sm text-[var(--fg-muted)] hover:text-[var(--green)] transition-colors mb-8 group">
+        <span class="text-[var(--green)]">$</span>
+        <span>{backLabel}</span>
+        <span class="text-[var(--green)] opacity-0 group-hover:opacity-100 transition-opacity">←</span>
+    </a>
+
+    <div class="border-b border-[var(--line)] pb-5 mb-8">
+        <div class="text-xs text-[var(--fg-muted)] mb-1">// last updated · {updated}</div>
+        <h1 class="heading-mono text-[clamp(1.75rem,5vw,2.75rem)]">
+            <span class="text-[var(--green)]">$</span> cat ./{file}
+        </h1>
+        <p class="mt-3 text-sm text-[var(--fg-dim)]">
+            <span class="text-[var(--fg-muted)]">// </span>{intro}
+        </p>
+    </div>
+
+    <div class="space-y-8">
+        {sections.map((s, i) => (
+            <section>
+                <h2 class="heading-mono text-lg mb-3">
+                    <span class="text-[var(--fg-muted)]">{String(i + 1).padStart(2, "0")} ·</span> {s.heading}
+                </h2>
+                <div class="space-y-3">
+                    {s.body.map((p) => (
+                        <p class="text-sm text-[var(--fg-dim)] leading-relaxed">{p}</p>
+                    ))}
+                </div>
+            </section>
+        ))}
+    </div>
+</div>

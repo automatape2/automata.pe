@@ -1,0 +1,51 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import LegalDoc from "../../components/LegalDoc.astro";
+
+const updated = "2026-05-22";
+const sections = [
+    {
+        heading: "Que recopilamos",
+        body: [
+            "Cuando envias el formulario de contacto recibimos el nombre, email y mensaje que proporcionas. Lo usamos solo para responder tu consulta.",
+            "Usamos Plausible Analytics, un servicio sin cookies y respetuoso de la privacidad que registra vistas de pagina y clics salientes de forma agregada. No te rastrea entre sitios ni guarda identificadores personales.",
+        ],
+    },
+    {
+        heading: "Que NO recopilamos",
+        body: [
+            "Sin cookies de rastreo, sin pixeles publicitarios, sin fingerprinting, sin venta de datos a terceros. No hay sistema de cuentas, asi que no guardamos contraseñas ni perfiles.",
+        ],
+    },
+    {
+        heading: "Terceros",
+        body: [
+            "Los envios del formulario los procesa Formspree. Las estadisticas de GitHub en las paginas de proyecto se consultan en vivo a la API publica de GitHub. Los diagramas cargan la libreria Mermaid desde un CDN. Cada uno tiene su propia politica de privacidad.",
+        ],
+    },
+    {
+        heading: "Tus derechos",
+        body: [
+            "Bajo la Ley de Proteccion de Datos Personales del Peru (Ley N° 29733) puedes solicitar acceso, rectificacion o cancelacion de cualquier dato personal que tengamos sobre ti. Escribe a contacto@automata.pe y responderemos dentro del plazo legal.",
+        ],
+    },
+    {
+        heading: "Contacto",
+        body: [
+            "Consultas sobre esta politica: contacto@automata.pe.",
+        ],
+    },
+];
+---
+
+<Layout title="Privacidad | Automata" description="Como Automata maneja tus datos.">
+    <LegalDoc
+        file="privacidad.md"
+        title="Privacidad"
+        updated={updated}
+        intro="Resumen en lenguaje claro de como este sitio maneja los datos."
+        sections={sections}
+        backHref="/es"
+        backLabel="cd ..  // volver al inicio"
+    />
+</Layout>
