@@ -1570,7 +1570,63 @@ return Object.entries(byEmployee).map(([id, ts]) => ({ id, tasks: ts }));`
                     description: "Graba calls de Zoom/Meet, transcribe con IA, extrae tareas y envia resumenes al equipo.",
                     tech: ["n8n", "Whisper AI", "OpenAI", "Slack"],
                     image: educationPortalImage,
-                    type: "caso"
+                    type: "caso",
+                    year: "2025",
+                    role: "IA · Automatizacion · Integraciones",
+                    fullDescription: "Cuando termina una reunion de Zoom/Meet, el audio se transcribe con Whisper, un LLM genera un resumen y extrae los action items con responsable, y n8n los publica en Slack y los crea como tareas. La reunion deja de evaporarse: queda el resumen y las tareas asignadas.",
+                    problem: "Las decisiones y tareas de las reuniones se perdian: nadie tomaba minuta, los action items quedaban en la cabeza de alguien, y a la semana nadie recordaba quien quedo a cargo de que.",
+                    audience: "Equipos con muchas reuniones (consultoras, agencias) que necesitan capturar decisiones y tareas sin un secretario dedicado.",
+                    infrastructure: {
+                        provider: "n8n + Whisper + OpenAI + Slack",
+                        services: ["Grabacion de la call (Zoom/Meet)", "Whisper (speech-to-text)", "OpenAI (resumen + extraccion de action items)", "n8n (orquestacion)", "Slack (resumen + tareas al canal)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    call[Reunion termina] -->|audio| whisper[Whisper STT]
+    whisper -->|transcript| ai["OpenAI: resumen + action items"]
+    ai --> n8n["n8n"]
+    n8n --> slack[Resumen al canal]
+    n8n --> tasks[Crea tareas con responsable]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class n8n edge
+    class call,whisper,ai,slack,tasks ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["ai", "nlu", "automation"],
+                            problem: "Extraer action items con responsable, no solo un resumen lindo",
+                            constraint: "Un resumen en prosa no es accionable. Hay que sacar tareas concretas con due/owner de una transcripcion ruidosa, sin inventar responsables que nadie menciono.",
+                            approach: "El LLM devuelve action items como JSON estructurado (texto, owner, due) y se le instruye a marcar owner=null si no fue mencionado, en vez de adivinar. n8n solo crea tareas con owner valido.",
+                            algorithm: "Structured extraction con campos opcionales: el modelo no rellena owner si no hay evidencia; el workflow filtra y asigna.",
+                            codeFile: "n8n · OpenAI node (schema)",
+                            codeLang: "json",
+                            code: `{
+  "summary": "string",
+  "action_items": [
+    {
+      "task": "string",
+      "owner": "string | null",
+      "due": "ISO date | null"
+    }
+  ]
+}
+// owner=null cuando nadie fue nombrado — no adivinar`
+                        }
+                    ],
+                    metrics: [
+                        { value: "0 minutas", label: "escritas a mano" },
+                        { value: "action items", label: "con responsable" },
+                        { value: "post-call", label: "resumen automatico al canal" }
+                    ],
+                    results: "Cada reunion termina con un resumen en Slack y tareas asignadas. Las decisiones quedan registradas sin que nadie tome nota a mano.",
+                    lessons: [
+                        {
+                            title: "Mejor 'no se' que un responsable inventado",
+                            body: "Forzar al LLM a asignar siempre un owner producia tareas con responsables equivocados. Permitir owner=null cuando no hay evidencia hizo la extraccion confiable: una tarea sin dueño se revisa, una con dueño falso se ignora."
+                        }
+                    ]
                 },
                 {
                     slug: "pipeline-cvs",
@@ -3202,7 +3258,63 @@ return Object.entries(byEmployee).map(([id, ts]) => ({ id, tasks: ts }));`
                     description: "Records Zoom/Meet calls, transcribes with AI, extracts tasks and sends summaries to the team.",
                     tech: ["n8n", "Whisper AI", "OpenAI", "Slack"],
                     image: educationPortalImage,
-                    type: "case"
+                    type: "case",
+                    year: "2025",
+                    role: "AI · Automation · Integrations",
+                    fullDescription: "When a Zoom/Meet meeting ends, the audio is transcribed with Whisper, an LLM generates a summary and extracts action items with their owner, and n8n posts them to Slack and creates them as tasks. The meeting stops evaporating: the summary and assigned tasks remain.",
+                    problem: "Decisions and tasks from meetings got lost: nobody took minutes, action items lived in someone's head, and a week later no one remembered who owned what.",
+                    audience: "Teams with lots of meetings (consultancies, agencies) that need to capture decisions and tasks without a dedicated note-taker.",
+                    infrastructure: {
+                        provider: "n8n + Whisper + OpenAI + Slack",
+                        services: ["Call recording (Zoom/Meet)", "Whisper (speech-to-text)", "OpenAI (summary + action-item extraction)", "n8n (orchestration)", "Slack (summary + tasks to the channel)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    call[Meeting ends] -->|audio| whisper[Whisper STT]
+    whisper -->|transcript| ai["OpenAI: summary + action items"]
+    ai --> n8n["n8n"]
+    n8n --> slack[Summary to channel]
+    n8n --> tasks[Create tasks with owner]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class n8n edge
+    class call,whisper,ai,slack,tasks ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["ai", "nlu", "automation"],
+                            problem: "Extract action items with an owner, not just a nice summary",
+                            constraint: "A prose summary isn't actionable. You must pull concrete tasks with due/owner from a noisy transcript, without inventing owners no one mentioned.",
+                            approach: "The LLM returns action items as structured JSON (text, owner, due) and is instructed to set owner=null if it wasn't mentioned, rather than guessing. n8n only creates tasks with a valid owner.",
+                            algorithm: "Structured extraction with optional fields: the model doesn't fill owner without evidence; the workflow filters and assigns.",
+                            codeFile: "n8n · OpenAI node (schema)",
+                            codeLang: "json",
+                            code: `{
+  "summary": "string",
+  "action_items": [
+    {
+      "task": "string",
+      "owner": "string | null",
+      "due": "ISO date | null"
+    }
+  ]
+}
+// owner=null when no one was named — never guess`
+                        }
+                    ],
+                    metrics: [
+                        { value: "0 minutes", label: "written by hand" },
+                        { value: "action items", label: "with an owner" },
+                        { value: "post-call", label: "summary auto-posted to channel" }
+                    ],
+                    results: "Every meeting ends with a Slack summary and assigned tasks. Decisions are recorded without anyone taking notes by hand.",
+                    lessons: [
+                        {
+                            title: "Better 'unknown' than an invented owner",
+                            body: "Forcing the LLM to always assign an owner produced tasks with the wrong person. Allowing owner=null when there's no evidence made extraction trustworthy: an unowned task gets reviewed, a falsely-owned one gets ignored."
+                        }
+                    ]
                 },
                 {
                     slug: "pipeline-cvs",
