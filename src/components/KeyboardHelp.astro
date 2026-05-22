@@ -152,11 +152,14 @@
             overlay.setAttribute("data-open", "true");
             overlay.setAttribute("aria-hidden", "false");
             document.body.style.overflow = "hidden";
+            (window as any).__focusTrap?.enable(overlay);
+            (overlay.querySelector("[data-khelp-close]") as HTMLElement | null)?.focus();
         }
         function close() {
             overlay.setAttribute("data-open", "false");
             overlay.setAttribute("aria-hidden", "true");
             document.body.style.overflow = "";
+            (window as any).__focusTrap?.disable();
         }
 
         document.addEventListener("keydown", (e) => {

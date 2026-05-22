@@ -227,12 +227,14 @@ const commandsJson = JSON.stringify(commands);
             render();
             setTimeout(() => input.focus(), 10);
             document.body.style.overflow = "hidden";
+            (window as any).__focusTrap?.enable(overlay);
         }
 
         function close() {
             overlay.setAttribute("data-open", "false");
             overlay.setAttribute("aria-hidden", "true");
             document.body.style.overflow = "";
+            (window as any).__focusTrap?.disable();
         }
 
         function move(delta) {

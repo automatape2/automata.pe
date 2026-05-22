@@ -365,6 +365,36 @@ const ldPayload = structuredData ?? (
             });
         </script>
 
+        <!-- Focus trap helper shared by modals (Cmd+K, ?, lightbox) -->
+        <script is:inline>
+            window.__focusTrap = (function () {
+                let active = null;
+                let restore = null;
+                const SEL = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+                function onKey(e) {
+                    if (e.key !== "Tab" || !active) return;
+                    const items = [...active.querySelectorAll(SEL)].filter((el) => el.offsetParent !== null);
+                    if (items.length === 0) return;
+                    const first = items[0], last = items[items.length - 1];
+                    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                }
+                return {
+                    enable(container) {
+                        restore = document.activeElement;
+                        active = container;
+                        document.addEventListener("keydown", onKey, true);
+                    },
+                    disable() {
+                        document.removeEventListener("keydown", onKey, true);
+                        active = null;
+                        if (restore && typeof restore.focus === "function") restore.focus();
+                        restore = null;
+                    },
+                };
+            })();
+        </script>
+
         <!-- Reading progress bar -->
         <script is:inline>
             (function () {
