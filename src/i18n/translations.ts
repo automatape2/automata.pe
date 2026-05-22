@@ -2206,6 +2206,267 @@ return Object.entries(byEmployee).map(([id, ts]) => ({ id, tasks: ts }));`
                             body: "El primer intento republicaba el mismo texto en todas las redes y se notaba. Darle a cada plataforma su propio prompt con longitud y tono fue la diferencia entre 'contenido automatizado' y 'contenido que parece escrito a mano'."
                         }
                     ]
+                },
+                {
+                    slug: "skolerom",
+                    title: "Skolerom",
+                    description: "Plataforma educativa K-12 en Noruega: gestion de aulas, tareas y curriculum digital para colegios publicos y privados.",
+                    tech: ["Laravel", "PostgreSQL", "MongoDB", "AWS", "Docker", "Terraform", "Argo CD", "GitHub Actions"],
+                    image: msCrmImage,
+                    type: "caso",
+                    year: "2023",
+                    role: "Backend Senior · Cloud · DevOps",
+                    fullDescription: "Skolerom (app.skolerom.no) es una plataforma educativa usada por colegios de Noruega para gestionar aulas, tareas, materiales y progreso de alumnos. Jose lideró la evolución técnica del backend durante más de 4 años: diseñó la arquitectura de la API Laravel, definió las estrategias de seguridad, estableció los pipelines de CI/CD y migró la infraestructura a IaC con Terraform. La plataforma maneja múltiples colegios con aislamiento de datos y alta disponibilidad.",
+                    problem: "La plataforma habia crecido sin una arquitectura clara: deploys manuales, sin IaC, tests escasos y deuda técnica acumulada que frenaba la velocidad del equipo y generaba incidentes en produccion.",
+                    audience: "Colegios públicos y privados noruegos K-12. Docentes que gestionan clases y tareas. Alumnos que acceden a materiales y entregan trabajos. Administradores de institución que controlan licencias y accesos.",
+                    infrastructure: {
+                        provider: "AWS + Docker + Terraform",
+                        services: ["Laravel API (core business logic)", "PostgreSQL (datos relacionales)", "MongoDB (contenido educativo)", "AWS S3 (archivos y materiales)", "AWS SQS (colas de tareas async)", "Docker (contenedores)", "Terraform (IaC)", "GitHub Actions (CI/CD)", "Argo CD (GitOps deployments)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    client[Cliente Web/App] --> api["Laravel API"]
+    api --> pg[(PostgreSQL)]
+    api --> mongo[(MongoDB)]
+    api --> s3[AWS S3]
+    api --> sqs[AWS SQS]
+    sqs --> worker[Worker Async]
+    worker --> pg
+
+    ci["GitHub Actions CI"] --> docker["Docker Build"]
+    docker --> argo["Argo CD"]
+    argo --> k8s["Cluster AWS"]
+
+    classDef main fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef infra fill:#111827,stroke:#06B6D4,color:#9CA3AF
+    classDef devops fill:#0D1117,stroke:#FBBF24,color:#E5E7EB
+    class api,worker main
+    class pg,mongo,s3,sqs,client infra
+    class ci,docker,argo,k8s devops`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["devops", "cicd", "gitops"],
+                            problem: "Deploys manuales con riesgo de error humano en cada release",
+                            constraint: "El equipo hacia deploys por SSH directamente al servidor. Cada release era estresante: pasos manuales, rollback complicado y sin trazabilidad de qué versión estaba en producción.",
+                            approach: "Se implementó un pipeline completo: GitHub Actions para build y tests, Docker para empaquetar la app, y Argo CD para gestionar los deployments via GitOps. El estado de producción quedó declarado en un repositorio Git.",
+                            algorithm: "Git push → GitHub Actions (lint + tests + docker build + push a registry) → Argo CD detecta cambio en helm chart → sync automático al cluster AWS.",
+                            codeFile: "github-actions deploy.yml",
+                            codeLang: "yaml",
+                            code: `jobs:
+  deploy:
+    steps:
+      - name: Build & push Docker image
+        run: |
+          docker build -t app:\${{ github.sha }} .
+          docker push registry/app:\${{ github.sha }}
+      - name: Update Helm chart tag
+        run: |
+          sed -i "s/tag:.*/tag: \${{ github.sha }}/" helm/values.yaml
+          git commit -am "release: \${{ github.sha }}"
+          git push
+# Argo CD detecta el cambio y sincroniza automaticamente`
+                        },
+                        {
+                            tags: ["security", "multitenancy", "backend"],
+                            problem: "Aislamiento de datos entre colegios en una base de datos compartida",
+                            constraint: "La plataforma sirve a múltiples instituciones. Un bug de autorización podría exponer datos de alumnos de un colegio a otro — inaceptable en un contexto educativo con GDPR noruego.",
+                            approach: "Se implementó Row-Level Security con scoping por institution_id en todas las queries mediante un middleware global. Ninguna query puede ejecutarse sin el contexto de institución activo.",
+                            algorithm: "Middleware Laravel inyecta `institution_id` en el query scope global. Tests de integración verifican cross-tenant isolation en cada PR.",
+                            codeFile: "app/Http/Middleware/ScopeToInstitution.php",
+                            codeLang: "php",
+                            code: `class ScopeToInstitution
+{
+    public function handle(Request $request, Closure $next)
+    {
+        $institutionId = $request->user()->institution_id;
+        // Aplica scope global a todos los modelos Eloquent
+        Builder::macro('scopeToInstitution', fn() =>
+            $this->where('institution_id', $institutionId)
+        );
+        app()->instance('institution_id', $institutionId);
+        return $next($request);
+    }
+}`
+                        }
+                    ],
+                    metrics: [
+                        { value: "4+ años", label: "de ownership técnico continuo" },
+                        { value: "0 deploys manuales", label: "tras implementar GitOps con Argo CD" },
+                        { value: "multi-tenant", label: "con aislamiento de datos por institución" }
+                    ],
+                    results: "La plataforma pasó de deploys manuales estresantes a releases automatizados y trazables. La deuda técnica se redujo con refactoring progresivo y cobertura de tests. La infraestructura quedó declarada en código, reproducible y auditada.",
+                    lessons: [
+                        {
+                            title: "GitOps cambia la cultura, no solo el proceso",
+                            body: "Antes de Argo CD, el estado de producción vivía en la cabeza del desarrollador que hizo el último deploy. Con GitOps, el estado está en Git: cualquiera puede ver qué versión corre, hacer rollback con un revert y auditar cada cambio."
+                        },
+                        {
+                            title: "El scope global de Eloquent es el guardia de seguridad que no se olvida",
+                            body: "Confiar en que cada developer aplique el filtro de institución manualmente es una receta para un bug de cross-tenant. Un scope global en el middleware lo hace imposible de olvidar — y los tests de aislamiento lo verifican en cada PR."
+                        }
+                    ]
+                },
+                {
+                    slug: "ceo-sim",
+                    title: "CEO Sim",
+                    description: "SaaS educativo donde equipos de estudiantes universitarios dirigen empresas en simulaciones de mercado competitivas.",
+                    tech: ["Laravel", "Angular", "MySQL", "Redis", "Docker", "LTI 1.3"],
+                    image: msCrmImage2,
+                    type: "caso",
+                    year: "2026",
+                    role: "Fullstack · Arquitectura · Integraciones LMS",
+                    fullDescription: "CEO Sim es una plataforma SaaS donde equipos de estudiantes toman decisiones de negocio (marketing, producción, finanzas, operaciones) en un mercado simulado que reacciona a sus movimientos. Se integra con los LMS universitarios más usados (Moodle, Canvas, Blackboard) via LTI 1.3: single sign-on automático, sincronización de calificaciones y carga de listas de estudiantes. Cada universidad tiene sus propias licencias, grupos y configuraciones de simulación.",
+                    problem: "Las simulaciones de negocio universitarias suelen correr en Excel o software legacy de los 90 que los estudiantes odian usar. El profesor pierde horas cargando datos manualmente y las calificaciones no conectan con el LMS.",
+                    audience: "Docentes universitarios de carreras de administración y negocios. Universidades que buscan complementar su currícula con experiencias prácticas. Estudiantes que aprenden tomando decisiones reales con consecuencias simuladas.",
+                    infrastructure: {
+                        provider: "Laravel + Angular + MySQL + Redis + Docker",
+                        services: ["Laravel API (lógica de simulación)", "Angular (dashboards + decisiones)", "MySQL (datos de simulación)", "Redis (estado en tiempo real)", "Docker (contenedores)", "LTI 1.3 (integración LMS)", "Moodle / Canvas / Blackboard (SSO + grades)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    lms["LMS (Moodle/Canvas)"] -->|LTI 1.3 SSO| api["Laravel API"]
+    api --> mysql[(MySQL)]
+    api --> redis[(Redis)]
+    angular["Angular SPA"] --> api
+    api -->|grade sync| lms
+
+    sim["Motor de Simulacion"] --> mysql
+    api --> sim
+
+    classDef main fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef infra fill:#111827,stroke:#06B6D4,color:#9CA3AF
+    classDef ext fill:#0D1117,stroke:#FBBF24,color:#E5E7EB
+    class api,sim main
+    class mysql,redis,angular infra
+    class lms ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["lti", "integration", "auth"],
+                            problem: "Integrar single sign-on con múltiples LMS universitarios sin contraseñas propias",
+                            constraint: "Cada universidad usa un LMS diferente (Moodle, Canvas, Blackboard). Pedir a los estudiantes crear otra cuenta era fricción innecesaria. Necesitábamos que el click en el LMS los dejara directo en la simulación con su identidad y matrícula.",
+                            approach: "Se implementó LTI 1.3 (Learning Tools Interoperability): el estándar moderno para integrar herramientas externas con LMS. El handshake OAuth 2.0 verifica la identidad del estudiante y nos da acceso a su roster y calificaciones.",
+                            algorithm: "LTI 1.3 Launch: LMS envía JWT firmado con clave pública → Laravel valida firma → extrae claims (user_id, course_id, roles) → crea/actualiza usuario en DB → genera token de sesión → redirige al dashboard.",
+                            codeFile: "app/Http/Controllers/LtiLaunchController.php",
+                            codeLang: "php",
+                            code: `public function launch(Request $request)
+{
+    // Validar el JWT del LMS con la clave pública registrada
+    $claims = $this->ltiService->validateLaunch($request);
+
+    $student = Student::updateOrCreate(
+        ['lms_user_id' => $claims['sub']],
+        [
+            'name'        => $claims['name'],
+            'email'       => $claims['email'],
+            'course_id'   => $claims['context']['id'],
+            'institution' => $claims['iss'],
+        ]
+    );
+
+    // Grade passback: guardar endpoint para sync posterior
+    $student->grade_service_url = $claims['grade_service'] ?? null;
+    $student->save();
+
+    return redirect()->to($this->sessionService->generateUrl($student));
+}`
+                        }
+                    ],
+                    metrics: [
+                        { value: "3 LMS", label: "integrados via LTI 1.3 (Moodle, Canvas, Blackboard)" },
+                        { value: "SSO automático", label: "sin cuentas adicionales para estudiantes" },
+                        { value: "grade sync", label: "automático al cerrar cada ronda de simulación" }
+                    ],
+                    results: "Los profesores configuran la simulación una vez en su LMS y la plataforma gestiona todo: acceso de estudiantes, rondas de decisión, cálculo de resultados y sincronización de calificaciones. El tiempo de setup por curso bajó de horas a minutos.",
+                    lessons: [
+                        {
+                            title: "LTI 1.3 es complejo, pero vale la pena",
+                            body: "Implementar LTI 1.3 correctamente lleva tiempo: el handshake OAuth 2.0, el manejo de claves públicas por institución y el grade passback tienen sus particularidades. Pero el resultado es una integración que funciona en cualquier LMS moderno sin código extra."
+                        }
+                    ]
+                },
+                {
+                    slug: "askly",
+                    title: "Askly",
+                    description: "Chatbot RAG que responde preguntas sobre documentos subidos (PDF, DOCX, XLSX) con busqueda semantica hibrida y respuestas transmitidas.",
+                    tech: ["Next.js", "TypeScript", "Supabase", "pgvector", "Vercel AI SDK", "OpenAI"],
+                    image: msCrmImage,
+                    type: "caso",
+                    year: "2026",
+                    role: "Fullstack · IA · RAG",
+                    fullDescription: "Askly (askly-rxav.vercel.app) permite subir documentos (PDF, DOCX, XLSX) y hacerle preguntas en lenguaje natural. Usa búsqueda semántica híbrida: embeddings vectoriales en Supabase/pgvector para similitud semántica combinados con búsqueda léxica BM25. El sistema clasifica la intención del usuario para elegir la estrategia de retrieval adecuada. Las respuestas se transmiten en streaming. Stack: Next.js, TypeScript, Vercel AI SDK, Supabase.",
+                    problem: "Cuando se trabaja con documentos largos (contratos, manuales, reportes), encontrar una respuesta específica implica leer decenas de páginas. Ctrl+F no entiende sinónimos ni contexto. El usuario sabe lo que busca pero no el término exacto.",
+                    audience: "Profesionales que trabajan con documentos extensos: abogados revisando contratos, analistas con reportes, equipos de soporte con manuales técnicos. Cualquiera que prefiera preguntar a buscar.",
+                    infrastructure: {
+                        provider: "Next.js + Supabase + Vercel",
+                        services: ["Next.js 14 App Router (frontend + API routes)", "Supabase (base de datos + pgvector)", "OpenAI Embeddings (vectorización de chunks)", "OpenAI GPT-4 (generación de respuestas)", "Vercel AI SDK (streaming)", "Vercel (deploy + edge functions)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    user["Usuario"] -->|sube doc| ingest["Ingestion Pipeline"]
+    ingest -->|chunks + embeddings| db[(Supabase pgvector)]
+
+    user -->|pregunta| classify["Clasificador de intención"]
+    classify -->|semántica| vec["Búsqueda vectorial"]
+    classify -->|léxica| bm25["Búsqueda BM25"]
+    vec --> merge["Merge + rerank"]
+    bm25 --> merge
+    merge -->|contexto| llm["OpenAI GPT-4"]
+    llm -->|stream| user
+
+    classDef main fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef infra fill:#111827,stroke:#06B6D4,color:#9CA3AF
+    classDef ext fill:#0D1117,stroke:#FBBF24,color:#E5E7EB
+    class classify,merge main
+    class db,vec,bm25 infra
+    class llm,ingest,user ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["rag", "retrieval", "ai"],
+                            problem: "La búsqueda solo por embeddings falla con nombres, fechas y términos técnicos",
+                            constraint: "Un embedding vectorial captura significado semántico, pero si el usuario pregunta '¿cuánto es el monto de la cláusula 5.2?' el modelo de embeddings puede traer chunks sobre cláusulas similares en vez del número exacto. Necesitábamos precisión léxica y semántica a la vez.",
+                            approach: "Búsqueda híbrida: se ejecutan en paralelo la búsqueda vectorial (similitud coseno en pgvector) y la búsqueda léxica (BM25 full-text en Postgres). Los resultados se fusionan con Reciprocal Rank Fusion (RRF) y se rerankan por relevancia.",
+                            algorithm: "RRF(d) = Σ 1/(k + rank_i(d)) donde k=60. Combina los rankings de ambas búsquedas sin necesitar scores normalizados. Luego un re-ranker ligero ordena el top-N por contexto de la pregunta.",
+                            codeFile: "lib/retrieval/hybrid-search.ts",
+                            codeLang: "typescript",
+                            code: `async function hybridSearch(query: string, docId: string) {
+  const embedding = await openai.embeddings.create({
+    input: query, model: "text-embedding-3-small"
+  });
+
+  const [vectorResults, bm25Results] = await Promise.all([
+    supabase.rpc("match_chunks", {
+      query_embedding: embedding.data[0].embedding,
+      match_count: 20, filter: { doc_id: docId }
+    }),
+    supabase.rpc("bm25_search", {
+      query_text: query, match_count: 20, doc_id: docId
+    }),
+  ]);
+
+  // Reciprocal Rank Fusion
+  return reciprocalRankFusion([vectorResults, bm25Results], { k: 60 });
+}`
+                        }
+                    ],
+                    metrics: [
+                        { value: "3 formatos", label: "PDF, DOCX, XLSX soportados" },
+                        { value: "búsqueda híbrida", label: "vectorial + léxica con RRF" },
+                        { value: "streaming", label: "respuestas palabra a palabra via Vercel AI SDK" }
+                    ],
+                    results: "Askly permite hacerle preguntas concretas a un documento largo y obtener la respuesta en segundos, citando el fragmento de origen. La búsqueda híbrida maneja tanto preguntas semánticas ('¿cuál es el propósito de este contrato?') como consultas exactas ('¿cuánto es la penalidad por incumplimiento?').",
+                    lessons: [
+                        {
+                            title: "Embeddings solos no son RAG, son solo la mitad",
+                            body: "El primer prototipo usaba solo búsqueda vectorial y fallaba con números, nombres propios y cláusulas específicas. Agregar BM25 y RRF aumentó notablemente la precisión en consultas exactas sin sacrificar la búsqueda semántica."
+                        },
+                        {
+                            title: "El clasificador de intención decide la estrategia",
+                            body: "No todas las preguntas necesitan el mismo retrieval. Una pregunta factual ('¿en qué fecha firmaron?') se sirve mejor con búsqueda léxica. Una pregunta conceptual ('¿qué riesgos cubre?') se sirve mejor con semántica. Clasificar la intención primero mejora la calidad de las respuestas."
+                        }
+                    ]
                 }
             ]
         },
@@ -4455,6 +4716,267 @@ return Object.entries(byEmployee).map(([id, ts]) => ({ id, tasks: ts }));`
                         {
                             title: "Adapt per channel, don't repost",
                             body: "The first attempt reposted the same text everywhere and it showed. Giving each platform its own prompt with length and tone was the difference between 'automated content' and 'content that looks hand-written'."
+                        }
+                    ]
+                },
+                {
+                    slug: "skolerom",
+                    title: "Skolerom",
+                    description: "K-12 education platform in Norway: classroom management, assignments and digital curriculum for public and private schools.",
+                    tech: ["Laravel", "PostgreSQL", "MongoDB", "AWS", "Docker", "Terraform", "Argo CD", "GitHub Actions"],
+                    image: msCrmImage,
+                    type: "case",
+                    year: "2023",
+                    role: "Senior Backend · Cloud · DevOps",
+                    fullDescription: "Skolerom (app.skolerom.no) is an education platform used by Norwegian schools to manage classrooms, assignments, materials and student progress. Jose led the technical evolution of the backend for over 4 years: designed the Laravel API architecture, defined security strategies, established CI/CD pipelines and migrated infrastructure to IaC with Terraform. The platform handles multiple schools with data isolation and high availability.",
+                    problem: "The platform had grown without a clear architecture: manual deployments, no IaC, sparse tests and accumulated technical debt that slowed the team and caused production incidents.",
+                    audience: "Norwegian K-12 public and private schools. Teachers managing classes and assignments. Students accessing materials and submitting work. Institution administrators controlling licenses and access.",
+                    infrastructure: {
+                        provider: "AWS + Docker + Terraform",
+                        services: ["Laravel API (core business logic)", "PostgreSQL (relational data)", "MongoDB (educational content)", "AWS S3 (files and materials)", "AWS SQS (async task queues)", "Docker (containers)", "Terraform (IaC)", "GitHub Actions (CI/CD)", "Argo CD (GitOps deployments)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    client[Web/App Client] --> api["Laravel API"]
+    api --> pg[(PostgreSQL)]
+    api --> mongo[(MongoDB)]
+    api --> s3[AWS S3]
+    api --> sqs[AWS SQS]
+    sqs --> worker[Async Worker]
+    worker --> pg
+
+    ci["GitHub Actions CI"] --> docker["Docker Build"]
+    docker --> argo["Argo CD"]
+    argo --> k8s["AWS Cluster"]
+
+    classDef main fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef infra fill:#111827,stroke:#06B6D4,color:#9CA3AF
+    classDef devops fill:#0D1117,stroke:#FBBF24,color:#E5E7EB
+    class api,worker main
+    class pg,mongo,s3,sqs,client infra
+    class ci,docker,argo,k8s devops`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["devops", "cicd", "gitops"],
+                            problem: "Manual deployments with human error risk on every release",
+                            constraint: "The team deployed via SSH directly to the server. Every release was stressful: manual steps, complicated rollbacks and no traceability of which version was running in production.",
+                            approach: "A complete pipeline was implemented: GitHub Actions for build and tests, Docker to package the app, and Argo CD to manage deployments via GitOps. The production state is now declared in a Git repository.",
+                            algorithm: "Git push → GitHub Actions (lint + tests + docker build + push to registry) → Argo CD detects change in helm chart → automatic sync to AWS cluster.",
+                            codeFile: "github-actions deploy.yml",
+                            codeLang: "yaml",
+                            code: `jobs:
+  deploy:
+    steps:
+      - name: Build & push Docker image
+        run: |
+          docker build -t app:\${{ github.sha }} .
+          docker push registry/app:\${{ github.sha }}
+      - name: Update Helm chart tag
+        run: |
+          sed -i "s/tag:.*/tag: \${{ github.sha }}/" helm/values.yaml
+          git commit -am "release: \${{ github.sha }}"
+          git push
+# Argo CD detects the change and syncs automatically`
+                        },
+                        {
+                            tags: ["security", "multitenancy", "backend"],
+                            problem: "Data isolation between schools in a shared database",
+                            constraint: "The platform serves multiple institutions. An authorization bug could expose student data from one school to another — unacceptable in an educational context with Norwegian GDPR compliance.",
+                            approach: "Row-Level Security was implemented with institution_id scoping on all queries via a global middleware. No query can execute without an active institution context.",
+                            algorithm: "Laravel middleware injects institution_id into the global query scope. Integration tests verify cross-tenant isolation on every PR.",
+                            codeFile: "app/Http/Middleware/ScopeToInstitution.php",
+                            codeLang: "php",
+                            code: `class ScopeToInstitution
+{
+    public function handle(Request $request, Closure $next)
+    {
+        $institutionId = $request->user()->institution_id;
+        // Apply global scope to all Eloquent models
+        Builder::macro('scopeToInstitution', fn() =>
+            $this->where('institution_id', $institutionId)
+        );
+        app()->instance('institution_id', $institutionId);
+        return $next($request);
+    }
+}`
+                        }
+                    ],
+                    metrics: [
+                        { value: "4+ years", label: "of continuous technical ownership" },
+                        { value: "0 manual deploys", label: "after implementing GitOps with Argo CD" },
+                        { value: "multi-tenant", label: "with per-institution data isolation" }
+                    ],
+                    results: "The platform went from stressful manual deployments to automated, traceable releases. Technical debt was reduced with progressive refactoring and test coverage. Infrastructure is now declared as code, reproducible and audited.",
+                    lessons: [
+                        {
+                            title: "GitOps changes culture, not just process",
+                            body: "Before Argo CD, the production state lived in the head of whoever did the last deployment. With GitOps, the state is in Git: anyone can see which version is running, roll back with a revert and audit every change."
+                        },
+                        {
+                            title: "Eloquent global scope is the security guard that never forgets",
+                            body: "Trusting every developer to manually apply the institution filter is a recipe for a cross-tenant bug. A global scope in middleware makes it impossible to forget — and isolation tests verify it on every PR."
+                        }
+                    ]
+                },
+                {
+                    slug: "ceo-sim",
+                    title: "CEO Sim",
+                    description: "Educational SaaS where university student teams run companies in competitive market simulations.",
+                    tech: ["Laravel", "Angular", "MySQL", "Redis", "Docker", "LTI 1.3"],
+                    image: msCrmImage2,
+                    type: "case",
+                    year: "2026",
+                    role: "Fullstack · Architecture · LMS Integrations",
+                    fullDescription: "CEO Sim is a SaaS platform where student teams make business decisions (marketing, production, finance, operations) in a simulated market that reacts to their moves. It integrates with the most widely used university LMS platforms (Moodle, Canvas, Blackboard) via LTI 1.3: automatic single sign-on, grade synchronization and student roster import. Each university has its own licenses, groups and simulation settings.",
+                    problem: "University business simulations typically run on Excel or 1990s legacy software that students hate. The professor spends hours loading data manually and grades don't connect to the LMS.",
+                    audience: "University professors in business and administration programs. Universities looking to complement their curriculum with practical hands-on experiences. Students who learn by making real decisions with simulated consequences.",
+                    infrastructure: {
+                        provider: "Laravel + Angular + MySQL + Redis + Docker",
+                        services: ["Laravel API (simulation logic)", "Angular (dashboards + decisions)", "MySQL (simulation data)", "Redis (real-time state)", "Docker (containers)", "LTI 1.3 (LMS integration)", "Moodle / Canvas / Blackboard (SSO + grades)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    lms["LMS (Moodle/Canvas)"] -->|LTI 1.3 SSO| api["Laravel API"]
+    api --> mysql[(MySQL)]
+    api --> redis[(Redis)]
+    angular["Angular SPA"] --> api
+    api -->|grade sync| lms
+
+    sim["Simulation Engine"] --> mysql
+    api --> sim
+
+    classDef main fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef infra fill:#111827,stroke:#06B6D4,color:#9CA3AF
+    classDef ext fill:#0D1117,stroke:#FBBF24,color:#E5E7EB
+    class api,sim main
+    class mysql,redis,angular infra
+    class lms ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["lti", "integration", "auth"],
+                            problem: "Integrating single sign-on with multiple university LMS platforms without own passwords",
+                            constraint: "Each university uses a different LMS (Moodle, Canvas, Blackboard). Asking students to create another account was unnecessary friction. We needed a click in the LMS to land them directly in the simulation with their identity and enrollment.",
+                            approach: "LTI 1.3 (Learning Tools Interoperability) was implemented: the modern standard for integrating external tools with LMS platforms. The OAuth 2.0 handshake verifies student identity and grants access to their roster and grades.",
+                            algorithm: "LTI 1.3 Launch: LMS sends JWT signed with public key → Laravel validates signature → extracts claims (user_id, course_id, roles) → creates/updates user in DB → generates session token → redirects to dashboard.",
+                            codeFile: "app/Http/Controllers/LtiLaunchController.php",
+                            codeLang: "php",
+                            code: `public function launch(Request $request)
+{
+    // Validate LMS JWT with registered public key
+    $claims = $this->ltiService->validateLaunch($request);
+
+    $student = Student::updateOrCreate(
+        ['lms_user_id' => $claims['sub']],
+        [
+            'name'        => $claims['name'],
+            'email'       => $claims['email'],
+            'course_id'   => $claims['context']['id'],
+            'institution' => $claims['iss'],
+        ]
+    );
+
+    // Grade passback: store endpoint for later sync
+    $student->grade_service_url = $claims['grade_service'] ?? null;
+    $student->save();
+
+    return redirect()->to($this->sessionService->generateUrl($student));
+}`
+                        }
+                    ],
+                    metrics: [
+                        { value: "3 LMS", label: "integrated via LTI 1.3 (Moodle, Canvas, Blackboard)" },
+                        { value: "automatic SSO", label: "no extra accounts for students" },
+                        { value: "grade sync", label: "automatic at end of each simulation round" }
+                    ],
+                    results: "Professors configure the simulation once in their LMS and the platform handles everything: student access, decision rounds, result calculation and grade synchronization. Per-course setup time dropped from hours to minutes.",
+                    lessons: [
+                        {
+                            title: "LTI 1.3 is complex, but worth it",
+                            body: "Implementing LTI 1.3 correctly takes time: the OAuth 2.0 handshake, per-institution public key handling and grade passback all have their quirks. But the result is an integration that works with any modern LMS without extra code."
+                        }
+                    ]
+                },
+                {
+                    slug: "askly",
+                    title: "Askly",
+                    description: "RAG chatbot that answers questions about uploaded documents (PDF, DOCX, XLSX) with hybrid semantic search and streamed responses.",
+                    tech: ["Next.js", "TypeScript", "Supabase", "pgvector", "Vercel AI SDK", "OpenAI"],
+                    image: msCrmImage,
+                    type: "case",
+                    year: "2026",
+                    role: "Fullstack · AI · RAG",
+                    fullDescription: "Askly (askly-rxav.vercel.app) lets you upload documents (PDF, DOCX, XLSX) and ask questions in natural language. It uses hybrid semantic search: vector embeddings in Supabase/pgvector for semantic similarity combined with BM25 lexical search. The system classifies user intent to choose the right retrieval strategy. Responses stream word by word. Stack: Next.js, TypeScript, Vercel AI SDK, Supabase.",
+                    problem: "When working with long documents (contracts, manuals, reports), finding a specific answer means reading dozens of pages. Ctrl+F doesn't understand synonyms or context. The user knows what they're looking for but not the exact term.",
+                    audience: "Professionals who work with extensive documents: lawyers reviewing contracts, analysts with reports, support teams with technical manuals. Anyone who prefers asking over searching.",
+                    infrastructure: {
+                        provider: "Next.js + Supabase + Vercel",
+                        services: ["Next.js 14 App Router (frontend + API routes)", "Supabase (database + pgvector)", "OpenAI Embeddings (chunk vectorization)", "OpenAI GPT-4 (response generation)", "Vercel AI SDK (streaming)", "Vercel (deploy + edge functions)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    user["User"] -->|uploads doc| ingest["Ingestion Pipeline"]
+    ingest -->|chunks + embeddings| db[(Supabase pgvector)]
+
+    user -->|asks question| classify["Intent Classifier"]
+    classify -->|semantic| vec["Vector Search"]
+    classify -->|lexical| bm25["BM25 Search"]
+    vec --> merge["Merge + rerank"]
+    bm25 --> merge
+    merge -->|context| llm["OpenAI GPT-4"]
+    llm -->|stream| user
+
+    classDef main fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef infra fill:#111827,stroke:#06B6D4,color:#9CA3AF
+    classDef ext fill:#0D1117,stroke:#FBBF24,color:#E5E7EB
+    class classify,merge main
+    class db,vec,bm25 infra
+    class llm,ingest,user ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["rag", "retrieval", "ai"],
+                            problem: "Embeddings-only search fails on names, dates and technical terms",
+                            constraint: "A vector embedding captures semantic meaning, but if the user asks 'what is the penalty amount in clause 5.2?' the embedding model may return chunks about similar clauses instead of the exact number. We needed both lexical precision and semantic understanding.",
+                            approach: "Hybrid search: vector search (cosine similarity in pgvector) and lexical search (BM25 full-text in Postgres) run in parallel. Results are merged with Reciprocal Rank Fusion (RRF) and re-ranked by relevance.",
+                            algorithm: "RRF(d) = Σ 1/(k + rank_i(d)) where k=60. Combines rankings from both searches without needing normalized scores. A lightweight re-ranker then orders the top-N by question context.",
+                            codeFile: "lib/retrieval/hybrid-search.ts",
+                            codeLang: "typescript",
+                            code: `async function hybridSearch(query: string, docId: string) {
+  const embedding = await openai.embeddings.create({
+    input: query, model: "text-embedding-3-small"
+  });
+
+  const [vectorResults, bm25Results] = await Promise.all([
+    supabase.rpc("match_chunks", {
+      query_embedding: embedding.data[0].embedding,
+      match_count: 20, filter: { doc_id: docId }
+    }),
+    supabase.rpc("bm25_search", {
+      query_text: query, match_count: 20, doc_id: docId
+    }),
+  ]);
+
+  // Reciprocal Rank Fusion
+  return reciprocalRankFusion([vectorResults, bm25Results], { k: 60 });
+}`
+                        }
+                    ],
+                    metrics: [
+                        { value: "3 formats", label: "PDF, DOCX, XLSX supported" },
+                        { value: "hybrid search", label: "vector + lexical with RRF" },
+                        { value: "streaming", label: "word-by-word responses via Vercel AI SDK" }
+                    ],
+                    results: "Askly lets you ask concrete questions about a long document and get the answer in seconds, citing the source passage. Hybrid search handles both semantic questions ('what is the purpose of this contract?') and exact queries ('what is the penalty for non-compliance?').",
+                    lessons: [
+                        {
+                            title: "Embeddings alone aren't RAG, they're just half of it",
+                            body: "The first prototype used only vector search and failed on numbers, proper names and specific clauses. Adding BM25 and RRF significantly improved precision on exact queries without sacrificing semantic search."
+                        },
+                        {
+                            title: "Intent classification decides the strategy",
+                            body: "Not all questions need the same retrieval approach. A factual question ('on what date did they sign?') is better served with lexical search. A conceptual question ('what risks does it cover?') is better served with semantics. Classifying intent first improves response quality."
                         }
                     ]
                 }
