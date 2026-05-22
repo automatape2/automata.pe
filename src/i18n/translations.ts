@@ -1381,7 +1381,76 @@ GROUP BY bucket, sensor_id;`
                     description: "Migracion asistida de cargas legacy a AWS con IaC, observabilidad y gobernanza de costos desde el dia uno.",
                     tech: ["AWS", "Terraform", "Docker", "CloudWatch"],
                     image: msCrmImage2,
-                    type: "caso"
+                    type: "caso",
+                    year: "2024",
+                    role: "Cloud · IaC · DevOps",
+                    fullDescription: "Migracion de cargas legacy on-premise a AWS con todo como codigo: infraestructura en Terraform, apps dockerizadas en ECS, observabilidad con CloudWatch y gobernanza de costos con presupuestos y alertas desde el primer dia. No fue 'lift & shift' a ciegas, sino un baseline reproducible.",
+                    problem: "Servidores fisicos al limite, sin redundancia, con deploys manuales y cero visibilidad de costos. Escalar significaba comprar hardware; un fallo de disco era un riesgo de negocio.",
+                    audience: "Empresas con sistemas legacy en servidores propios que necesitan moverse a la nube sin perder el control de costos ni la trazabilidad.",
+                    infrastructure: {
+                        provider: "AWS (ECS, RDS, S3, CloudWatch) + Terraform",
+                        services: ["Terraform (toda la infra como codigo)", "ECS + Docker (apps containerizadas)", "RDS (BD gestionada con backups)", "S3 + CloudFront (assets/CDN)", "CloudWatch (logs, metricas, alarmas)", "AWS Budgets (gobernanza de costos)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    tf[Terraform] -->|provisiona| aws["AWS account"]
+    subgraph aws ["AWS"]
+        ecs["ECS + Docker"]
+        rds[(RDS)]
+        s3[S3 + CloudFront]
+        cw[CloudWatch]
+        budget[Budgets + alarmas]
+    end
+    ecs --> rds
+    ecs --> s3
+    ecs --> cw
+    cw --> budget
+
+    classDef edge fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    class tf edge
+    class ecs,s3,cw,budget edge
+    class rds db
+    style aws fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["iac", "cost", "devops"],
+                            problem: "Migrar sin que la factura de AWS se dispare en el mes 1",
+                            constraint: "Es facil sobre-provisionar (instancias grandes 'por si acaso') y descubrir el costo cuando llega la factura. El cliente venia de un CAPEX fijo y temia el OPEX variable.",
+                            approach: "Todo en Terraform (nada de clicks en consola), sizing conservador con auto-scaling, y AWS Budgets con alarmas que avisan al 50/80/100% del presupuesto antes de que el mes cierre.",
+                            algorithm: "Infra inmutable + presupuesto como guardrail: cada recurso es codigo revisable, y el gasto tiene un circuit-breaker (alarma) en vez de descubrirse post-factura.",
+                            codeFile: "budget.tf",
+                            codeLang: "hcl",
+                            code: `resource "aws_budgets_budget" "monthly" {
+  name         = "monthly-cost"
+  budget_type  = "COST"
+  limit_amount = "500"
+  limit_unit   = "USD"
+  time_unit    = "MONTHLY"
+
+  notification {
+    comparison_operator = "GREATER_THAN"
+    threshold           = 80      # avisa al 80%, no post-factura
+    threshold_type      = "PERCENTAGE"
+    notification_type   = "ACTUAL"
+    subscriber_email_addresses = [var.ops_email]
+  }
+}`
+                        }
+                    ],
+                    metrics: [
+                        { value: "100% IaC", label: "infra reproducible" },
+                        { value: "alarmas", label: "de costo al 50/80/100%" },
+                        { value: "0 deploys", label: "manuales" }
+                    ],
+                    results: "El cliente quedo con una infra versionada, con backups y observabilidad, y con visibilidad de costos en tiempo real. Recrear el entorno es `terraform apply`, no una semana de trabajo.",
+                    lessons: [
+                        {
+                            title: "El presupuesto es parte de la arquitectura, no del cierre de mes",
+                            body: "Tratar el costo como algo que se revisa cuando llega la factura es tarde. Poner AWS Budgets con alarmas en el mismo Terraform que la infra convirtio el costo en un guardrail proactivo."
+                        }
+                    ]
                 },
                 {
                     slug: "onboarding-empleados",
@@ -2840,7 +2909,76 @@ GROUP BY bucket, sensor_id;`
                     description: "Assisted migration of legacy workloads to AWS with IaC, observability and cost governance from day one.",
                     tech: ["AWS", "Terraform", "Docker", "CloudWatch"],
                     image: msCrmImage2,
-                    type: "case"
+                    type: "case",
+                    year: "2024",
+                    role: "Cloud · IaC · DevOps",
+                    fullDescription: "Migration of legacy on-premise workloads to AWS with everything as code: infrastructure in Terraform, dockerized apps on ECS, observability with CloudWatch, and cost governance with budgets and alerts from day one. Not a blind lift & shift, but a reproducible baseline.",
+                    problem: "Physical servers at their limit, no redundancy, manual deploys and zero cost visibility. Scaling meant buying hardware; a disk failure was a business risk.",
+                    audience: "Companies with legacy systems on their own servers that need to move to the cloud without losing cost control or traceability.",
+                    infrastructure: {
+                        provider: "AWS (ECS, RDS, S3, CloudWatch) + Terraform",
+                        services: ["Terraform (all infra as code)", "ECS + Docker (containerized apps)", "RDS (managed DB with backups)", "S3 + CloudFront (assets/CDN)", "CloudWatch (logs, metrics, alarms)", "AWS Budgets (cost governance)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    tf[Terraform] -->|provisions| aws["AWS account"]
+    subgraph aws ["AWS"]
+        ecs["ECS + Docker"]
+        rds[(RDS)]
+        s3[S3 + CloudFront]
+        cw[CloudWatch]
+        budget[Budgets + alarms]
+    end
+    ecs --> rds
+    ecs --> s3
+    ecs --> cw
+    cw --> budget
+
+    classDef edge fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    class tf edge
+    class ecs,s3,cw,budget edge
+    class rds db
+    style aws fill:transparent,stroke:#4ADE80,stroke-dasharray:4 4,color:#E5E7EB`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["iac", "cost", "devops"],
+                            problem: "Migrate without the AWS bill blowing up in month 1",
+                            constraint: "It's easy to over-provision ('big instances just in case') and discover the cost when the bill lands. The client came from fixed CAPEX and feared variable OPEX.",
+                            approach: "Everything in Terraform (no console clicks), conservative sizing with auto-scaling, and AWS Budgets with alarms that warn at 50/80/100% of budget before the month closes.",
+                            algorithm: "Immutable infra + budget as a guardrail: every resource is reviewable code, and spend has a circuit-breaker (alarm) instead of being discovered post-bill.",
+                            codeFile: "budget.tf",
+                            codeLang: "hcl",
+                            code: `resource "aws_budgets_budget" "monthly" {
+  name         = "monthly-cost"
+  budget_type  = "COST"
+  limit_amount = "500"
+  limit_unit   = "USD"
+  time_unit    = "MONTHLY"
+
+  notification {
+    comparison_operator = "GREATER_THAN"
+    threshold           = 80      # warns at 80%, not post-bill
+    threshold_type      = "PERCENTAGE"
+    notification_type   = "ACTUAL"
+    subscriber_email_addresses = [var.ops_email]
+  }
+}`
+                        }
+                    ],
+                    metrics: [
+                        { value: "100% IaC", label: "reproducible infra" },
+                        { value: "alarms", label: "on cost at 50/80/100%" },
+                        { value: "0 deploys", label: "done by hand" }
+                    ],
+                    results: "The client ended with versioned infra, backups and observability, and real-time cost visibility. Recreating the environment is `terraform apply`, not a week of work.",
+                    lessons: [
+                        {
+                            title: "The budget is part of the architecture, not the month-end close",
+                            body: "Treating cost as something you review when the bill arrives is too late. Putting AWS Budgets with alarms in the same Terraform as the infra turned cost into a proactive guardrail."
+                        }
+                    ]
                 },
                 {
                     slug: "onboarding-empleados",
