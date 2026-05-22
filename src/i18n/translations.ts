@@ -1244,7 +1244,61 @@ Notification::send(
                     description: "Detecta pagos en Stripe/PayPal, genera facturas electronicas y las envia al cliente. Cero trabajo manual.",
                     tech: ["n8n", "Stripe", "SUNAT API", "Email"],
                     image: msCrmImage3,
-                    type: "caso"
+                    type: "caso",
+                    year: "2025",
+                    role: "Automatizacion · Integraciones",
+                    fullDescription: "Flujo que cierra el ciclo cobro→factura: un webhook de Stripe/PayPal dispara la emision del comprobante SUNAT, genera el PDF y lo envia por email al cliente. El equipo de admin pasa de facturar a mano a solo revisar excepciones.",
+                    problem: "Cada pago obligaba a alguien a entrar al panel de SUNAT, emitir la factura, descargar el PDF y mandarlo por correo. Horas de trabajo repetitivo y facturas que se emitian tarde o se olvidaban.",
+                    audience: "Negocios que cobran online (Stripe/PayPal) y estan obligados a emitir comprobante SUNAT por cada venta.",
+                    infrastructure: {
+                        provider: "n8n + Stripe webhooks + SUNAT API",
+                        services: ["Stripe/PayPal webhooks (evento de pago)", "n8n (orquestacion + idempotencia)", "SUNAT API (emision via Greenter/REST)", "Email (envio del PDF)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    pago[Pago en Stripe/PayPal] -->|webhook| n8n["n8n workflow"]
+    n8n -->|dedup por payment_id| guard{ya emitido?}
+    guard -->|no| sunat[SUNAT API]
+    sunat --> pdf[Genera PDF]
+    pdf --> mail[Email al cliente]
+    guard -->|si| skip[Skip]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    classDef db fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    class n8n edge
+    class pago,sunat,mail ext
+    class pdf,guard,skip db`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["webhooks", "idempotency", "automation"],
+                            problem: "Un mismo pago no debe generar dos facturas",
+                            constraint: "Stripe reintenta webhooks; un timeout o un retry puede disparar el flujo dos veces. Una factura duplicada en SUNAT es un problema fiscal real.",
+                            approach: "Idempotencia por payment_id: antes de emitir, el workflow verifica si ya existe un comprobante para ese pago. Stripe ademas firma cada webhook (HMAC) que se valida antes de procesar.",
+                            algorithm: "Dedup key (payment_id) + verificacion de firma. El primer evento emite; los reintentos caen en el branch 'ya emitido'.",
+                            codeFile: "n8n · Function node (guard)",
+                            codeLang: "javascript",
+                            code: `// Idempotencia: el payment_id es la clave
+const exists = await db.comprobantes.findOne({ payment_id });
+if (exists) return { skip: true };   // retry de Stripe → no-op
+
+// Solo el primer evento llega aca
+return { emit: true, payment_id, monto, cliente };`
+                        }
+                    ],
+                    metrics: [
+                        { value: "0 manual", label: "facturas a mano" },
+                        { value: "1 factura", label: "por pago (idempotente)" },
+                        { value: "segundos", label: "pago → PDF al cliente" }
+                    ],
+                    results: "El cobro y la facturacion quedaron pegados: cada pago emite su comprobante y lo envia solo. Admin solo mira el log de excepciones.",
+                    lessons: [
+                        {
+                            title: "Webhooks sin idempotencia = duplicados garantizados",
+                            body: "Asumir que un webhook llega una sola vez es la receta para facturas duplicadas. La dedup key por payment_id desde el primer dia evito el problema fiscal antes de que existiera."
+                        }
+                    ]
                 },
                 {
                     slug: "monitor-precios",
@@ -2590,7 +2644,61 @@ Notification::send(
                     description: "Detects payments in Stripe/PayPal, generates electronic invoices and sends them to the client. Zero manual work.",
                     tech: ["n8n", "Stripe", "Tax API", "Email"],
                     image: msCrmImage3,
-                    type: "case"
+                    type: "case",
+                    year: "2025",
+                    role: "Automation · Integrations",
+                    fullDescription: "A flow that closes the payment→invoice loop: a Stripe/PayPal webhook triggers SUNAT document issuance, generates the PDF and emails it to the customer. The admin team goes from invoicing by hand to only reviewing exceptions.",
+                    problem: "Every payment forced someone to log into the SUNAT panel, issue the invoice, download the PDF and email it. Hours of repetitive work, with invoices issued late or forgotten.",
+                    audience: "Businesses that charge online (Stripe/PayPal) and are required to issue a SUNAT document for each sale.",
+                    infrastructure: {
+                        provider: "n8n + Stripe webhooks + SUNAT API",
+                        services: ["Stripe/PayPal webhooks (payment event)", "n8n (orchestration + idempotency)", "SUNAT API (issuance via Greenter/REST)", "Email (PDF delivery)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    pay[Stripe/PayPal payment] -->|webhook| n8n["n8n workflow"]
+    n8n -->|dedup by payment_id| guard{already issued?}
+    guard -->|no| sunat[SUNAT API]
+    sunat --> pdf[Generate PDF]
+    pdf --> mail[Email to customer]
+    guard -->|yes| skip[Skip]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    classDef db fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    class n8n edge
+    class pay,sunat,mail ext
+    class pdf,guard,skip db`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["webhooks", "idempotency", "automation"],
+                            problem: "The same payment must not generate two invoices",
+                            constraint: "Stripe retries webhooks; a timeout or a retry can fire the flow twice. A duplicate invoice in SUNAT is a real tax problem.",
+                            approach: "Idempotency by payment_id: before issuing, the workflow checks whether a document already exists for that payment. Stripe also signs each webhook (HMAC), validated before processing.",
+                            algorithm: "Dedup key (payment_id) + signature verification. The first event issues; retries fall into the 'already issued' branch.",
+                            codeFile: "n8n · Function node (guard)",
+                            codeLang: "javascript",
+                            code: `// Idempotency: the payment_id is the key
+const exists = await db.invoices.findOne({ payment_id });
+if (exists) return { skip: true };   // Stripe retry → no-op
+
+// Only the first event reaches here
+return { emit: true, payment_id, amount, customer };`
+                        }
+                    ],
+                    metrics: [
+                        { value: "0 manual", label: "hand-typed invoices" },
+                        { value: "1 invoice", label: "per payment (idempotent)" },
+                        { value: "seconds", label: "payment → PDF to customer" }
+                    ],
+                    results: "Charging and invoicing are now glued together: each payment issues its document and sends it on its own. Admin only watches the exceptions log.",
+                    lessons: [
+                        {
+                            title: "Webhooks without idempotency = guaranteed duplicates",
+                            body: "Assuming a webhook arrives exactly once is the recipe for duplicate invoices. A payment_id dedup key from day one avoided the tax problem before it could exist."
+                        }
+                    ]
                 },
                 {
                     slug: "monitor-precios",
