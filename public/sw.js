@@ -1,14 +1,18 @@
 // Service Worker for Portfolio PWA
 // Implements offline-first caching strategy for optimal performance
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 
-// Assets to cache immediately on install
+// Shell routes + offline fallback cached immediately on install
 const STATIC_ASSETS = [
     '/',
-    '/index.html',
-    '/favicon.svg'
+    '/en',
+    '/es',
+    '/projects',
+    '/es/projects',
+    '/favicon.svg',
+    '/offline.html'
 ];
 
 // Install event - cache static assets
@@ -70,9 +74,10 @@ self.addEventListener('fetch', (event) => {
                     });
                     return response;
                 })
-                .catch(() => {
-                    // Offline fallback - serve cached version
-                    return caches.match(request);
+                .catch(async () => {
+                    // Offline: serve the cached version of this page, or the offline fallback
+                    const cached = await caches.match(request);
+                    return cached || caches.match('/offline.html');
                 })
         );
         return;
