@@ -1634,7 +1634,60 @@ return Object.entries(byEmployee).map(([id, ts]) => ({ id, tasks: ts }));`
                     description: "Recibe CVs por email o formulario, los analiza con IA y pre-califica candidatos automaticamente.",
                     tech: ["n8n", "OpenAI", "Airtable", "Email"],
                     image: msCrmImage,
-                    type: "caso"
+                    type: "caso",
+                    year: "2025",
+                    role: "IA · Automatizacion · Integraciones",
+                    fullDescription: "Cuando llega un CV por email o formulario, n8n extrae el texto del PDF, un LLM lo estructura (experiencia, skills, años) y lo puntua contra los requisitos de la vacante. El candidato cae en Airtable ya pre-calificado, con un score y un resumen de por que encaja o no. El reclutador revisa una lista ordenada en vez de abrir 200 PDFs.",
+                    problem: "Por cada vacante llegaban cientos de CVs en formatos distintos. Filtrarlos a mano tomaba dias, los buenos candidatos se enfriaban esperando, y el criterio variaba segun quien revisaba.",
+                    audience: "Equipos de RR.HH. y agencias de reclutamiento que reciben alto volumen de postulaciones y necesitan pre-filtrar sin perder buenos perfiles.",
+                    infrastructure: {
+                        provider: "n8n + OpenAI + Airtable",
+                        services: ["Email / formulario (entrada de CVs)", "Parser de PDF (extraccion de texto)", "OpenAI (estructuracion + scoring)", "n8n (orquestacion)", "Airtable (pipeline de candidatos)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    cv[CV por email/form] -->|PDF| parse[Extrae texto]
+    parse -->|texto| ai["OpenAI: estructura + score"]
+    ai --> n8n["n8n"]
+    n8n --> air[Airtable: candidato + score]
+    n8n --> notify[Aviso al reclutador]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class n8n edge
+    class cv,parse,ai,air,notify ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["ai", "scoring", "automation"],
+                            problem: "Puntuar candidatos de forma consistente, no por intuicion del modelo",
+                            constraint: "Pedirle al LLM 'que tan bueno es este CV' devolvia scores inestables: el mismo perfil sacaba 6 o 9 segun el dia. Sin criterio fijo el ranking no servia.",
+                            approach: "Se descompone el score en criterios explicitos por vacante (años de experiencia, skills obligatorias, skills deseables) y cada uno se evalua por separado con un peso. El score final es una suma ponderada, no un numero que el modelo inventa de una.",
+                            algorithm: "Scoring por rubrica: el LLM evalua cada criterio (match booleano o 0-1), el workflow aplica los pesos y suma. Determinista dado el mismo CV.",
+                            codeFile: "n8n · OpenAI node (rubrica)",
+                            codeLang: "json",
+                            code: `{
+  "criteria": [
+    { "name": "años_experiencia", "match": 0.0, "weight": 0.3 },
+    { "name": "skills_obligatorias", "match": 0.0, "weight": 0.5 },
+    { "name": "skills_deseables", "match": 0.0, "weight": 0.2 }
+  ]
+}
+// score = Σ(match * weight) — no un numero suelto del modelo`
+                        }
+                    ],
+                    metrics: [
+                        { value: "horas → minutos", label: "para filtrar una vacante" },
+                        { value: "score + resumen", label: "por candidato" },
+                        { value: "0 PDFs", label: "abiertos a mano para descartar" }
+                    ],
+                    results: "El reclutador abre Airtable y ve a los candidatos ordenados por score, cada uno con un resumen de por que encaja. Los buenos perfiles ya no se enfrian en la bandeja de entrada.",
+                    lessons: [
+                        {
+                            title: "Una rubrica le gana a 'puntua del 1 al 10'",
+                            body: "Pedir un score directo daba numeros inestables. Descomponerlo en criterios con pesos hizo el ranking reproducible y, de paso, explicable: el reclutador ve que criterio fallo, no solo un numero."
+                        }
+                    ]
                 },
                 {
                     slug: "contenido-social",
@@ -1642,7 +1695,61 @@ return Object.entries(byEmployee).map(([id, ts]) => ({ id, tasks: ts }));`
                     description: "Crea posts con IA, los programa automaticamente y envia reportes de metricas semanales.",
                     tech: ["n8n", "OpenAI", "Buffer API", "Google Sheets"],
                     image: msCrmImage2,
-                    type: "caso"
+                    type: "caso",
+                    year: "2025",
+                    role: "IA · Automatizacion · Integraciones",
+                    fullDescription: "Cada semana n8n toma una linea editorial desde Google Sheets, un LLM redacta los posts adaptados a cada red, y se programan en Buffer para publicarse en los horarios definidos. Los lunes llega un reporte con las metricas de la semana anterior (alcance, engagement) leidas de la API. El equipo aprueba un calendario en vez de escribir post por post.",
+                    problem: "Mantener presencia constante en redes consumia horas: redactar, adaptar a cada plataforma, programar y luego juntar metricas a mano. Cuando llegaba trabajo, lo primero que se caia era el contenido.",
+                    audience: "Pymes, freelancers y equipos de marketing chicos que necesitan presencia constante en redes sin un community manager full-time.",
+                    infrastructure: {
+                        provider: "n8n + OpenAI + Buffer",
+                        services: ["Google Sheets (linea editorial)", "OpenAI (redaccion por red)", "n8n (orquestacion + scheduling)", "Buffer API (programacion + publicacion)", "Google Sheets (reporte de metricas)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    sheet[Linea editorial · Sheets] --> n8n["n8n"]
+    n8n -->|prompt| ai["OpenAI: posts por red"]
+    ai --> n8n
+    n8n --> buffer[Buffer: programa posts]
+    buffer -->|metricas| report[Reporte semanal · Sheets]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class n8n edge
+    class sheet,ai,buffer,report ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["ai", "content", "automation"],
+                            problem: "Un mismo mensaje suena bien en LinkedIn y fatal en X",
+                            constraint: "Generar un post generico y republicarlo en todas las redes daba contenido plano: largo de mas para X, demasiado informal para LinkedIn, sin los hashtags ni el tono que cada plataforma espera.",
+                            approach: "El mismo brief se expande con un prompt por red que fija longitud, tono y formato (hashtags, emojis, CTA). El LLM no reescribe un texto, lo adapta desde la idea base con las reglas de cada canal.",
+                            algorithm: "Fan-out por plataforma: un brief → N prompts con restricciones especificas → N variantes. Cada canal tiene su propia plantilla de estilo.",
+                            codeFile: "n8n · OpenAI node (por red)",
+                            codeLang: "json",
+                            code: `{
+  "brief": "string",
+  "channels": {
+    "x":        { "max_chars": 280, "tone": "directo", "hashtags": 2 },
+    "linkedin": { "max_chars": 1300, "tone": "profesional", "cta": true },
+    "instagram":{ "max_chars": 2200, "tone": "cercano", "emojis": true }
+  }
+}
+// un brief → una variante por canal, no copy-paste`
+                        }
+                    ],
+                    metrics: [
+                        { value: "semanas adelantadas", label: "de contenido programado" },
+                        { value: "1 brief", label: "→ post por red, adaptado" },
+                        { value: "reporte lunes", label: "metricas sin armarlas a mano" }
+                    ],
+                    results: "El equipo aprueba un calendario semanal y la publicacion corre sola. El lunes llega el reporte de la semana anterior, asi que el contenido ya no es lo primero que se cae cuando hay trabajo.",
+                    lessons: [
+                        {
+                            title: "Adaptar por canal, no republicar",
+                            body: "El primer intento republicaba el mismo texto en todas las redes y se notaba. Darle a cada plataforma su propio prompt con longitud y tono fue la diferencia entre 'contenido automatizado' y 'contenido que parece escrito a mano'."
+                        }
+                    ]
                 }
             ]
         },
@@ -3322,7 +3429,60 @@ return Object.entries(byEmployee).map(([id, ts]) => ({ id, tasks: ts }));`
                     description: "Receives CVs via email or form, analyzes them with AI and pre-qualifies candidates automatically.",
                     tech: ["n8n", "OpenAI", "Airtable", "Email"],
                     image: msCrmImage,
-                    type: "case"
+                    type: "case",
+                    year: "2025",
+                    role: "AI · Automation · Integrations",
+                    fullDescription: "When a CV arrives by email or form, n8n extracts the text from the PDF, an LLM structures it (experience, skills, years) and scores it against the role's requirements. The candidate lands in Airtable already pre-qualified, with a score and a summary of why they fit or not. The recruiter reviews a ranked list instead of opening 200 PDFs.",
+                    problem: "Every opening drew hundreds of CVs in different formats. Screening them by hand took days, good candidates went cold while waiting, and the criteria shifted depending on who was reviewing.",
+                    audience: "HR teams and recruiting agencies that get high application volume and need to pre-filter without losing strong profiles.",
+                    infrastructure: {
+                        provider: "n8n + OpenAI + Airtable",
+                        services: ["Email / form (CV intake)", "PDF parser (text extraction)", "OpenAI (structuring + scoring)", "n8n (orchestration)", "Airtable (candidate pipeline)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    cv[CV via email/form] -->|PDF| parse[Extract text]
+    parse -->|text| ai["OpenAI: structure + score"]
+    ai --> n8n["n8n"]
+    n8n --> air[Airtable: candidate + score]
+    n8n --> notify[Notify recruiter]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class n8n edge
+    class cv,parse,ai,air,notify ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["ai", "scoring", "automation"],
+                            problem: "Score candidates consistently, not by the model's gut feeling",
+                            constraint: "Asking the LLM 'how good is this CV' returned unstable scores: the same profile got a 6 or a 9 depending on the day. Without fixed criteria the ranking was useless.",
+                            approach: "The score is broken into explicit per-role criteria (years of experience, required skills, nice-to-have skills) and each is evaluated separately with a weight. The final score is a weighted sum, not a number the model makes up in one shot.",
+                            algorithm: "Rubric scoring: the LLM evaluates each criterion (boolean match or 0-1), the workflow applies the weights and sums. Deterministic given the same CV.",
+                            codeFile: "n8n · OpenAI node (rubric)",
+                            codeLang: "json",
+                            code: `{
+  "criteria": [
+    { "name": "years_experience", "match": 0.0, "weight": 0.3 },
+    { "name": "required_skills",   "match": 0.0, "weight": 0.5 },
+    { "name": "nice_to_have",      "match": 0.0, "weight": 0.2 }
+  ]
+}
+// score = Σ(match * weight) — not a loose number from the model`
+                        }
+                    ],
+                    metrics: [
+                        { value: "hours → minutes", label: "to screen one opening" },
+                        { value: "score + summary", label: "per candidate" },
+                        { value: "0 PDFs", label: "opened by hand to reject" }
+                    ],
+                    results: "The recruiter opens Airtable and sees candidates ranked by score, each with a summary of why they fit. Good profiles no longer go cold in the inbox.",
+                    lessons: [
+                        {
+                            title: "A rubric beats 'rate it 1 to 10'",
+                            body: "Asking for a direct score gave unstable numbers. Breaking it into weighted criteria made the ranking reproducible and, as a bonus, explainable: the recruiter sees which criterion failed, not just a number."
+                        }
+                    ]
                 },
                 {
                     slug: "contenido-social",
@@ -3330,7 +3490,61 @@ return Object.entries(byEmployee).map(([id, ts]) => ({ id, tasks: ts }));`
                     description: "Creates social media posts with AI, schedules them automatically and sends weekly metrics reports.",
                     tech: ["n8n", "OpenAI", "Buffer API", "Google Sheets"],
                     image: msCrmImage2,
-                    type: "case"
+                    type: "case",
+                    year: "2025",
+                    role: "AI · Automation · Integrations",
+                    fullDescription: "Each week n8n pulls an editorial line from Google Sheets, an LLM drafts posts tailored to each network, and they get scheduled in Buffer to publish at set times. On Mondays a report arrives with the previous week's metrics (reach, engagement) read from the API. The team approves a calendar instead of writing post by post.",
+                    problem: "Keeping a steady social presence ate up hours: writing, adapting to each platform, scheduling, then pulling metrics by hand. When client work picked up, content was the first thing to slip.",
+                    audience: "SMBs, freelancers and small marketing teams that need a steady social presence without a full-time community manager.",
+                    infrastructure: {
+                        provider: "n8n + OpenAI + Buffer",
+                        services: ["Google Sheets (editorial line)", "OpenAI (per-network copy)", "n8n (orchestration + scheduling)", "Buffer API (scheduling + publishing)", "Google Sheets (metrics report)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    sheet[Editorial line · Sheets] --> n8n["n8n"]
+    n8n -->|prompt| ai["OpenAI: posts per network"]
+    ai --> n8n
+    n8n --> buffer[Buffer: schedule posts]
+    buffer -->|metrics| report[Weekly report · Sheets]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class n8n edge
+    class sheet,ai,buffer,report ext`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["ai", "content", "automation"],
+                            problem: "The same message reads great on LinkedIn and terrible on X",
+                            constraint: "Generating one generic post and reposting it everywhere produced flat content: too long for X, too casual for LinkedIn, missing the hashtags and tone each platform expects.",
+                            approach: "The same brief is expanded with a per-network prompt that fixes length, tone and format (hashtags, emojis, CTA). The LLM doesn't rewrite a text, it adapts from the base idea using each channel's rules.",
+                            algorithm: "Per-platform fan-out: one brief → N prompts with specific constraints → N variants. Each channel has its own style template.",
+                            codeFile: "n8n · OpenAI node (per network)",
+                            codeLang: "json",
+                            code: `{
+  "brief": "string",
+  "channels": {
+    "x":        { "max_chars": 280, "tone": "direct", "hashtags": 2 },
+    "linkedin": { "max_chars": 1300, "tone": "professional", "cta": true },
+    "instagram":{ "max_chars": 2200, "tone": "warm", "emojis": true }
+  }
+}
+// one brief → one variant per channel, not copy-paste`
+                        }
+                    ],
+                    metrics: [
+                        { value: "weeks ahead", label: "of content scheduled" },
+                        { value: "1 brief", label: "→ a post per network, adapted" },
+                        { value: "Monday report", label: "metrics without assembling them" }
+                    ],
+                    results: "The team approves a weekly calendar and publishing runs on its own. Monday brings the previous week's report, so content is no longer the first thing to slip when work piles up.",
+                    lessons: [
+                        {
+                            title: "Adapt per channel, don't repost",
+                            body: "The first attempt reposted the same text everywhere and it showed. Giving each platform its own prompt with length and tone was the difference between 'automated content' and 'content that looks hand-written'."
+                        }
+                    ]
                 }
             ]
         },
