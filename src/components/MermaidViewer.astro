@@ -414,8 +414,28 @@ const shareKey = (label || uid)
             renderViewer(viewer, originalSrc);
         });
 
-        // Initial render
-        renderViewer(viewer);
+        // Lazy initial render: only when the viewer scrolls near the viewport.
+        // Mermaid (~700KB from CDN) loads on demand instead of on every page mount.
+        let rendered = false;
+        const renderOnce = () => {
+            if (rendered) return;
+            rendered = true;
+            renderViewer(viewer);
+        };
+        if ("IntersectionObserver" in window) {
+            const io = new IntersectionObserver(
+                (entries, obs) => {
+                    if (entries.some((e) => e.isIntersecting)) {
+                        renderOnce();
+                        obs.disconnect();
+                    }
+                },
+                { rootMargin: "300px 0px" }
+            );
+            io.observe(viewer);
+        } else {
+            renderOnce();
+        }
     }
 
     document.querySelectorAll<HTMLElement>("[data-mermaid-viewer]").forEach(wireUp);
