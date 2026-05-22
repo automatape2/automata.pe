@@ -1306,7 +1306,59 @@ return { emit: true, payment_id, monto, cliente };`
                     description: "Scraper que revisa precios de competidores diariamente y alerta cuando hay cambios importantes.",
                     tech: ["Python", "n8n", "Telegram", "PostgreSQL"],
                     image: educationPortalImage,
-                    type: "caso"
+                    type: "caso",
+                    year: "2025",
+                    role: "Scraping · Automatizacion · Datos",
+                    fullDescription: "Un scraper en Python recorre las paginas de competidores cada dia, guarda el historico de precios en PostgreSQL, y un flujo n8n alerta por Telegram solo cuando hay cambios significativos. El equipo comercial deja de revisar webs a mano y reacciona el mismo dia a un cambio de precio.",
+                    problem: "Saber si la competencia subio o bajo precios requeria que alguien abriera 15 webs cada manana. Lento, inconsistente, y los cambios se descubrian tarde.",
+                    audience: "Retailers y e-commerce que compiten por precio y necesitan reaccionar rapido a movimientos de la competencia.",
+                    infrastructure: {
+                        provider: "Python scraper + n8n + PostgreSQL",
+                        services: ["Scraper Python (requests + parser, rotacion de user-agent)", "Cron diario (n8n schedule)", "PostgreSQL (historico de precios)", "n8n (comparacion + umbral)", "Telegram Bot (alertas)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    cron[Cron diario] --> scraper[Scraper Python]
+    scraper -->|precios de hoy| db[(PostgreSQL)]
+    db --> compare["n8n: compara vs ayer"]
+    compare -->|cambio > umbral| tg[Telegram]
+    compare -->|sin cambio| noop[No-op]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class cron,scraper,tg ext
+    class compare edge
+    class db,noop db`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["scraping", "data", "automation"],
+                            problem: "Alertar solo de cambios reales, no del ruido del scraping",
+                            constraint: "Los sitios cambian de markup, devuelven precios con formato variable o fallan intermitentemente. Alertar de cada diferencia llenaria Telegram de falsos positivos.",
+                            approach: "Se compara contra el ultimo precio valido en PostgreSQL y solo se alerta si el delta supera un umbral (ej. >2%). Lecturas nulas o atipicas se descartan en vez de tratarse como cambio.",
+                            algorithm: "Diff con umbral sobre historico: alerta = |precio_hoy - precio_prev| / precio_prev > umbral, ignorando outliers.",
+                            codeFile: "scraper/diff.py",
+                            codeLang: "python",
+                            code: `def should_alert(prev: float, today: float, threshold=0.02) -> bool:
+    if prev is None or today is None or today <= 0:
+        return False                      # lectura invalida → ignorar
+    delta = abs(today - prev) / prev
+    return delta > threshold              # solo cambios significativos`
+                        }
+                    ],
+                    metrics: [
+                        { value: "diario", label: "vs revision manual" },
+                        { value: ">2%", label: "umbral de alerta" },
+                        { value: "historico", label: "de precios en BD" }
+                    ],
+                    results: "Los cambios de precio de la competencia llegan por Telegram el mismo dia, sin abrir una sola web, y queda el historico para analizar tendencias.",
+                    lessons: [
+                        {
+                            title: "Una alerta sin umbral es ruido",
+                            body: "Alertar de cada diferencia, incluido el ruido del scraping, hace que la gente silencie el canal. Filtrar por umbral y descartar outliers fue lo que mantuvo las alertas accionables."
+                        }
+                    ]
                 },
                 {
                     slug: "iot-telemetria",
@@ -2834,7 +2886,59 @@ return { emit: true, payment_id, amount, customer };`
                     description: "Scraper that checks competitor prices daily and alerts you when significant changes occur.",
                     tech: ["Python", "n8n", "Telegram", "PostgreSQL"],
                     image: educationPortalImage,
-                    type: "case"
+                    type: "case",
+                    year: "2025",
+                    role: "Scraping · Automation · Data",
+                    fullDescription: "A Python scraper crawls competitor pages daily, stores price history in PostgreSQL, and an n8n flow alerts via Telegram only when there's a significant change. The sales team stops checking sites by hand and reacts same-day to a price move.",
+                    problem: "Knowing whether competitors raised or lowered prices required someone to open 15 sites every morning. Slow, inconsistent, and changes were caught late.",
+                    audience: "Retailers and e-commerce that compete on price and need to react fast to competitor moves.",
+                    infrastructure: {
+                        provider: "Python scraper + n8n + PostgreSQL",
+                        services: ["Python scraper (requests + parser, user-agent rotation)", "Daily cron (n8n schedule)", "PostgreSQL (price history)", "n8n (comparison + threshold)", "Telegram Bot (alerts)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    cron[Daily cron] --> scraper[Python scraper]
+    scraper -->|today's prices| db[(PostgreSQL)]
+    db --> compare["n8n: compare vs yesterday"]
+    compare -->|change > threshold| tg[Telegram]
+    compare -->|no change| noop[No-op]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class cron,scraper,tg ext
+    class compare edge
+    class db,noop db`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["scraping", "data", "automation"],
+                            problem: "Alert only on real changes, not on scraping noise",
+                            constraint: "Sites change markup, return prices in varying formats, or fail intermittently. Alerting on every diff would flood Telegram with false positives.",
+                            approach: "Compare against the last valid price in PostgreSQL and only alert if the delta exceeds a threshold (e.g. >2%). Null or outlier readings are discarded instead of treated as a change.",
+                            algorithm: "Threshold diff over history: alert = |price_today - price_prev| / price_prev > threshold, ignoring outliers.",
+                            codeFile: "scraper/diff.py",
+                            codeLang: "python",
+                            code: `def should_alert(prev: float, today: float, threshold=0.02) -> bool:
+    if prev is None or today is None or today <= 0:
+        return False                      # invalid reading → ignore
+    delta = abs(today - prev) / prev
+    return delta > threshold              # only significant changes`
+                        }
+                    ],
+                    metrics: [
+                        { value: "daily", label: "vs manual checking" },
+                        { value: ">2%", label: "alert threshold" },
+                        { value: "history", label: "of prices in the DB" }
+                    ],
+                    results: "Competitor price changes arrive on Telegram the same day, without opening a single site, and the history is there to analyze trends.",
+                    lessons: [
+                        {
+                            title: "An alert without a threshold is noise",
+                            body: "Alerting on every diff, scraping noise included, makes people mute the channel. Filtering by threshold and discarding outliers is what kept the alerts actionable."
+                        }
+                    ]
                 },
                 {
                     slug: "iot-telemetria",
