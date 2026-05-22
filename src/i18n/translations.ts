@@ -634,6 +634,40 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                         ai: ["Shiki (theming server-side)", "Mermaid (live diagram rendering)", "Claude Code (pair programming en cada sesion)"],
                         devops: ["Vercel / Cloudflare Pages", "Plausible analytics", "Sitemap + RSS autogenerados"]
                     },
+                    codeHighlights: [
+                        {
+                            file: "src/components/ProjectDetail.astro",
+                            lang: "typescript",
+                            note: "Tema Shiki custom: el sitio resaltea su propio codigo con su propia paleta",
+                            code: `const automataShikiTheme = {
+  name: "automata",
+  type: "dark",
+  tokenColors: [
+    { scope: ["keyword", "storage"],     settings: { foreground: "#4ADE80" } },
+    { scope: ["string"],                  settings: { foreground: "#FBBF24" } },
+    { scope: ["entity.name.type"],        settings: { foreground: "#06B6D4" } },
+    { scope: ["comment"], settings: { foreground: "#6B7280", fontStyle: "italic" } },
+  ],
+};
+
+// server-side en el frontmatter: cero JS al cliente
+const codeHtml = await codeToHtml(code, { lang, theme: automataShikiTheme });`
+                        },
+                        {
+                            file: "src/pages/og/[slug].svg.ts",
+                            lang: "typescript",
+                            note: "OG image por proyecto: SVG 1200x630 generado en build desde el record",
+                            code: `export function getStaticPaths() {
+  return translations.en.solutions.items.map((p) => ({ params: { slug: p.slug } }));
+}
+
+export const GET: APIRoute = ({ params }) => {
+  const project = items.find((p) => p.slug === params.slug);
+  const svg = renderOgCard(project); // terminal-chrome + title + tech stack
+  return new Response(svg, { headers: { "Content-Type": "image/svg+xml" } });
+};`
+                        }
+                    ],
                     techChallenges: [
                         {
                             tags: ["astro", "compiler", "patterns"],
@@ -895,6 +929,49 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                         data: ["MySQL 8.4 (60+ tablas)", "Redis (opcional)", "Storage local / S3"],
                         devops: ["GitHub Actions", "Pest (49 tests)", "Sentry", "MercadoPago webhooks", "Spatie ActivityLog"]
                     },
+                    codeHighlights: [
+                        {
+                            file: "app/Domain/Services/CalculadoraTributaria.php",
+                            lang: "php",
+                            note: "Un solo punto de calculo tributario: IGV 18%, exoneradas, gratuitas",
+                            code: `public function calcular(Comprobante $c): Totales
+{
+    $gravadas = $c->items->where('afectacion', '10'); // gravado
+    $baseIgv  = $gravadas->sum(fn ($i) => $i->cantidad * $i->valorUnitario);
+    $igv      = round($baseIgv * 0.18, 2);
+
+    return new Totales(
+        gravadas:   $baseIgv,
+        igv:        $igv,
+        exoneradas: $c->items->where('afectacion', '20')->sum('importe'),
+        gratuitas:  $c->items->where('afectacion', '21')->sum('importe'),
+        total:      $baseIgv + $igv,
+    );
+}`
+                        },
+                        {
+                            file: "app/Domain/UseCases/EmitirComprobante.php",
+                            lang: "php",
+                            note: "Use case invokable: firma local + dispatch async, sin tocar SUNAT en el request",
+                            code: `public function __invoke(EmitirDto $dto): Comprobante
+{
+    return DB::transaction(function () use ($dto) {
+        $numero = $this->numerador->siguiente($dto->empresa, $dto->tipo, $dto->serie);
+        $xml    = $this->firmador->firmar($this->builder->build($dto, $numero));
+
+        $comprobante = Comprobante::create([
+            ...$dto->toArray(),
+            'numero' => $numero,
+            'xml'    => $xml,
+            'estado' => Estado::Pendiente,
+        ]);
+
+        EnviarComprobanteJob::dispatch($comprobante); // SUNAT en background
+        return $comprobante;
+    });
+}`
+                        }
+                    ],
                     techChallenges: [
                         {
                             tags: ["concurrency", "database", "sunat"],
@@ -1781,6 +1858,40 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                         ai: ["Shiki (server-side theming)", "Mermaid (live diagram rendering)", "Claude Code (pair-programming each session)"],
                         devops: ["Vercel / Cloudflare Pages", "Plausible analytics", "Auto-generated sitemap + RSS"]
                     },
+                    codeHighlights: [
+                        {
+                            file: "src/components/ProjectDetail.astro",
+                            lang: "typescript",
+                            note: "Custom Shiki theme: the site highlights its own code with its own palette",
+                            code: `const automataShikiTheme = {
+  name: "automata",
+  type: "dark",
+  tokenColors: [
+    { scope: ["keyword", "storage"],     settings: { foreground: "#4ADE80" } },
+    { scope: ["string"],                  settings: { foreground: "#FBBF24" } },
+    { scope: ["entity.name.type"],        settings: { foreground: "#06B6D4" } },
+    { scope: ["comment"], settings: { foreground: "#6B7280", fontStyle: "italic" } },
+  ],
+};
+
+// server-side in the frontmatter: zero client JS
+const codeHtml = await codeToHtml(code, { lang, theme: automataShikiTheme });`
+                        },
+                        {
+                            file: "src/pages/og/[slug].svg.ts",
+                            lang: "typescript",
+                            note: "Per-project OG image: 1200x630 SVG generated at build from the record",
+                            code: `export function getStaticPaths() {
+  return translations.en.solutions.items.map((p) => ({ params: { slug: p.slug } }));
+}
+
+export const GET: APIRoute = ({ params }) => {
+  const project = items.find((p) => p.slug === params.slug);
+  const svg = renderOgCard(project); // terminal-chrome + title + tech stack
+  return new Response(svg, { headers: { "Content-Type": "image/svg+xml" } });
+};`
+                        }
+                    ],
                     techChallenges: [
                         {
                             tags: ["astro", "compiler", "patterns"],
@@ -2042,6 +2153,49 @@ async function withRetry<T>(fn: () => Promise<T>, max = 3) {
                         data: ["MySQL 8.4 (60+ tables)", "Redis (optional)", "Local storage / S3"],
                         devops: ["GitHub Actions", "Pest (49 tests)", "Sentry", "MercadoPago webhooks", "Spatie ActivityLog"]
                     },
+                    codeHighlights: [
+                        {
+                            file: "app/Domain/Services/TaxCalculator.php",
+                            lang: "php",
+                            note: "Single source of tax math: 18% IGV, exempt and free items",
+                            code: `public function calculate(Document $d): Totals
+{
+    $taxed   = $d->items->where('affectation', '10'); // taxed
+    $igvBase = $taxed->sum(fn ($i) => $i->qty * $i->unitValue);
+    $igv     = round($igvBase * 0.18, 2);
+
+    return new Totals(
+        taxed:   $igvBase,
+        igv:     $igv,
+        exempt:  $d->items->where('affectation', '20')->sum('amount'),
+        free:    $d->items->where('affectation', '21')->sum('amount'),
+        total:   $igvBase + $igv,
+    );
+}`
+                        },
+                        {
+                            file: "app/Domain/UseCases/IssueDocument.php",
+                            lang: "php",
+                            note: "Invokable use case: local sign + async dispatch, never touches SUNAT in-request",
+                            code: `public function __invoke(IssueDto $dto): Document
+{
+    return DB::transaction(function () use ($dto) {
+        $number = $this->numbering->next($dto->company, $dto->type, $dto->series);
+        $xml    = $this->signer->sign($this->builder->build($dto, $number));
+
+        $document = Document::create([
+            ...$dto->toArray(),
+            'number' => $number,
+            'xml'    => $xml,
+            'status' => Status::Pending,
+        ]);
+
+        SendDocumentJob::dispatch($document); // SUNAT in the background
+        return $document;
+    });
+}`
+                        }
+                    ],
                     techChallenges: [
                         {
                             tags: ["concurrency", "database", "sunat"],
