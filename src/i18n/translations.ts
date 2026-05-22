@@ -1314,7 +1314,66 @@ return { emit: true, payment_id, monto, cliente };`
                     description: "Lectura de sensores Modbus/MQTT en planta, dashboards en tiempo real y alertas tempranas de fallas.",
                     tech: ["MQTT", "Node-RED", "TimescaleDB", "Grafana"],
                     image: msCrmImage,
-                    type: "caso"
+                    type: "caso",
+                    year: "2024",
+                    role: "IoT · Datos · Observabilidad",
+                    fullDescription: "Telemetria para una planta industrial: gateways leen sensores Modbus/RS-485, publican por MQTT, Node-RED normaliza y persiste en TimescaleDB, y Grafana muestra dashboards en tiempo real con alertas tempranas de falla. Pasamos de revisar maquinas a mano a verlas desde un tablero.",
+                    problem: "El estado de las maquinas se sabia solo cuando algo ya se habia roto. Sin historico, sin alertas: el mantenimiento era reactivo y caro.",
+                    audience: "Plantas y operaciones industriales que tienen sensores/PLCs pero sin telemetria centralizada ni alertas.",
+                    infrastructure: {
+                        provider: "MQTT broker + Node-RED + TimescaleDB + Grafana",
+                        services: ["Gateways (Modbus/RS-485 → MQTT)", "MQTT broker (Mosquitto)", "Node-RED (normalizacion + reglas)", "TimescaleDB (serie temporal)", "Grafana (dashboards + alertas)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    sensores[Sensores Modbus/RS-485] --> gw[Gateway]
+    gw -->|MQTT| broker[MQTT Broker]
+    broker --> nodered[Node-RED]
+    nodered -->|normaliza| ts[(TimescaleDB)]
+    ts --> grafana[Grafana]
+    nodered -->|umbral excedido| alerta[Alerta temprana]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class sensores,gw,broker ext
+    class nodered edge
+    class ts,grafana,alerta db`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["iot", "timeseries", "data"],
+                            problem: "Guardar miles de lecturas/min sin que la BD explote ni el dashboard se ponga lento",
+                            constraint: "Decenas de sensores muestreando cada segundo generan millones de filas/dia. Una tabla normal en Postgres se vuelve impracticable para consultar.",
+                            approach: "TimescaleDB con hypertables particionadas por tiempo + continuous aggregates: los dashboards consultan rollups por minuto/hora, no las filas crudas. Retencion automatica de datos viejos.",
+                            algorithm: "Hypertable + continuous aggregate: el detalle se guarda comprimido, las consultas leen agregados precomputados. O(rollups) en vez de O(filas crudas).",
+                            codeFile: "schema.sql",
+                            codeLang: "sql",
+                            code: `SELECT create_hypertable('lecturas', 'ts');
+
+-- Rollup por minuto que el dashboard consulta
+CREATE MATERIALIZED VIEW lecturas_1m
+WITH (timescaledb.continuous) AS
+SELECT time_bucket('1 minute', ts) AS bucket,
+       sensor_id,
+       avg(valor) AS avg_v,
+       max(valor) AS max_v
+FROM lecturas
+GROUP BY bucket, sensor_id;`
+                        }
+                    ],
+                    metrics: [
+                        { value: "tiempo real", label: "estado de planta" },
+                        { value: "alertas", label: "antes de la falla" },
+                        { value: "historico", label: "para mantenimiento predictivo" }
+                    ],
+                    results: "El mantenimiento paso de reactivo a basado en datos: las anomalias disparan alertas antes del paro, y hay historico para analizar tendencias.",
+                    lessons: [
+                        {
+                            title: "Serie temporal != tabla relacional comun",
+                            body: "Intentar guardar telemetria en una tabla Postgres normal no escala. TimescaleDB con hypertables y continuous aggregates fue la diferencia entre dashboards instantaneos y consultas que timeouteaban."
+                        }
+                    ]
                 },
                 {
                     slug: "cloud-migration",
@@ -2714,7 +2773,66 @@ return { emit: true, payment_id, amount, customer };`
                     description: "Modbus/MQTT sensor readings on the plant floor, real-time dashboards and early failure alerts.",
                     tech: ["MQTT", "Node-RED", "TimescaleDB", "Grafana"],
                     image: msCrmImage,
-                    type: "case"
+                    type: "case",
+                    year: "2024",
+                    role: "IoT · Data · Observability",
+                    fullDescription: "Telemetry for an industrial plant: gateways read Modbus/RS-485 sensors, publish over MQTT, Node-RED normalizes and persists to TimescaleDB, and Grafana shows real-time dashboards with early failure alerts. We went from checking machines by hand to watching them from a board.",
+                    problem: "Machine state was only known once something had already broken. No history, no alerts: maintenance was reactive and expensive.",
+                    audience: "Plants and industrial operations that have sensors/PLCs but no centralized telemetry or alerting.",
+                    infrastructure: {
+                        provider: "MQTT broker + Node-RED + TimescaleDB + Grafana",
+                        services: ["Gateways (Modbus/RS-485 → MQTT)", "MQTT broker (Mosquitto)", "Node-RED (normalization + rules)", "TimescaleDB (time series)", "Grafana (dashboards + alerts)"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    sensors[Modbus/RS-485 sensors] --> gw[Gateway]
+    gw -->|MQTT| broker[MQTT Broker]
+    broker --> nodered[Node-RED]
+    nodered -->|normalizes| ts[(TimescaleDB)]
+    ts --> grafana[Grafana]
+    nodered -->|threshold exceeded| alert[Early alert]
+
+    classDef edge fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class sensors,gw,broker ext
+    class nodered edge
+    class ts,grafana,alert db`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["iot", "timeseries", "data"],
+                            problem: "Store thousands of readings/min without the DB exploding or the dashboard crawling",
+                            constraint: "Dozens of sensors sampling every second generate millions of rows/day. A plain Postgres table becomes impractical to query.",
+                            approach: "TimescaleDB with time-partitioned hypertables + continuous aggregates: dashboards query per-minute/hour rollups, not raw rows. Automatic retention of old data.",
+                            algorithm: "Hypertable + continuous aggregate: detail is stored compressed, queries read precomputed aggregates. O(rollups) instead of O(raw rows).",
+                            codeFile: "schema.sql",
+                            codeLang: "sql",
+                            code: `SELECT create_hypertable('readings', 'ts');
+
+-- Per-minute rollup the dashboard queries
+CREATE MATERIALIZED VIEW readings_1m
+WITH (timescaledb.continuous) AS
+SELECT time_bucket('1 minute', ts) AS bucket,
+       sensor_id,
+       avg(value) AS avg_v,
+       max(value) AS max_v
+FROM readings
+GROUP BY bucket, sensor_id;`
+                        }
+                    ],
+                    metrics: [
+                        { value: "real time", label: "plant state" },
+                        { value: "alerts", label: "before the failure" },
+                        { value: "history", label: "for predictive maintenance" }
+                    ],
+                    results: "Maintenance went from reactive to data-driven: anomalies trigger alerts before downtime, and there's history to analyze trends.",
+                    lessons: [
+                        {
+                            title: "Time series != ordinary relational table",
+                            body: "Trying to store telemetry in a plain Postgres table doesn't scale. TimescaleDB with hypertables and continuous aggregates was the difference between instant dashboards and queries that timed out."
+                        }
+                    ]
                 },
                 {
                     slug: "cloud-migration",
