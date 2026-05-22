@@ -5,13 +5,14 @@ import MermaidViewer from "./MermaidViewer.astro";
 import MasterDetail from "./MasterDetail.astro";
 import Carousel from "./Carousel.astro";
 import TableOfContents from "./TableOfContents.astro";
+import type { Project } from "../types/project";
 
 interface Props {
-    project: any;
+    project: Project;
     lang: "en" | "es";
-    prev?: any;
-    next?: any;
-    related?: any[];
+    prev?: Project | null;
+    next?: Project | null;
+    related?: Project[];
 }
 
 const { project, lang, prev, next, related = [] } = Astro.props;
