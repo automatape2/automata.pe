@@ -34,6 +34,33 @@ jobs:
           path: dist/
           retention-days: 5
 
+  e2e:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright (chromium)
+        run: |
+          npm i -D @playwright/test@^1.48
+          npx playwright install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+
+      - name: Run smoke tests
+        run: npx playwright test
+
   lighthouse:
     needs: build
     runs-on: ubuntu-latest
