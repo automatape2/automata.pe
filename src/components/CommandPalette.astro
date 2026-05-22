@@ -24,7 +24,7 @@ const commandsJson = JSON.stringify(commands);
             <input
                 id="cmdk-input"
                 type="text"
-                placeholder="search projects, sections…"
+                placeholder="search projects, sections, content…"
                 autocomplete="off"
                 spellcheck="false"
                 aria-label="Search"
@@ -132,8 +132,15 @@ const commandsJson = JSON.stringify(commands);
         text-transform: uppercase;
         letter-spacing: 0.1em;
     }
-    .cmdk-label { flex: 1; font-size: 13px; }
-    .cmdk-sub { font-size: 11px; color: var(--fg-muted); }
+    .cmdk-label { flex: 1; min-width: 0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cmdk-sub {
+        font-size: 11px;
+        color: var(--fg-muted);
+        max-width: 55%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
     .cmdk-arrow {
         opacity: 0;
         color: var(--green);
@@ -180,6 +187,33 @@ const commandsJson = JSON.stringify(commands);
         let selected = 0;
         let filtered = commands.slice();
 
+        // ---- Full-text content index (lazy-loaded on first open) ----
+        const lang = (document.documentElement.lang || "en").startsWith("es") ? "es" : "en";
+        let contentIndex = null;       // Entry[] for the current lang, or null until fetched
+        let indexLoading = false;
+        function loadIndex() {
+            if (contentIndex !== null || indexLoading) return;
+            indexLoading = true;
+            fetch("/search-index.json")
+                .then((r) => (r.ok ? r.json() : null))
+                .then((data) => {
+                    contentIndex = (data && data[lang]) || [];
+                    // If a query is already typed, re-run with content now available
+                    if (input.value.trim().length >= 2) applyFilter();
+                })
+                .catch(() => { contentIndex = []; })
+                .finally(() => { indexLoading = false; });
+        }
+
+        // Build a ~70-char snippet centered on the first query hit
+        function snippet(text, q) {
+            const i = text.indexOf(q);
+            if (i === -1) return text.slice(0, 70);
+            const start = Math.max(0, i - 28);
+            const end = Math.min(text.length, i + q.length + 42);
+            return (start > 0 ? "…" : "") + text.slice(start, end).trim() + (end < text.length ? "…" : "");
+        }
+
         // Cheap fuzzy: every query char must appear in label/sublabel/tag in order
         function fuzzy(query, item) {
             if (!query) return true;
@@ -194,6 +228,37 @@ const commandsJson = JSON.stringify(commands);
             return true;
         }
 
+        // Combine static commands (fuzzy) with full-text content matches (substring)
+        function applyFilter() {
+            const raw = input.value.trim();
+            const q = raw.toLowerCase();
+            const base = commands.filter((c) => fuzzy(raw, c));
+
+            let content = [];
+            if (q.length >= 2 && Array.isArray(contentIndex)) {
+                content = contentIndex
+                    .filter((e) => e.text.includes(q))
+                    .slice(0, 8)
+                    .map((e) => ({
+                        label: e.title,
+                        sublabel: snippet(e.text, q),
+                        href: e.href,
+                        tag: lang === "es" ? "texto" : "match",
+                    }));
+            }
+            filtered = base.concat(content);
+            selected = 0;
+            render();
+        }
+
+        function esc(s) {
+            return String(s ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
         function render() {
             list.innerHTML = "";
             if (filtered.length === 0) {
@@ -206,10 +271,10 @@ const commandsJson = JSON.stringify(commands);
             filtered.forEach((cmd, i) => {
                 const li = document.createElement("li");
                 li.innerHTML = `
-                    <a class="cmdk-item" data-selected="${i === selected}" href="${cmd.href}">
-                        ${cmd.tag ? `<span class="cmdk-tag">${cmd.tag}</span>` : ""}
-                        <span class="cmdk-label">${cmd.label}</span>
-                        ${cmd.sublabel ? `<span class="cmdk-sub">${cmd.sublabel}</span>` : ""}
+                    <a class="cmdk-item" data-selected="${i === selected}" href="${esc(cmd.href)}">
+                        ${cmd.tag ? `<span class="cmdk-tag">${esc(cmd.tag)}</span>` : ""}
+                        <span class="cmdk-label">${esc(cmd.label)}</span>
+                        ${cmd.sublabel ? `<span class="cmdk-sub">${esc(cmd.sublabel)}</span>` : ""}
                         <span class="cmdk-arrow">↵</span>
                     </a>
                 `;
@@ -225,6 +290,7 @@ const commandsJson = JSON.stringify(commands);
             filtered = commands.slice();
             selected = 0;
             render();
+            loadIndex();
             setTimeout(() => input.focus(), 10);
             document.body.style.overflow = "hidden";
             window.__focusTrap && window.__focusTrap.enable(overlay);
@@ -267,12 +333,8 @@ const commandsJson = JSON.stringify(commands);
             else if (e.key === "Enter") { e.preventDefault(); activate(); }
         });
 
-        // Input updates filter
-        input.addEventListener("input", () => {
-            filtered = commands.filter((c) => fuzzy(input.value, c));
-            selected = 0;
-            render();
-        });
+        // Input updates filter (static commands + full-text content)
+        input.addEventListener("input", applyFilter);
 
         // Click outside the panel closes
         overlay.addEventListener("click", (e) => {
