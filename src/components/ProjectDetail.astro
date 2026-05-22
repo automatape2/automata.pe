@@ -324,7 +324,9 @@ if (project.lessons && project.lessons.length > 0) {
                     loading="eager"
                     width={720}
                     height={480}
-                    format="webp"
+                    widths={[360, 540, 720]}
+                    sizes="(max-width: 1024px) 100vw, 480px"
+                    formats={["avif", "webp"]}
                 />
             </div>
         </div>
@@ -728,7 +730,9 @@ if (project.lessons && project.lessons.length > 0) {
                             loading="lazy"
                             width={500}
                             height={320}
-                            format="webp"
+                            widths={[250, 500]}
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            formats={["avif", "webp"]}
                         />
                     </a>
                 ))}

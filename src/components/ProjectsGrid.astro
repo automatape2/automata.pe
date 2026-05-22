@@ -95,7 +95,9 @@ const labels = lang === "es"
                         loading="lazy"
                         width={600}
                         height={340}
-                        format="webp"
+                        widths={[300, 600]}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        formats={["avif", "webp"]}
                     />
                     <div class="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2 py-1 text-[10px] uppercase tracking-wider bg-black/80 backdrop-blur border border-[var(--line-bright)] text-[var(--green)]">
                         <span class="w-1 h-1 rounded-full bg-[var(--green)]"></span>
