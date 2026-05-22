@@ -1106,7 +1106,68 @@ ConsultarTicketGreJob::dispatch($comprobante, $ticket)
                     tech: ["Laravel", "Livewire", "MySQL", "APIs"],
                     image: educationPortalImage,
                     demoUrl: "https://automata.pe/education_portal",
-                    type: "producto"
+                    type: "producto",
+                    year: "2024",
+                    role: "FE · BE · Integraciones",
+                    fullDescription: "Portal para una institucion educativa que centraliza recursos, comunicaciones y calendario academico. Reemplazo un flujo de correos y PDFs sueltos por un panel donde docentes publican material, los alumnos reciben notificaciones segmentadas y todo se sincroniza con Google Calendar.",
+                    problem: "La comunicacion vivia en grupos de WhatsApp y emails: material perdido, avisos que no llegaban, fechas desactualizadas. Nadie tenia una fuente unica de verdad del calendario academico.",
+                    audience: "Coordinadores academicos, docentes y alumnos de una institucion con varios programas en paralelo.",
+                    infrastructure: {
+                        provider: "Laravel + MySQL (VPS)",
+                        services: ["PHP-FPM + Laravel", "MySQL", "Google Calendar API", "Cola para notificaciones (email + push)", "Storage para material"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    docente[Docente] -->|publica recurso| app["Portal (Laravel + Livewire)"]
+    app --> db[(MySQL)]
+    app -->|notifica| queue[Cola]
+    queue --> mail[Email / Push]
+    app -->|sincroniza| gcal[Google Calendar]
+    alumno[Alumno] --> app
+
+    classDef edge fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class docente,alumno ext
+    class app,queue edge
+    class db,mail,gcal db`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["notifications", "laravel", "ux"],
+                            problem: "Notificar solo a los alumnos relevantes sin spamear a toda la institucion",
+                            constraint: "Un aviso de un curso no debe llegar a alumnos de otros programas. Los grupos cambian cada ciclo.",
+                            approach: "Segmentacion por relaciones (curso → matriculas → alumnos) resuelta en una sola query, y notificaciones encoladas por canal (email/push) segun la preferencia del alumno.",
+                            algorithm: "Fan-out por relacion en cola: una notificacion se expande a N destinatarios via job batch, respetando opt-in por canal.",
+                            codeFile: "app/Notifications/RecursoPublicado.php",
+                            codeLang: "php",
+                            code: `public function via(object $notifiable): array
+{
+    return $notifiable->prefersPush()
+        ? ['database', 'broadcast']
+        : ['database', 'mail'];
+}
+
+// El curso hace fan-out solo a sus matriculados
+Notification::send(
+    $curso->alumnosActivos(),       // relacion, no toda la BD
+    new RecursoPublicado($recurso)
+);`,
+                            outcome: "Avisos llegan solo al curso correcto; los alumnos eligen canal. Cayeron los 'no me llego' a casi cero."
+                        }
+                    ],
+                    metrics: [
+                        { value: "1 fuente", label: "de verdad del calendario" },
+                        { value: "0 PDFs", label: "sueltos por email" },
+                        { value: "push + email", label: "por preferencia" }
+                    ],
+                    results: "El calendario academico y el material dejaron de vivir en WhatsApp. Coordinacion publica una vez y el sistema segmenta y notifica.",
+                    lessons: [
+                        {
+                            title: "Segmentar por relacion, no por lista manual",
+                            body: "Mantener listas de destinatarios a mano se desincroniza cada ciclo. Derivar los destinatarios de la relacion curso→matricula hizo que la segmentacion fuera siempre correcta sin mantenimiento."
+                        }
+                    ]
                 },
                 {
                     slug: "whatsapp-cotizador",
@@ -2330,7 +2391,68 @@ CheckGreTicketJob::dispatch($document, $ticket)
                     tech: ["Laravel", "Livewire", "MySQL", "APIs"],
                     image: educationPortalImage,
                     demoUrl: "https://automata.pe/education_portal",
-                    type: "product"
+                    type: "product",
+                    year: "2024",
+                    role: "FE · BE · Integrations",
+                    fullDescription: "Portal for an educational institution that centralizes resources, communications and the academic calendar. Replaced a tangle of loose emails and PDFs with a panel where teachers publish material, students get segmented notifications, and everything syncs to Google Calendar.",
+                    problem: "Communication lived in WhatsApp groups and email: lost material, notices that never arrived, stale dates. No one had a single source of truth for the academic calendar.",
+                    audience: "Academic coordinators, teachers and students at an institution running several programs in parallel.",
+                    infrastructure: {
+                        provider: "Laravel + MySQL (VPS)",
+                        services: ["PHP-FPM + Laravel", "MySQL", "Google Calendar API", "Queue for notifications (email + push)", "Storage for material"],
+                        diagram: {
+                            mermaid: `flowchart TD
+    teacher[Teacher] -->|publishes resource| app["Portal (Laravel + Livewire)"]
+    app --> db[(MySQL)]
+    app -->|notifies| queue[Queue]
+    queue --> mail[Email / Push]
+    app -->|syncs| gcal[Google Calendar]
+    student[Student] --> app
+
+    classDef edge fill:#0D1117,stroke:#4ADE80,color:#E5E7EB
+    classDef db fill:#0D1117,stroke:#06B6D4,color:#E5E7EB
+    classDef ext fill:#111827,stroke:#374151,color:#9CA3AF
+    class teacher,student ext
+    class app,queue edge
+    class db,mail,gcal db`
+                        }
+                    },
+                    techChallenges: [
+                        {
+                            tags: ["notifications", "laravel", "ux"],
+                            problem: "Notify only the relevant students without spamming the whole institution",
+                            constraint: "A course notice must not reach students in other programs. Groups change every term.",
+                            approach: "Segmentation by relationship (course → enrollments → students) resolved in one query, with notifications queued per channel (email/push) based on each student's preference.",
+                            algorithm: "Relationship fan-out on a queue: one notification expands to N recipients via a batch job, honoring per-channel opt-in.",
+                            codeFile: "app/Notifications/ResourcePublished.php",
+                            codeLang: "php",
+                            code: `public function via(object $notifiable): array
+{
+    return $notifiable->prefersPush()
+        ? ['database', 'broadcast']
+        : ['database', 'mail'];
+}
+
+// The course fans out only to its enrolled students
+Notification::send(
+    $course->activeStudents(),     // relationship, not the whole DB
+    new ResourcePublished($resource)
+);`,
+                            outcome: "Notices reach only the right course; students pick their channel. 'I didn't get it' complaints dropped to near zero."
+                        }
+                    ],
+                    metrics: [
+                        { value: "1 source", label: "of truth for the calendar" },
+                        { value: "0 PDFs", label: "loose over email" },
+                        { value: "push + email", label: "by preference" }
+                    ],
+                    results: "The academic calendar and material stopped living in WhatsApp. Coordination publishes once and the system segments and notifies.",
+                    lessons: [
+                        {
+                            title: "Segment by relationship, not by manual list",
+                            body: "Hand-maintained recipient lists drift out of sync every term. Deriving recipients from the course→enrollment relationship made segmentation always correct with zero maintenance."
+                        }
+                    ]
                 },
                 {
                     slug: "whatsapp-cotizador",
