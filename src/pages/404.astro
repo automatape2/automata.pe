@@ -1,10 +1,18 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { getLangFromUrl } from "../i18n/utils";
+import { translations } from "../i18n/translations";
 
 const lang = getLangFromUrl(Astro.url);
 const homeHref = lang === "es" ? "/" : "/en";
 const requested = Astro.url.pathname || "/";
+const projectsBase = lang === "es" ? "/es/projects" : "/projects";
+
+// Known project slugs, surfaced to the client for fuzzy "did you mean?".
+const slugs = (translations[lang] as any).solutions.items.map((p: any) => ({
+    slug: p.slug,
+    title: p.title,
+}));
 
 const L = lang === "es"
     ? {
@@ -58,6 +66,14 @@ const L = lang === "es"
             </div>
         </div>
 
+        <!-- Fuzzy "did you mean?" — filled by JS when the path looks like a project slug -->
+        <div id="did-you-mean" class="hidden panel p-5 mb-8 border border-[var(--line)]">
+            <div class="text-xs text-[var(--fg-muted)] mb-3">
+                <span class="text-[var(--amber)]">?</span> {lang === "es" ? "quisiste decir" : "did you mean"}:
+            </div>
+            <ul id="dym-list" class="space-y-1 text-sm font-mono"></ul>
+        </div>
+
         <div class="flex flex-wrap gap-3">
             <a href={homeHref} class="btn-cli btn-cli--primary">
                 <span>{L.home}</span>
@@ -67,4 +83,47 @@ const L = lang === "es"
             </a>
         </div>
     </div>
+
+    <script is:inline define:vars={{ slugs, projectsBase, requested }}>
+        (function () {
+            // Levenshtein distance for fuzzy matching the requested path's last segment.
+            function lev(a, b) {
+                const m = a.length, n = b.length;
+                const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+                for (let j = 0; j <= n; j++) d[0][j] = j;
+                for (let i = 1; i <= m; i++)
+                    for (let j = 1; j <= n; j++)
+                        d[i][j] = Math.min(
+                            d[i - 1][j] + 1,
+                            d[i][j - 1] + 1,
+                            d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+                        );
+                return d[m][n];
+            }
+
+            const seg = (requested.split("/").filter(Boolean).pop() || "").toLowerCase();
+            if (!seg) return;
+
+            const ranked = slugs
+                .map((s) => ({ ...s, dist: lev(seg, s.slug.toLowerCase()) }))
+                .filter((s) => s.dist <= Math.max(3, Math.floor(s.slug.length * 0.5)))
+                .sort((a, b) => a.dist - b.dist)
+                .slice(0, 3);
+
+            if (ranked.length === 0) return;
+
+            const list = document.getElementById("dym-list");
+            ranked.forEach((s) => {
+                const li = document.createElement("li");
+                li.innerHTML =
+                    '<a href="' + projectsBase + "/" + s.slug + '" class="inline-flex items-center gap-2 text-[var(--fg-dim)] hover:text-[var(--green)] transition-colors">' +
+                    '<span class="text-[var(--green)]">▸</span>' +
+                    "<span>" + s.title + '</span>' +
+                    '<span class="text-[var(--fg-muted)] text-xs">' + projectsBase + "/" + s.slug + "</span>" +
+                    "</a>";
+                list.appendChild(li);
+            });
+            document.getElementById("did-you-mean").classList.remove("hidden");
+        })();
+    </script>
 </Layout>

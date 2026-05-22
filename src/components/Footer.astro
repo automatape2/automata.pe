@@ -47,6 +47,26 @@ const year = new Date().getFullYear();
             </div>
         </div>
 
+        <!-- Built with -->
+        <div class="pt-6 border-t border-[var(--line)] mb-4">
+            <div class="text-[11px] text-[var(--fg-muted)] font-mono">
+                <span class="text-[var(--fg-muted)]">// built with </span>
+                {[
+                    { name: "Astro", url: "https://astro.build" },
+                    { name: "TypeScript", url: "https://www.typescriptlang.org" },
+                    { name: "Tailwind", url: "https://tailwindcss.com" },
+                    { name: "Mermaid", url: "https://mermaid.js.org" },
+                    { name: "Shiki", url: "https://shiki.style" },
+                    { name: "GSAP", url: "https://gsap.com" },
+                ].map((dep, i) => (
+                    <>
+                        {i > 0 && <span class="text-[var(--line-bright)]"> · </span>}
+                        <a href={dep.url} target="_blank" rel="noopener noreferrer" class="text-[var(--fg-dim)] hover:text-[var(--green)] transition-colors">{dep.name}</a>
+                    </>
+                ))}
+            </div>
+        </div>
+
         <div class="pt-6 border-t border-[var(--line)] flex flex-col md:flex-row justify-between gap-3 text-xs text-[var(--fg-muted)]">
             <p>
                 <span class="text-[var(--green)]">●</span> {year} {t.footer.copyright}

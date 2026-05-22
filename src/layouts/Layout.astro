@@ -208,6 +208,12 @@ const ldPayload = structuredData ?? (
         <title>{title}</title>
     </head>
     <body class="bg-terminal">
+        <!-- Skip to content (visible on keyboard focus) -->
+        <a href="#main" class="skip-link">$ skip to content</a>
+
+        <!-- Reading progress bar -->
+        <div id="read-progress" aria-hidden="true"></div>
+
         <!-- Grid backdrop -->
         <div class="fixed inset-0 -z-10 bg-grid pointer-events-none"></div>
 
@@ -265,7 +271,7 @@ const ldPayload = structuredData ?? (
             </nav>
         </header>
 
-        <main>
+        <main id="main">
             <slot />
         </main>
 
@@ -357,6 +363,29 @@ const ldPayload = structuredData ?? (
                     );
                 });
             });
+        </script>
+
+        <!-- Reading progress bar -->
+        <script is:inline>
+            (function () {
+                const bar = document.getElementById("read-progress");
+                if (!bar) return;
+                let ticking = false;
+                function update() {
+                    const doc = document.documentElement;
+                    const scrollable = doc.scrollHeight - doc.clientHeight;
+                    const pct = scrollable > 0 ? (doc.scrollTop / scrollable) * 100 : 0;
+                    bar.style.width = pct + "%";
+                    ticking = false;
+                }
+                document.addEventListener("scroll", function () {
+                    if (!ticking) {
+                        window.requestAnimationFrame(update);
+                        ticking = true;
+                    }
+                }, { passive: true });
+                update();
+            })();
         </script>
     </body>
 </html>

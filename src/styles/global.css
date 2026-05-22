@@ -433,6 +433,42 @@ body {
 }
 
 /* ========================================
+   Skip link + reading progress bar
+   ======================================== */
+
+.skip-link {
+    position: fixed;
+    top: -100px;
+    left: 12px;
+    z-index: 300;
+    padding: 8px 14px;
+    background: var(--green);
+    color: #000;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 150ms;
+}
+.skip-link:focus {
+    top: 12px;
+    outline: 2px solid #000;
+    outline-offset: 2px;
+}
+
+#read-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--green);
+    z-index: 60;
+    transition: width 80ms linear;
+    pointer-events: none;
+}
+
+/* ========================================
    Cross-document view transitions
    Browser-native (Chrome/Edge). Other browsers fall through to a
    normal navigation. No SPA router → all our client scripts keep
